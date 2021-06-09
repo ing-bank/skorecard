@@ -1,0 +1,2 @@
+include skorecard/data/*.zip
+include skorecard/apps/assets/*.css

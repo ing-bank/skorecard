@@ -1,0 +1,236 @@
+x1:
+  feature_name: x1
+  map:
+  - 75000.0
+  - 145000.0
+  - 375000.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials:
+    special_demo:
+    - 50000
+  type: numerical
+x10:
+  feature_name: x10
+  map:
+  - 1.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x11:
+  feature_name: x11
+  map:
+  - 1.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x12:
+  feature_name: x12
+  map:
+  - 782.5
+  - 12423.0
+  - 52063.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x13:
+  feature_name: x13
+  map:
+  - 420.5
+  - 11993.0
+  - 56874.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x14:
+  feature_name: x14
+  map: []
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x15:
+  feature_name: x15
+  map: []
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x16:
+  feature_name: x16
+  map:
+  - 391.5
+  - 12552.5
+  - 53008.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x17:
+  feature_name: x17
+  map:
+  - 2501.5
+  - 8843.5
+  - 36990.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x18:
+  feature_name: x18
+  map:
+  - 21.0
+  - 4552.5
+  - 15001.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x19:
+  feature_name: x19
+  map:
+  - 131.5
+  - 4970.5
+  - 15001.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x2:
+  feature_name: x2
+  map:
+    1.0: 1
+    2.0: 0
+  missing_bucket: null
+  other_bucket: null
+  right: true
+  specials: {}
+  type: categorical
+x20:
+  feature_name: x20
+  map:
+  - 16.5
+  - 4513.5
+  - 12490.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x21:
+  feature_name: x21
+  map:
+  - 0.5
+  - 1608.5
+  - 4843.0
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x22:
+  feature_name: x22
+  map:
+  - 0.5
+  - 2501.5
+  - 13769.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x23:
+  feature_name: x23
+  map:
+  - 1.5
+  - 2000.5
+  - 9849.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x3:
+  feature_name: x3
+  map:
+    1.0: 0
+    2.0: 1
+    3.0: 2
+  missing_bucket: null
+  other_bucket: null
+  right: true
+  specials: {}
+  type: categorical
+x4:
+  feature_name: x4
+  map:
+    1.0: 1
+    2.0: 0
+  missing_bucket: null
+  other_bucket: null
+  right: true
+  specials: {}
+  type: categorical
+x5:
+  feature_name: x5
+  map:
+  - 25.5
+  - 35.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x6:
+  feature_name: x6
+  map:
+  - -0.5
+  - 0.5
+  - 1.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x7:
+  feature_name: x7
+  map:
+  - 1.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x8:
+  feature_name: x8
+  map:
+  - 1.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical
+x9:
+  feature_name: x9
+  map:
+  - 1.5
+  missing_bucket: null
+  other_bucket: null
+  right: false
+  specials: {}
+  type: numerical

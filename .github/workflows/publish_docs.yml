@@ -1,0 +1,33 @@
+name: Publish Documentation
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        miniconda-version: "latest"
+        python-version: "3.7"
+        activate-environment: deploydocs
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade setuptools wheel twine
+        pip install ".[all]"
+        # In our docs, we need to output static images
+        # That requires additional setup
+        conda install --yes -c anaconda psutil 
+        conda install --yes -c plotly plotly-orca
+
+    - name: Deploy mkdocs site
+      run: |
+        mkdocs gh-deploy --force

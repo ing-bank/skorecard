@@ -1,0 +1,159 @@
+site_name: skorecard
+repo_url: https://github.com/timvink/skorecard
+site_url: https://github.com/timvink/skorecard
+edit_uri: ""
+site_description: Build credit risk scorecards with sklearn-compatible components
+site_author: RPAA
+copyright: Copyright &copy; 2021.
+
+theme:
+    name: material
+    palette:
+      # Light mode
+      - media: "(prefers-color-scheme: light)"
+        scheme: default
+        primary: white
+        accent: deep orange
+        toggle:
+          icon: material/toggle-switch-off-outline
+          name: Switch to dark mode
+
+      # Dark mode
+      - media: "(prefers-color-scheme: dark)"
+        scheme: slate
+        primary: deep orange
+        accent: deep purple
+        toggle:
+          icon: material/toggle-switch
+          name: Switch to light mode
+
+    font: false
+    icon:
+        repo: fontawesome/brands/github
+    logo: assets/img/skorecard_logo.svg
+    favicon: assets/img/skorecard_logo.svg
+    favicon: assets/images/cli.png
+    features:
+        - navigation.tracking
+        - navigation.sections
+        - header.autohide
+        - navigation.tabs
+        - navigation.top
+
+
+plugins:
+    - search
+    - mknotebooks:
+        enable_default_jupyter_cell_styling: false
+        enable_default_pandas_dataframe_styling: true
+    - mkdocstrings:
+        default_handler: python
+        handlers:
+            python:
+                selection:
+                    inherited_members: true
+                rendering:
+                    show_source: false
+                    show_root_heading: false
+        watch:
+            - skorecard
+    - git-revision-date-localized:
+        type: timeago
+
+nav:
+    - Home: 
+        - Index: index.md
+        - Contributing: contributing.md
+    - Tutorials:
+        - Using bucketers: tutorials/using_bucketers.ipynb
+        - Using BucketingProcess: tutorials/using-bucketing-process.ipynb
+        - Save bucketers to file: tutorials/save_buckets_to_file.ipynb
+        - Manually defining buckets: tutorials/using_manually_defined_buckets.ipynb
+        - Assessing bucket quality: tutorials/psi_and_iv.ipynb
+        - Reporting: tutorials/reporting.ipynb
+    - How to:
+        - howto/howto-placeholder.md
+        - Skorecard from A-Z:
+            - Intro: howto/intro.md
+            - Bucketing step: howto/1_bucketing.ipynb
+            - Selecting features: howto/2_feature_selection.ipynb
+            - Scorecard model: howto/3_skorecard_model.ipynb
+        - Optimizations in the bucketing process: howto/Optimizations.ipynb
+    - API: 
+        - bucketers:
+            - api/bucketers/OptimalBucketer.md
+            - api/bucketers/AgglomerativeClusteringBucketer.md
+            - api/bucketers/DecisionTreeBucketer.md
+            - api/bucketers/EqualFrequencyBucketer.md
+            - api/bucketers/EqualWidthBucketer.md
+            - api/bucketers/OrdinalCategoricalBucketer.md
+            - api/bucketers/UserInputBucketer.md
+            - api/bucketers/AsIsNumericalBucketer.md
+            - api/bucketers/AsIsCategoricalBucketer.md
+        - pipeline:
+            - api/pipeline/BucketingProcess.md
+            - api/pipeline/KeepPandas.md
+            - api/pipeline/SkorecardPipeline.md
+            - api/pipeline/to_skorecard_pipeline.md
+        - preprocessing:
+            - api/preprocessing/ColumnSelector.md
+            - api/preprocessing/WoeEncoder.md
+        # # - apps:
+        #     - api/apps/BucketTweakerApp.md
+        - linear_model:
+            - api/linear_model/LogisticRegression.md
+        - reporting:
+            - api/reporting/iv.md
+            - api/reporting/psi.md
+        - datasets:
+            - api/datasets/load_uci_credit_card.md
+    - Discussion:
+        - discussion/scorecard_concepts.md
+
+
+markdown_extensions:
+    - codehilite:
+        linenums: false
+        guess_lang: false
+    - attr_list
+    - abbr
+    - meta
+    - def_list
+    - admonition
+    - footnotes
+    - pymdownx.details
+    - pymdownx.tabbed
+    - pymdownx.superfences
+    - pymdownx.details
+    - pymdownx.keys
+    - pymdownx.snippets
+    - pymdownx.emoji:
+        emoji_index: !!python/name:materialx.emoji.twemoji
+        emoji_generator: !!python/name:materialx.emoji.to_svg
+    - pymdownx.inlinehilite
+    - pymdownx.highlight:
+        use_pygments: true
+    - pymdownx.critic:
+        mode: view
+    - pymdownx.betterem:
+        smart_enable: all
+    - pymdownx.tasklist:
+        custom_checkbox: true
+    - pymdownx.tasklist:
+        clickable_checkbox: true
+    - pymdownx.arithmatex:
+        generic: true
+    - pymdownx.caret
+    - pymdownx.mark
+    - pymdownx.tilde
+    - pymdownx.smartsymbols
+    - toc:
+        permalink: true
+
+extra_javascript:
+    - assets/javascripts/config.js
+    - https://polyfill.io/v3/polyfill.min.js?features=es6
+    - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra_css:
+  - assets/stylesheets/mknotebooks.css
