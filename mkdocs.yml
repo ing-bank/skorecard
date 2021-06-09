@@ -68,6 +68,7 @@ nav:
         - Using bucketers: tutorials/using_bucketers.ipynb
         - Using BucketingProcess: tutorials/using-bucketing-process.ipynb
         - Save bucketers to file: tutorials/save_buckets_to_file.ipynb
+        - Create bucketer from file: tutorials/create_bucketer_from_file.ipynb
         - Manually defining buckets: tutorials/using_manually_defined_buckets.ipynb
         - Assessing bucket quality: tutorials/psi_and_iv.ipynb
         - Reporting: tutorials/reporting.ipynb
