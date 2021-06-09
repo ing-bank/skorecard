@@ -39,7 +39,7 @@ We use [semver](https://semver.org/) for versioning. When we are ready for a rel
 git tag -a v0.1 -m "skorecard v0.1" && git push origin v0.1
 ```
 
-When we create a new github release a [github action](https://github.com/timvink/skorecard/blob/main/.github/workflows/publish_pypi.yml) is triggered that:
+When we create a new github release a [github action](https://github.com/ing-bank/skorecard/blob/main/.github/workflows/publish_pypi.yml) is triggered that:
 
 - a new version will be deployed to pypi
 - the docs will be re-built and deployed

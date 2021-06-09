@@ -68,6 +68,6 @@ setup(
         "reporting": reporting_dep,
         "all": base_packages + dashboard_dep + reporting_dep + dev_dep + docs_dep + utils_dep,
     },
-    url="https://github.com/timvink/skorecard/",
+    url="https://github.com/ing-bank/skorecard/",
     packages=find_packages(".", exclude=["tests", "notebooks", "docs"]),
 )

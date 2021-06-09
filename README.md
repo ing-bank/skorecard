@@ -1,13 +1,13 @@
-<img src="https://github.com/timvink/skorecard/raw/main/docs/assets/img/skorecard_logo.svg" width="150" align="right">
+<img src="https://github.com/ing-bank/skorecard/raw/main/docs/assets/img/skorecard_logo.svg" width="150" align="right">
 
 # skorecard
 
-<!-- ![pytest](https://github.com/timvink/skorecard/workflows/Release/badge.svg) -->
-![pytest](https://github.com/timvink/skorecard/workflows/Development/badge.svg)
+<!-- ![pytest](https://github.com/ing-bank/skorecard/workflows/Release/badge.svg) -->
+![pytest](https://github.com/ing-bank/skorecard/workflows/Development/badge.svg)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/skorecard)
 ![PyPI](https://img.shields.io/pypi/v/skorecard)
 ![PyPI - License](https://img.shields.io/pypi/l/skorecard)
-![GitHub contributors](https://img.shields.io/github/contributors/timvink/skorecard)
+![GitHub contributors](https://img.shields.io/github/contributors/ing-bank/skorecard)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
@@ -30,4 +30,4 @@ pip3 install skorecard
 
 ## Documentation
 
-See [timvink.github.io/skorecard/](https://timvink.github.io/skorecard/).
+See [ing-bank.github.io/skorecard/](https://ing-bank.github.io/skorecard/).

@@ -1,6 +1,6 @@
 site_name: skorecard
-repo_url: https://github.com/timvink/skorecard
-site_url: https://github.com/timvink/skorecard
+repo_url: https://github.com/ing-bank/skorecard
+site_url: https://github.com/ing-bank/skorecard
 edit_uri: ""
 site_description: Build credit risk scorecards with sklearn-compatible components
 site_author: RPAA
