@@ -68,16 +68,16 @@ nav:
         - Using bucketers: tutorials/using_bucketers.ipynb
         - Using BucketingProcess: tutorials/using-bucketing-process.ipynb
         - Reporting: tutorials/reporting.ipynb
+        - Skorecard from A-Z:
+            - Intro: tutorials/intro.md
+            - Bucketing step: tutorials/1_bucketing.ipynb
+            - Selecting features: tutorials/2_feature_selection.ipynb
+            - Scorecard model: tutorials/3_skorecard_model.ipynb
     - How to:
         - Save bucketers to file: howto/save_buckets_to_file.ipynb
         - Create bucketer from file: howto/create_bucketer_from_file.ipynb
         - Manually defining buckets: howto/using_manually_defined_buckets.ipynb
         - Assessing bucket quality: howto/psi_and_iv.ipynb
-        - Skorecard from A-Z:
-            - Intro: howto/intro.md
-            - Bucketing step: howto/1_bucketing.ipynb
-            - Selecting features: howto/2_feature_selection.ipynb
-            - Scorecard model: howto/3_skorecard_model.ipynb
         - Optimizations in the bucketing process: howto/Optimizations.ipynb
     - API: 
         - bucketers:
