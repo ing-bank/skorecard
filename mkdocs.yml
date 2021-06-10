@@ -67,13 +67,12 @@ nav:
     - Tutorials:
         - Using bucketers: tutorials/using_bucketers.ipynb
         - Using BucketingProcess: tutorials/using-bucketing-process.ipynb
-        - Save bucketers to file: tutorials/save_buckets_to_file.ipynb
-        - Create bucketer from file: tutorials/create_bucketer_from_file.ipynb
-        - Manually defining buckets: tutorials/using_manually_defined_buckets.ipynb
-        - Assessing bucket quality: tutorials/psi_and_iv.ipynb
         - Reporting: tutorials/reporting.ipynb
     - How to:
-        - howto/howto-placeholder.md
+        - Save bucketers to file: howto/save_buckets_to_file.ipynb
+        - Create bucketer from file: howto/create_bucketer_from_file.ipynb
+        - Manually defining buckets: howto/using_manually_defined_buckets.ipynb
+        - Assessing bucket quality: howto/psi_and_iv.ipynb
         - Skorecard from A-Z:
             - Intro: howto/intro.md
             - Bucketing step: howto/1_bucketing.ipynb
