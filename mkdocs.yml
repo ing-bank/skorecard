@@ -65,8 +65,14 @@ nav:
         - Index: index.md
         - Contributing: contributing.md
     - Tutorials:
-        - Using bucketers: tutorials/using_bucketers.ipynb
-        - Using BucketingProcess: tutorials/using-bucketing-process.ipynb
+        - Basic Bucketer:
+            - Background: tutorials/background.ipynb
+            - The Basics: tutorials/the_basics.ipynb
+            - Missing Values: tutorials/missing_values.ipynb
+            - Special Values: tutorials/specials.ipynb
+            - Categoricals: tutorials/categoricals.ipynb
+            - Methods: tutorials/methods.ipynb
+        - BucketingProcess: tutorials/using-bucketing-process.ipynb
         - Reporting: tutorials/reporting.ipynb
         - Skorecard from A-Z:
             - Intro: tutorials/intro.md
