@@ -13,7 +13,7 @@
 
 `skorecard` is a scikit-learn compatible python package that helps streamline the development of credit risk acceptance models (scorecards).
 
-Scorecards are ‘traditional’ models used by banks in the credit decision process. Internally, scorecards are Logistic Regressions models that make use of features that are binned into different groups. The process of binning is usually done manually by experts, and `skorecard` provides tools to makes this process easier. `skorecard` is built on top of [scikit-learn](https://pypi.org/project/scikit-learn/) as well as other excellent open sources projects like [optbinning](https://pypi.org/project/optbinning/), [dash](https://pypi.org/project/dash/) and [plotly](https://pypi.org/project/plotly/).
+Scorecards are ‘traditional’ models used by banks in the credit decision process. Internally, scorecards are Logistic Regressions models that make use of features that are binned into different groups. The process of binning is usually done manually by experts, and `skorecard` provides tools to makes this process easier. `skorecard` is built on top of [scikit-learn](https://pypi.org/project/scikit-learn/) as well as other excellent open source projects like [optbinning](https://pypi.org/project/optbinning/), [dash](https://pypi.org/project/dash/) and [plotly](https://pypi.org/project/plotly/).
 
 ## Features ⭐
 
