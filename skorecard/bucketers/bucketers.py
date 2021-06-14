@@ -73,6 +73,7 @@ class OptimalBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -172,7 +173,7 @@ class OptimalBucketer(BaseBucketer):
                 splits = binner.splits
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -196,7 +197,7 @@ class OptimalBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -213,14 +214,18 @@ class OptimalBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
@@ -299,6 +304,7 @@ class EqualWidthBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -353,7 +359,7 @@ class EqualWidthBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -375,7 +381,7 @@ class EqualWidthBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -392,14 +398,18 @@ class EqualWidthBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
@@ -479,6 +489,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -551,7 +562,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -573,7 +584,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -590,14 +601,18 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
@@ -669,6 +684,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -740,7 +756,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -762,7 +778,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -780,14 +796,18 @@ class EqualFrequencyBucketer(BaseBucketer):
                             .reset_index(drop=True)["bucket_id"][1]
                         )
 
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id'])
 
@@ -883,6 +903,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -968,7 +989,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 splits = []
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -990,7 +1011,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -1007,14 +1028,18 @@ class DecisionTreeBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
@@ -1115,6 +1140,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -1205,7 +1231,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             )
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1223,7 +1249,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                 X, y, column=feature, bucket_mapping=features_bucket_mapping_.get(feature)
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -1240,14 +1266,18 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
@@ -1318,6 +1348,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -1363,7 +1394,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
             mapping = dict(zip(unq, range(0, len(unq))))
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1381,7 +1412,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
                 X, y, column=feature, bucket_mapping=features_bucket_mapping_.get(feature)
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -1398,14 +1429,18 @@ class AsIsCategoricalBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
@@ -1479,6 +1514,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
+                    least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -1529,7 +1565,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 raise NotPreBucketedError(msg)
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1551,7 +1587,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
                 if self.missing_treatment == "most_frequent":
                     most_frequent_row = (
                         self.bucket_tables_[feature]
@@ -1568,14 +1604,18 @@ class AsIsNumericalBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
-                elif self.missing_treatment == "most_risky":
+                elif self.missing_treatment in ["most_risky", "least_risky"]:
+                    if self.missing_treatment == "least_risky":
+                        ascending = True
+                    else:
+                        ascending = False
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
                         raise AttributeError("bucketer must be fit with y to determine the risk rates")
                     
                     missing_bucket = int(
                         self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=False)
+                        .sort_values("Event Rate", ascending=ascending)
                         .reset_index(drop=True)
                         .iloc[0]['bucket_id']
                     )
