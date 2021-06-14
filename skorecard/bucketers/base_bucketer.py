@@ -24,7 +24,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
     @staticmethod
     def _is_allowed_missing_treatment(missing_treatment):
         # checks if the argument for missing_values is valid
-        allowed_str_missing = ["separate", "most_frequent", "most_risky"]
+        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky"]
 
         if type(missing_treatment) == str:
             if missing_treatment not in allowed_str_missing:
