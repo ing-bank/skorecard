@@ -1,3 +1,4 @@
+import pathlib
 import pandas as pd
 
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -13,7 +14,9 @@ from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 
-from typing import Dict
+from typing import Dict, TypeVar
+
+PathLike = TypeVar("PathLike", str, pathlib.Path)
 
 
 class BucketingProcess(
@@ -236,7 +239,7 @@ class BucketingProcess(
         X_prebucketed = self.prebucketing_pipeline.transform(X)
         return self.bucketing_pipeline.transform(X_prebucketed)
 
-    def save_yml(self, fout: str) -> None:
+    def save_yml(self, fout: PathLike) -> None:
         """
         Save the features bucket to a yaml file.
 

@@ -1,4 +1,6 @@
+import pathlib
 import warnings
+import yaml
 import numpy as np
 import pandas as pd
 
@@ -1554,14 +1556,17 @@ class UserInputBucketer(BaseBucketer):
         features_bucket_mapping: Union[Dict, FeaturesBucketMapping],
         variables: List = [],
     ) -> None:
-        """Initialise the user-defined boundaries with a dictionary.
+        """
+        Initialise the user-defined boundaries with a dictionary.
 
         Notes:
         - features_bucket_mapping is stored without the trailing underscore (_) because it is not fitted.
 
         Args:
-            features_bucket_mapping (dict): Contains the feature name and boundaries defined for this feature.
-                Either dict or FeaturesBucketMapping
+            features_bucket_mapping (Dict, FeaturesBucketMapping, str or Path): Contains the feature name and boundaries 
+                defined for this feature.
+                If a dict, it will be converted to an internal FeaturesBucketMapping object.
+                If a string or path, which will attempt to load the file as a yaml and convert to FeaturesBucketMapping object.
             variables (list): The features to bucket. Uses all features in features_bucket_mapping if not defined.
         """
         # Assigning the variable in the init to the attribute with the same name is a requirement of
@@ -1569,17 +1574,20 @@ class UserInputBucketer(BaseBucketer):
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
 
-        # Check user defined input for bucketing. If a dict is specified, will auto convert
-        if not isinstance(self.features_bucket_mapping, FeaturesBucketMapping):
-            if not isinstance(self.features_bucket_mapping, dict):
-                raise TypeError(
-                    "'features_bucket_mapping' must be a dict or FeaturesBucketMapping instance"
-                )
-            self.features_bucket_mapping_ = FeaturesBucketMapping(
-                self.features_bucket_mapping
-            )
+        if isinstance(features_bucket_mapping, str):
+            buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
+            self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
+        elif isinstance(features_bucket_mapping, pathlib.Path):
+            buckets_yaml = yaml.safe_load(features_bucket_mapping)
+            self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
+        elif isinstance(features_bucket_mapping, dict):
+            self.features_bucket_mapping_ = FeaturesBucketMapping(features_bucket_mapping)
+        elif isinstance(features_bucket_mapping, FeaturesBucketMapping):
+            self.features_bucket_mapping_ = features_bucket_mapping
         else:
-            self.features_bucket_mapping_ = self.features_bucket_mapping
+            raise TypeError(
+                "'features_bucket_mapping' must be a dict, str, path, or FeaturesBucketMapping instance"
+            )
 
         # If user did not specify any variables,
         # use all the variables defined in the features_bucket_mapping
