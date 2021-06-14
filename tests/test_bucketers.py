@@ -111,7 +111,7 @@ def test_missing_manual(bucketer, df_with_missings) -> None:
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
 def test_missing_most_frequent_set(bucketer, df_with_missings) -> None:
-    """Test that missing values are assigned to the right bucket when manually given."""
+    """Test that missing values are assigned to the right bucket when most_frequent is chosens."""
     X = df_with_missings
     y = df_with_missings["default"].values
 
@@ -124,7 +124,7 @@ def test_missing_most_frequent_set(bucketer, df_with_missings) -> None:
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
 def test_missing_most_frequent_withoutset(bucketer, df_with_missings) -> None:
-    """Test that missing values are assigned to the right bucket when manually given."""
+    """Test that missing values are assigned to the right bucket when most_frequent is chosen."""
     X = df_with_missings
     y = df_with_missings["default"].values
 
@@ -133,6 +133,42 @@ def test_missing_most_frequent_withoutset(bucketer, df_with_missings) -> None:
 
     for feature in ["MARRIAGE", "EDUCATION"]:
         assert "Missing" in BUCK.bucket_table(feature).sort_values('Count', ascending=False).reset_index(drop=True)['label'][0]
+
+
+@pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
+def test_missing_most_risky_set(bucketer, df_with_missings) -> None:
+    """Test that missing values are assigned to the right bucket when most_risky is chosen."""
+    X = df_with_missings
+    y = df_with_missings["default"].values
+
+    BUCK_risk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="most_risky")
+    BUCK_risk.fit(X, y)
+
+    BUCK_norisk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"])
+    BUCK_norisk.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the riskiest bucket when missings are in a separate bucket
+        riskiest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=False).reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == riskiest_bucket].reset_index()['label'][0]
+
+
+@pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
+def test_missing_most_risky_withoutset(bucketer, df_with_missings) -> None:
+    """Test that missing values are assigned to the right bucket when most_risky is chosen."""
+    X = df_with_missings
+    y = df_with_missings["default"].values
+
+    BUCK_risk = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="most_risky")
+    BUCK_risk.fit(X, y)
+
+    BUCK_norisk = bucketer(variables=["MARRIAGE", "EDUCATION"])
+    BUCK_norisk.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the riskiest bucket when missings are in a separate bucket
+        riskiest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=False).reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == riskiest_bucket].reset_index()['label'][0]
 
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
