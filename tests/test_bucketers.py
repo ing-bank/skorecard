@@ -171,6 +171,42 @@ def test_missing_most_risky_withoutset(bucketer, df_with_missings) -> None:
         assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == riskiest_bucket].reset_index()['label'][0]
 
 
+@pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
+def test_missing_least_risky_set(bucketer, df_with_missings) -> None:
+    """Test that missing values are assigned to the right bucket when least_risky is chosen."""
+    X = df_with_missings
+    y = df_with_missings["default"].values
+
+    BUCK_risk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="least_risky")
+    BUCK_risk.fit(X, y)
+
+    BUCK_norisk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"])
+    BUCK_norisk.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the safest bucket when missings are in a separate bucket
+        safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
+
+
+@pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
+def test_missing_least_risky_withoutset(bucketer, df_with_missings) -> None:
+    """Test that missing values are assigned to the right bucket when least_risky is chosen."""
+    X = df_with_missings
+    y = df_with_missings["default"].values
+
+    BUCK_risk = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="least_risky")
+    BUCK_risk.fit(X, y)
+
+    BUCK_norisk = bucketer(variables=["MARRIAGE", "EDUCATION"])
+    BUCK_norisk.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the safest bucket when missings are in a separate bucket
+        safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
+
+
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
 def test_type_error_input(bucketer, df):
     """Test that input is always a dataFrame."""
