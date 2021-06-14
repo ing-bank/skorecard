@@ -222,7 +222,7 @@ class OptimalBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
+                        .iloc[0]['bucket_id']
                     )
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -353,7 +353,7 @@ class EqualWidthBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -401,8 +401,10 @@ class EqualWidthBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
+                        .iloc[0]['bucket_id']
                     )
+
+                assert isinstance(missing_bucket, int)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
@@ -549,7 +551,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -597,7 +599,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
+                        .iloc[0]['bucket_id']
                     )
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -738,7 +740,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -777,6 +779,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                             .sort_values("Count", ascending=False)
                             .reset_index(drop=True)["bucket_id"][1]
                         )
+
                 elif self.missing_treatment == "most_risky":
                     # if fitted with .fit(X) and not .fit(X, y)
                     if 'Event' not in self.bucket_tables_[feature].columns:
@@ -786,8 +789,8 @@ class EqualFrequencyBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
-                    )
+                        .iloc[0]['bucket_id'])
+
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
@@ -965,7 +968,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 splits = []
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1013,7 +1016,7 @@ class DecisionTreeBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
+                        .iloc[0]['bucket_id']
                     )
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -1202,7 +1205,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             )
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1246,7 +1249,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
+                        .iloc[0]['bucket_id']
                     )
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -1360,7 +1363,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
             mapping = dict(zip(unq, range(0, len(unq))))
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1404,8 +1407,8 @@ class AsIsCategoricalBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
-                    ).reset_index(drop=True)["bucket_id"][1]
+                        .iloc[0]['bucket_id']
+                    )
 
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -1526,7 +1529,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 raise NotPreBucketedError(msg)
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1574,7 +1577,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                         self.bucket_tables_[feature]
                         .sort_values("Event Rate", ascending=False)
                         .reset_index(drop=True)
-                        .iloc[0]
+                        .iloc[0]['bucket_id']
                     )
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
