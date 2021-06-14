@@ -72,7 +72,7 @@ class OptimalBucketer(BaseBucketer):
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -298,7 +298,7 @@ class EqualWidthBucketer(BaseBucketer):
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -478,7 +478,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -668,7 +668,7 @@ class EqualFrequencyBucketer(BaseBucketer):
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -882,7 +882,7 @@ class DecisionTreeBucketer(BaseBucketer):
             missing_treatment (str or dict): Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -1114,7 +1114,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             missing_treatment (str or dict): Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -1317,7 +1317,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
@@ -1478,7 +1478,7 @@ class AsIsNumericalBucketer(BaseBucketer):
             missing_treatment (str or dict): Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
-                    most_risky: not yet implemented
+                    most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     most_frequent: Missing values are put into the most common bucket.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
