@@ -198,37 +198,7 @@ class OptimalBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
@@ -382,37 +352,7 @@ class EqualWidthBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
 
                 assert isinstance(missing_bucket, int)
                 # Repeat above procedure now we know the bucket distribution
@@ -585,37 +525,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
@@ -779,37 +689,7 @@ class EqualFrequencyBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id'])
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
 
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -1012,37 +892,7 @@ class DecisionTreeBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
@@ -1250,37 +1100,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
@@ -1413,37 +1233,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
 
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -1588,37 +1378,7 @@ class AsIsNumericalBucketer(BaseBucketer):
             )
 
             if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
-                if self.missing_treatment == "most_frequent":
-                    most_frequent_row = (
-                        self.bucket_tables_[feature]
-                        .sort_values("Count", ascending=False)
-                        .reset_index(drop=True)
-                        .iloc[0]
-                    )
-                    if most_frequent_row["label"] != "Missing":
-                        missing_bucket = int(most_frequent_row["bucket_id"])
-                    else:
-                        # missings are already the most common bucket, pick the next one
-                        missing_bucket = int(
-                            self.bucket_tables_[feature]
-                            .sort_values("Count", ascending=False)
-                            .reset_index(drop=True)["bucket_id"][1]
-                        )
-                elif self.missing_treatment in ["most_risky", "least_risky"]:
-                    if self.missing_treatment == "least_risky":
-                        ascending = True
-                    else:
-                        ascending = False
-                    # if fitted with .fit(X) and not .fit(X, y)
-                    if 'Event' not in self.bucket_tables_[feature].columns:
-                        raise AttributeError("bucketer must be fit with y to determine the risk rates")
-                    
-                    missing_bucket = int(
-                        self.bucket_tables_[feature]
-                        .sort_values("Event Rate", ascending=ascending)
-                        .reset_index(drop=True)
-                        .iloc[0]['bucket_id']
-                    )
+                missing_bucket = self._missing_bucket_for_special_na(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
                     feature_name=feature,
