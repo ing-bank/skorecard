@@ -25,10 +25,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
     def _is_allowed_missing_treatment(missing_treatment):
         # checks if the argument for missing_values is valid
         allowed_str_missing = ["separate", "most_frequent", "most_risky"]
-        if missing_treatment in ["most_risky"]:
-            raise NotImplementedError(
-                f"missing_treatment '{missing_treatment}' has not yet been implemented. Open an issue."
-            )
+
         if type(missing_treatment) == str:
             if missing_treatment not in allowed_str_missing:
                 raise ValueError(f"missing_treatment must be in {allowed_str_missing} or a dict")
