@@ -121,7 +121,7 @@ def build_bucket_table(
     stats["% Non-event"] = stats["Non-event"] / stats["Non-event"].sum()
 
     stats["WoE"] = ((stats["% Non-event"] + epsilon) / (stats["% Event"] + epsilon)).apply(lambda x: np.log(x))
-    stats["IV"] = (stats["% Event"] - stats["% Non-event"]) * stats["WoE"]
+    stats["IV"] = (stats["% Non-event"] - stats["% Event"]) * stats["WoE"]
 
     stats["WoE"] = np.round(stats["WoE"], 3)
     stats["IV"] = np.round(stats["IV"], 3)
