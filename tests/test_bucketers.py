@@ -130,11 +130,11 @@ def test_missings_set(bucketer, df_with_missings) -> None:
         # look at the safest bucket when missings are in a separate bucket
         safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
         assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
-    
+
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
 def test_missings_without_set(bucketer, df_with_missings) -> None:
- """Test all missing methods work for bucketers without set bins."""
+    """Test all missing methods work for bucketers without set bins."""
     X = df_with_missings
     y = df_with_missings["default"].values
 
