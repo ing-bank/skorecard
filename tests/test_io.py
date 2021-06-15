@@ -1,6 +1,7 @@
 import pytest
 import os
 import yaml
+
 from skorecard.bucketers import (
     DecisionTreeBucketer,
     UserInputBucketer,
@@ -15,11 +16,39 @@ from skorecard.bucketers import (
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 
 from sklearn.pipeline import make_pipeline
+from contextlib import contextmanager
 
 
 BUCKETERS_WITH_SET_BINS = [EqualWidthBucketer, AgglomerativeClusteringBucketer, EqualFrequencyBucketer]
 
 AS_IS_BUCKETERS = [AsIsNumericalBucketer, AsIsCategoricalBucketer]
+
+
+@contextmanager
+def working_directory(path):
+    """
+    Temporary working directories.
+
+    A context manager which changes the working directory to the given
+    path, and then changes it back to its previous value on exit.
+
+    Usage:
+
+    ```python
+    # Do something in original directory
+    with working_directory('/my/new/path'):
+        # Do something in new directory
+    # Back to old directory
+    ````
+
+    Credits: https://gist.github.com/nottrobin/3d675653244f8814838a
+    """
+    prev_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(prev_cwd)
 
 
 @pytest.fixture
@@ -44,6 +73,18 @@ def test_ordinal_bucketer_to_file(df, tmpdir):
     buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
     assert X_trans.equals(X_trans_yaml)
+
+    # Test save to yaml with str path
+    with working_directory(tmpdir):
+        ocb.save_yml("buckets.yml")
+        buckets_yaml = yaml.safe_load(open("buckets.yml", "r"))
+        X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
+        assert X_trans.equals(X_trans_yaml)
+
+        # test alternative flow
+        ocb.save_yml("buckets.yml")
+        X_trans_yaml = UserInputBucketer("buckets.yml").transform(X)
+        assert X_trans.equals(X_trans_yaml)
 
 
 def test_decision_tree_bucketer_to_file(df, tmpdir):
