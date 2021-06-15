@@ -14,7 +14,6 @@ from skorecard.bucketers import (
     AsIsCategoricalBucketer,
 )
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
-from skorecard import features_bucket_mapping
 
 from sklearn.pipeline import make_pipeline
 from contextlib import contextmanager
@@ -28,6 +27,8 @@ AS_IS_BUCKETERS = [AsIsNumericalBucketer, AsIsCategoricalBucketer]
 @contextmanager
 def working_directory(path):
     """
+    Temporary working directories.
+
     A context manager which changes the working directory to the given
     path, and then changes it back to its previous value on exit.
 
@@ -48,7 +49,6 @@ def working_directory(path):
         yield
     finally:
         os.chdir(prev_cwd)
-
 
 
 @pytest.fixture
@@ -85,7 +85,6 @@ def test_ordinal_bucketer_to_file(df, tmpdir):
         ocb.save_yml("buckets.yml")
         X_trans_yaml = UserInputBucketer("buckets.yml").transform(X)
         assert X_trans.equals(X_trans_yaml)
-
 
 
 def test_decision_tree_bucketer_to_file(df, tmpdir):

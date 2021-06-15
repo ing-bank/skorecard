@@ -1,15 +1,7 @@
-
 import yaml
 import dataclasses
-import pathlib
-
-from typing import TypeVar
 
 from skorecard.bucket_mapping import BucketMapping, merge_bucket_mapping
-
-PathLike = TypeVar("PathLike", str, pathlib.Path)
-
-
 
 
 class FeaturesBucketMapping:
@@ -115,14 +107,14 @@ class FeaturesBucketMapping:
         """
         raise NotImplementedError("todo")
 
-    def save_yml(self, file: PathLike) -> None:
+    def save_yml(self, file) -> None:
         """Should write data to a yml.
 
         Returns:
             None: nothing
         """
         if isinstance(file, str):
-            file = open(file, 'w')
+            file = open(file, "w")
         yaml.safe_dump(self.as_dict(), file)
 
     def load_dict(self, obj):

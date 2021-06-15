@@ -119,7 +119,10 @@ def test_missing_most_frequent_set(bucketer, df_with_missings) -> None:
     BUCK.fit(X, y)
 
     for feature in ["MARRIAGE", "LIMIT_BAL"]:
-        assert "Missing" in BUCK.bucket_table(feature).sort_values('Count', ascending=False).reset_index(drop=True)['label'][0]
+        assert (
+            "Missing"
+            in BUCK.bucket_table(feature).sort_values("Count", ascending=False).reset_index(drop=True)["label"][0]
+        )
 
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
@@ -132,7 +135,10 @@ def test_missing_most_frequent_withoutset(bucketer, df_with_missings) -> None:
     BUCK.fit(X, y)
 
     for feature in ["MARRIAGE", "EDUCATION"]:
-        assert "Missing" in BUCK.bucket_table(feature).sort_values('Count', ascending=False).reset_index(drop=True)['label'][0]
+        assert (
+            "Missing"
+            in BUCK.bucket_table(feature).sort_values("Count", ascending=False).reset_index(drop=True)["label"][0]
+        )
 
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)

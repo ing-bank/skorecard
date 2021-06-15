@@ -12,6 +12,7 @@ from skorecard.features_bucket_mapping import FeaturesBucketMapping
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
+
 class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTableMethod, SummaryMethod):
     """Base class for bucket transformers."""
 
