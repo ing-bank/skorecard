@@ -89,7 +89,7 @@ class BaseBucketer(
             y_out = y
         return X_out, y_out
 
-    def _missing_bucket_for_special_na(self, feature):
+    def _find_missing_bucket(self, feature):
         """
         Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky"]
 
