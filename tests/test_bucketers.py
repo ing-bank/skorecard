@@ -78,6 +78,7 @@ def test_error_input(bucketer):
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
 def test_missings_set(bucketer, df_with_missings) -> None:
+    """Test all missing methods work for bucketers with set bins."""
     X = df_with_missings
     y = df_with_missings["default"].values
 
@@ -133,6 +134,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
 def test_missings_without_set(bucketer, df_with_missings) -> None:
+ """Test all missing methods work for bucketers without set bins."""
     X = df_with_missings
     y = df_with_missings["default"].values
 
