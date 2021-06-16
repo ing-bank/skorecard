@@ -117,6 +117,19 @@ def test_missing_manual(df_with_missings) -> None:
     assert len(X["EDUCATION_trans"].unique()) == 2
     assert X[X["EDUCATION"].isnull()]["EDUCATION_trans"].sum() == 0
 
+def test_missing_special_bucket(df_with_missings) -> None:
+
+    X = df_with_missings
+    y = df_with_missings["default"].values
+
+    BUCK_risk = OrdinalCategoricalBucketer(
+                            variables=["MARRIAGE", "EDUCATION"],
+                            missing_treatment="most_risky")
+    BUCK_risk.fit(X, y)
+    table = BUCK_risk.bucket_table('MARRIAGE')
+
+    assert table[table['bucket'] == -2]['label'].values[0] == 'Other | Missing'
+
 
 def test_missings():
     """
