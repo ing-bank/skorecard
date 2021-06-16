@@ -989,7 +989,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
 
         Args:
             tol (float): the minimum frequency a label should have to be considered frequent.
-                Categories with frequencies lower than tol will be grouped together (in the highest ).
+                Categories with frequencies lower than tol will be grouped together (in the 'other' bucket).
             max_n_categories (int): the maximum number of categories that should be considered frequent.
                 If None, all categories with frequency above the tolerance (tol) will be
                 considered.
@@ -1070,9 +1070,10 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             if self.encoding_method == "ordered":
                 if y is None:
                     raise ValueError("To use encoding_method=='ordered', y cannot be None.")
+
                 # X_flt["target"] = y_flt
                 normalized_counts = X_y[var].value_counts(normalize=True)
-                cats = X_y.groupby([var])["target"].mean().sort_values(ascending=True).index
+                cats = X_y.groupby([var])["target"].mean().sort_values(ascending=False).index
                 normalized_counts = normalized_counts[cats]
 
             if self.encoding_method == "frequency":
@@ -1080,7 +1081,6 @@ class OrdinalCategoricalBucketer(BaseBucketer):
 
             # Limit number of categories if set.
             normalized_counts = normalized_counts[: self.max_n_categories]
-
             # Remove less frequent categories
             normalized_counts = normalized_counts[normalized_counts >= self.tol]
 
