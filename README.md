@@ -31,3 +31,9 @@ pip3 install skorecard
 ## Documentation
 
 See [ing-bank.github.io/skorecard/](https://ing-bank.github.io/skorecard/).
+
+## Presentations
+
+| Title                                              | Host                    | Date         | Speaker(s)                                   |
+|----------------------------------------------------|-------------------------|--------------|----------------------------------------------|
+| Skorecard: Making logistic regressions great again | [ING Data Science Meetup](https://www.youtube.com/watch?v=UR_1XZxEuCw) | 10 June 2021 | Daniel Timbrell, Sandro Bjelogrlic, Tim Vink |

@@ -107,12 +107,14 @@ class FeaturesBucketMapping:
         """
         raise NotImplementedError("todo")
 
-    def save_yml(self, file=None) -> None:
+    def save_yml(self, file) -> None:
         """Should write data to a yml.
 
         Returns:
             None: nothing
         """
+        if isinstance(file, str):
+            file = open(file, "w")
         yaml.safe_dump(self.as_dict(), file)
 
     def load_dict(self, obj):

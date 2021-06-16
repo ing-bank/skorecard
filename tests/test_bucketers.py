@@ -107,6 +107,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     BUCK.fit(X, y)
 
     for feature in ["MARRIAGE", "LIMIT_BAL"]:
+
         assert "Missing" in BUCK.bucket_table(feature).sort_values('Count', ascending=False).reset_index(drop=True)['label'][0]
     
     BUCK_risk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="most_risky")
@@ -127,6 +128,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
         # look at the safest bucket when missings are in a separate bucket
         safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
         assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
+
 
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)

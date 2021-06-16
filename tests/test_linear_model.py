@@ -49,28 +49,26 @@ def test_results(X_y):
 
     np.testing.assert_array_almost_equal(lr.p_val_coef_, expected_approx_p_val_coef_, decimal=3)
 
-def test_linear_model(X_y):
-    """Test OHE sparse matrix compatibility"""
 
-    pipeline = Pipeline([
-        ('bucketer', EqualFrequencyBucketer(n_bins=10)),
-        ('ohe', OneHotEncoder()),
-        ('clf', LogisticRegression())
-    ])
+def test_linear_model(X_y):
+    """Test OHE sparse matrix compatibility."""
+    pipeline = Pipeline(
+        [("bucketer", EqualFrequencyBucketer(n_bins=10)), ("ohe", OneHotEncoder()), ("clf", LogisticRegression())]
+    )
     pipeline.fit(*X_y)
-    assert pipeline.named_steps['clf'].p_val_coef_.shape[1] > 0
+    assert pipeline.named_steps["clf"].p_val_coef_.shape[1] > 0
+
 
 def test_get_stats(X_y):
-    """Test that we get the expected pandas dataframe"""
+    """Test that we get the expected pandas dataframe."""
     lr = LogisticRegression(fit_intercept=True).fit(*X_y)
 
     # We add 1 because of the intercept
     assert lr.get_stats().shape[0] == len(X_y[0].columns) + 1
-    assert lr.get_stats().index[0] == 'const'
+    assert lr.get_stats().index[0] == "const"
 
     lr = LogisticRegression(fit_intercept=False).fit(*X_y)
-    assert lr.get_stats().fillna(-999)['Coef.'][0] == 0
-    assert lr.get_stats().fillna(-999)['Std.Err'][0] == -999
-    assert lr.get_stats().fillna(-999)['z'][0] == -999
-    assert lr.get_stats().fillna(-999)['P>|z|'][0] == -999
-
+    assert lr.get_stats().fillna(-999)["Coef."][0] == 0
+    assert lr.get_stats().fillna(-999)["Std.Err"][0] == -999
+    assert lr.get_stats().fillna(-999)["z"][0] == -999
+    assert lr.get_stats().fillna(-999)["P>|z|"][0] == -999

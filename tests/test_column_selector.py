@@ -5,7 +5,7 @@ import pandas as pd
 from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
 from skorecard.preprocessing import WoeEncoder
 from skorecard.linear_model import LogisticRegression
-from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.pipeline import make_pipeline
 
 
 def test_column_selector(df):
@@ -24,21 +24,21 @@ def test_column_selector(df):
     npX = X.values
     cs = ColumnSelector(variables=features)
     with pytest.raises(AssertionError):
-     cs.fit_transform(npX)
+        cs.fit_transform(npX)
 
 
 def test_column_selector_in_pipeline(df):
     """Test that the column selector works well in a pipeline."""
     features = ["LIMIT_BAL", "BILL_AMT1"]
-    X = df.drop('default', axis =1)
+    X = df.drop("default", axis=1)
     y = df["default"]
 
     model_pipe = make_pipeline(
         DecisionTreeBucketer(variables=["LIMIT_BAL"], max_n_bins=5),
-        OrdinalCategoricalBucketer(variables=["MARRIAGE"],tol=0.05),
+        OrdinalCategoricalBucketer(variables=["MARRIAGE"], tol=0.05),
         WoeEncoder(),
-        ColumnSelector(variables = features),
-        LogisticRegression()
+        ColumnSelector(variables=features),
+        LogisticRegression(),
     ).fit(X, y)
 
     # test that the model pipe has as many coefficients as there are features.
@@ -46,7 +46,5 @@ def test_column_selector_in_pipeline(df):
 
     # test that the stats of the model pipe represent the correct features with a selector.
     model_stats = model_pipe[-1].get_stats().index.tolist()
-    model_stats.remove('const')
-    assert model_stats ==features
-
-
+    model_stats.remove("const")
+    assert model_stats == features

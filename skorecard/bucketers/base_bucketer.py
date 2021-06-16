@@ -1,6 +1,7 @@
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, TypeVar
 import pandas as pd
 import itertools
+import pathlib
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -8,6 +9,8 @@ from sklearn.utils.validation import check_is_fitted
 from skorecard.reporting.plotting import PlotBucketMethod
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.features_bucket_mapping import FeaturesBucketMapping
+
+PathLike = TypeVar("PathLike", str, pathlib.Path)
 
 
 class BaseBucketer(
@@ -200,7 +203,7 @@ class BaseBucketer(
         """
         return self.transform(X)
 
-    def save_yml(self, fout: str) -> None:
+    def save_yml(self, fout: PathLike) -> None:
         """
         Save the features bucket to a yaml file.
 
