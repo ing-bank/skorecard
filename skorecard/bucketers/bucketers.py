@@ -1165,7 +1165,6 @@ class AsIsCategoricalBucketer(BaseBucketer):
         self.bucket_tables_ = {}
 
         for feature in self.variables:
-
             if feature in self.specials.keys():
                 special = self.specials[feature]
                 X_flt, y_flt = self._filter_specials_for_fit(
