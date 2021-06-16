@@ -63,7 +63,7 @@ def test_encoding_method(df):
     ocb = OrdinalCategoricalBucketer(tol=0.03, variables=["EDUCATION"], encoding_method="ordered")
     ocb.fit(X, y)
 
-    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 2, 2: 0, 3: 1}
+    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 0, 2: 2, 3: 1}
 
 
 def test_specials(df):
