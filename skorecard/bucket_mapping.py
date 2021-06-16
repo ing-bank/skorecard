@@ -156,9 +156,11 @@ class BucketMapping:
 
             # Set 'missing' bucket
             if self.missing_bucket is not None:
-                assert (
-                    self.missing_bucket in self.map.values()
-                ), "missing_bucket '%s' does not exist in map values: %s" % (self.missing_bucket, self.map)
+                # Allow -2, -1 Some missing_treatments (e.g. most_risky) add it here
+                if self.missing_bucket not in [-2, -1]:
+                    assert (
+                        self.missing_bucket in self.map.values()
+                    ), "missing_bucket '%s' does not exist in map values: %s" % (self.missing_bucket, self.map)
                 self._missing_bucket = self.missing_bucket
             else:
                 self._missing_bucket = -1

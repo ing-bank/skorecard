@@ -63,7 +63,7 @@ def test_encoding_method(df):
     ocb = OrdinalCategoricalBucketer(tol=0.03, variables=["EDUCATION"], encoding_method="ordered")
     ocb.fit(X, y)
 
-    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 2, 2: 0, 3: 1}
+    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 0, 2: 2, 3: 1}
 
 
 def test_specials(df):
@@ -116,6 +116,19 @@ def test_missing_manual(df_with_missings) -> None:
 
     assert len(X["EDUCATION_trans"].unique()) == 2
     assert X[X["EDUCATION"].isnull()]["EDUCATION_trans"].sum() == 0
+
+def test_missing_special_bucket(df_with_missings) -> None:
+
+    X = df_with_missings
+    y = df_with_missings["default"].values
+
+    BUCK_risk = OrdinalCategoricalBucketer(
+                            variables=["MARRIAGE", "EDUCATION"],
+                            missing_treatment="most_risky")
+    BUCK_risk.fit(X, y)
+    table = BUCK_risk.bucket_table('MARRIAGE')
+
+    assert table[table['bucket'] == -2]['label'].values[0] == 'Other | Missing'
 
 
 def test_missings():
