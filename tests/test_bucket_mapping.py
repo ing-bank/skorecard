@@ -446,6 +446,13 @@ def test_missing_bucket():
         x = ["car", "motorcycle", "boat", "truck", "truck", np.nan]
         assert a.transform(x)[5] == missing_bucket
 
+    # missing_bucket=<bucket that does not exist in map>
+    # should raise an error!
+    with pytest.raises(AssertionError):
+        a = BucketMapping(
+            "feature1", "categorical", map={"car": 0, "boat": 0}, specials={"is truck": ["truck"]}, missing_bucket=7
+        )
+
     # numerical. missing_bucket='separate'
     a = BucketMapping("testfeat", "numerical", map=[1, 3, 5], right=True)
     x = [1, 3, 5, np.nan, 7]
