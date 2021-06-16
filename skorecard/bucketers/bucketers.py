@@ -1,4 +1,5 @@
 import warnings
+import yaml
 import numpy as np
 import pandas as pd
 
@@ -6,7 +7,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import _tree
 
-from typing import Union, List, Dict
+from typing import List
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.bucket_mapping import BucketMapping
 from skorecard.features_bucket_mapping import FeaturesBucketMapping
@@ -121,9 +122,7 @@ class OptimalBucketer(BaseBucketer):
 
             if feature in self.specials.keys():
                 special = self.specials[feature]
-                X_flt, y_flt = self._filter_specials_for_fit(
-                    X=X[feature], y=y, specials=special
-                )
+                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
             else:
                 X_flt, y_flt = X[feature], y
                 special = {}
@@ -308,9 +307,7 @@ class EqualWidthBucketer(BaseBucketer):
 
             if feature in self.specials.keys():
                 special = self.specials[feature]
-                X_flt, y_flt = self._filter_specials_for_fit(
-                    X=X[feature], y=y, specials=special
-                )
+                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
             else:
                 X_flt = X[feature]
                 y_flt = y
@@ -467,9 +464,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
 
             if feature in self.specials.keys():
                 special = self.specials[feature]
-                X_flt, y_flt = self._filter_specials_for_fit(
-                    X=X[feature], y=y, specials=special
-                )
+                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
             else:
                 X_flt = X[feature]
                 y_flt = y
@@ -480,21 +475,13 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
             self.binners[feature] = ab
 
             # Find the boundaries
-            df = pd.DataFrame({"x": X_flt.values, "label": ab.labels_}).sort_values(
-                by="x"
-            )
-            cluster_minimum_values = (
-                df.groupby("label")["x"].min().sort_values().tolist()
-            )
-            cluster_maximum_values = (
-                df.groupby("label")["x"].max().sort_values().tolist()
-            )
+            df = pd.DataFrame({"x": X_flt.values, "label": ab.labels_}).sort_values(by="x")
+            cluster_minimum_values = df.groupby("label")["x"].min().sort_values().tolist()
+            cluster_maximum_values = df.groupby("label")["x"].max().sort_values().tolist()
             # take the mean of the upper boundary of a cluster and the lower boundary of the next cluster
             boundaries = [
                 # Assures numbers are float and not np.float - necessary for serialization
-                float(
-                    np.mean([cluster_minimum_values[i + 1], cluster_maximum_values[i]])
-                )
+                float(np.mean([cluster_minimum_values[i + 1], cluster_maximum_values[i]]))
                 for i in range(len(cluster_minimum_values) - 1)
             ]
 
@@ -633,28 +620,18 @@ class EqualFrequencyBucketer(BaseBucketer):
 
             if feature in self.specials.keys():
                 special = self.specials[feature]
-                X_flt, y_flt = self._filter_specials_for_fit(
-                    X=X[feature], y=y, specials=special
-                )
+                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
             else:
                 X_flt = X[feature]
                 special = {}
             try:
-                _, boundaries = pd.qcut(
-                    X_flt, q=self.n_bins, retbins=True, duplicates="raise"
-                )
+                _, boundaries = pd.qcut(X_flt, q=self.n_bins, retbins=True, duplicates="raise")
             except ValueError:
                 # If there are too many duplicate values (assume a lot of filled missings)
                 # this crashes - the exception drops them.
                 # This means that it will return approximate quantile bins
-                _, boundaries = pd.qcut(
-                    X_flt, q=self.n_bins, retbins=True, duplicates="drop"
-                )
-                warnings.warn(
-                    ApproximationWarning(
-                        "Approximated quantiles - too many unique values"
-                    )
-                )
+                _, boundaries = pd.qcut(X_flt, q=self.n_bins, retbins=True, duplicates="drop")
+                warnings.warn(ApproximationWarning("Approximated quantiles - too many unique values"))
 
             # pd.qcut returns the min & max values of the fits
             # On transform, we use np.digitize, which means new data that is outside of this range
@@ -831,9 +808,7 @@ class DecisionTreeBucketer(BaseBucketer):
                         f"max_n_bins>= {n_special_bins+2} (currently max_n_bins={self.max_n_bins})"
                     )
 
-                X_flt, y_flt = self._filter_specials_for_fit(
-                    X=X[feature], y=y, specials=special
-                )
+                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
             else:
                 X_flt = X[feature]
                 y_flt = y
@@ -861,9 +836,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 binner.fit(X_flt.values.reshape(-1, 1), y_flt)
 
                 # Extract fitted boundaries
-                splits = np.unique(
-                    binner.tree_.threshold[binner.tree_.feature != _tree.TREE_UNDEFINED]
-                )
+                splits = np.unique(binner.tree_.threshold[binner.tree_.feature != _tree.TREE_UNDEFINED])
 
             else:
                 splits = []
@@ -969,7 +942,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
 
         Args:
             tol (float): the minimum frequency a label should have to be considered frequent.
-                Categories with frequencies lower than tol will be grouped together (in the highest ).
+                Categories with frequencies lower than tol will be grouped together (in the 'other' bucket).
             max_n_categories (int): the maximum number of categories that should be considered frequent.
                 If None, all categories with frequency above the tolerance (tol) will be
                 considered.
@@ -1052,9 +1025,8 @@ class OrdinalCategoricalBucketer(BaseBucketer):
 
             if self.encoding_method == "ordered":
                 if y is None:
-                    raise ValueError(
-                        "To use encoding_method=='ordered', y cannot be None."
-                    )
+                    raise ValueError("To use encoding_method=='ordered', y cannot be None.")
+
                 # X_flt["target"] = y_flt
                 normalized_counts = X_y[feature].value_counts(normalize=True)
                 cats = (
@@ -1070,15 +1042,12 @@ class OrdinalCategoricalBucketer(BaseBucketer):
 
             # Limit number of categories if set.
             normalized_counts = normalized_counts[: self.max_n_categories]
-
             # Remove less frequent categories
             normalized_counts = normalized_counts[normalized_counts >= self.tol]
 
             # Determine Ordinal Encoder based on ordered labels
             # Note we start at 1, to be able to encode missings as 0.
-            mapping = dict(
-                zip(normalized_counts.index, range(0, len(normalized_counts)))
-            )
+            mapping = dict(zip(normalized_counts.index, range(0, len(normalized_counts))))
 
             # Deal with missing values
             if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
@@ -1338,9 +1307,7 @@ class AsIsNumericalBucketer(BaseBucketer):
 
             if feature in self.specials.keys():
                 special = self.specials[feature]
-                X_flt, y_flt = self._filter_specials_for_fit(
-                    X=X[feature], y=y, specials=special
-                )
+                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
             else:
                 X_flt = X[feature]
                 special = {}
@@ -1451,35 +1418,42 @@ class UserInputBucketer(BaseBucketer):
 
     def __init__(
         self,
-        features_bucket_mapping: Union[Dict, FeaturesBucketMapping],
+        features_bucket_mapping,
         variables: List = [],
     ) -> None:
-        """Initialise the user-defined boundaries with a dictionary.
+        """
+        Initialise the user-defined boundaries with a dictionary.
 
         Notes:
         - features_bucket_mapping is stored without the trailing underscore (_) because it is not fitted.
 
         Args:
-            features_bucket_mapping (dict): Contains the feature name and boundaries defined for this feature.
-                Either dict or FeaturesBucketMapping
+            features_bucket_mapping (Dict, FeaturesBucketMapping, str or Path): Contains the feature name and boundaries
+                defined for this feature.
+                If a dict, it will be converted to an internal FeaturesBucketMapping object.
+                If a string or path, which will attempt to load the file as a yaml and convert to FeaturesBucketMapping object.
             variables (list): The features to bucket. Uses all features in features_bucket_mapping if not defined.
-        """
+        """  # noqa
         # Assigning the variable in the init to the attribute with the same name is a requirement of
         # sklearn.base.BaseEstimator. See the notes in
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
 
-        # Check user defined input for bucketing. If a dict is specified, will auto convert
-        if not isinstance(self.features_bucket_mapping, FeaturesBucketMapping):
-            if not isinstance(self.features_bucket_mapping, dict):
-                raise TypeError(
-                    "'features_bucket_mapping' must be a dict or FeaturesBucketMapping instance"
-                )
-            self.features_bucket_mapping_ = FeaturesBucketMapping(
-                self.features_bucket_mapping
-            )
+        if isinstance(features_bucket_mapping, str):
+            buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
+            self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
+        elif isinstance(features_bucket_mapping, dict):
+            self.features_bucket_mapping_ = FeaturesBucketMapping(features_bucket_mapping)
+        elif isinstance(features_bucket_mapping, FeaturesBucketMapping):
+            self.features_bucket_mapping_ = features_bucket_mapping
         else:
-            self.features_bucket_mapping_ = self.features_bucket_mapping
+            try:
+                buckets_yaml = yaml.safe_load(features_bucket_mapping)
+                self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
+            except Exception:
+                raise TypeError(
+                    "'features_bucket_mapping' must be a dict, str, path, or FeaturesBucketMapping instance"
+                )
 
         # If user did not specify any variables,
         # use all the variables defined in the features_bucket_mapping

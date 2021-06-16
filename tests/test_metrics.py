@@ -10,7 +10,10 @@ from skorecard.bucketers import DecisionTreeBucketer
 @pytest.fixture()
 def X_y():
     """Set of X,y for testing the transformers."""
-    X = np.array([[0, 1], [1, 0], [0, 0], [3, 2], [0, 1], [1, 2], [2, 0], [2, 1], [0, 0]], np.int32,)
+    X = np.array(
+        [[0, 1], [1, 0], [0, 0], [3, 2], [0, 1], [1, 2], [2, 0], [2, 1], [0, 0]],
+        np.int32,
+    )
     y = np.array([0, 0, 0, 1, 1, 1, 0, 0, 1])
 
     return X, y

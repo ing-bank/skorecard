@@ -11,15 +11,15 @@ except ModuleNotFoundError:
 
 def detect_types(X: pd.DataFrame) -> Tuple[List, List]:
     """Detects numerical and categorical columns.
-    
+
     Wrapper around `dabl.detect_types`.
 
     ```python
     from skorecard import datasets
     from skorecard.utils import detect_types
-    
+
     X, y = datasets.load_uci_credit_card(return_X_y=True)
-    
+
     num_cols, cat_cols = detect_types(X)
     print(f"Categorical column(s) = {cat_cols}")
     print(f"Numerical column(s) = {num_cols}")
