@@ -1,5 +1,6 @@
 import pathlib
 import pandas as pd
+import numpy as np
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -303,9 +304,19 @@ class BucketingProcess(
         table = self.prebucket_tables_.get(column)
         table = table.rename(columns={"bucket_id": "pre-bucket"})
 
-        # Apply bucket mapping
+        # Find bucket for each pre-bucket
         bucket_mapping = self.bucketing_pipeline.features_bucket_mapping_.get(column)
         table["bucket"] = bucket_mapping.transform(table["pre-bucket"])
+
+        # Find out missing bucket
+        if -1 in table["pre-bucket"].values:
+            table.loc[table["pre-bucket"] == -1, "bucket"] = bucket_mapping.transform([np.nan])[0]
+
+        # Find out the 'other' bucket
+        if bucket_mapping.type == "categorical" and -2 in table["pre-bucket"].values:
+            something_random = "84a088e251d2fa058f37145222e536dc"
+            table.loc[table["pre-bucket"] == -2, "bucket"] = bucket_mapping.transform([something_random])[0]
+
         return table
 
 

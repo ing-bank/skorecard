@@ -212,7 +212,7 @@ def test_bucketing_process_with_numerical_specials(df):
     bucketing_process.fit(X, y)
 
     table = bucketing_process.prebucket_table("LIMIT_BAL")
-    assert len(table["bucket"].unique()) == 10
+    assert len(table["bucket"].unique()) == 11
     assert table[["label"]].values[0] == "Special: =400000.0"
 
     table = bucketing_process.prebucket_table("MARRIAGE")
