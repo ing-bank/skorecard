@@ -58,12 +58,12 @@ def test_encoding_method(df):
     ocb = OrdinalCategoricalBucketer(tol=0.03, variables=["EDUCATION"], encoding_method="frequency")
     ocb.fit(X, y)
 
-    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {2: 0, 1: 1, 3: 2}
+    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 1, 2: 0, 3: 2}
 
     ocb = OrdinalCategoricalBucketer(tol=0.03, variables=["EDUCATION"], encoding_method="ordered")
     ocb.fit(X, y)
 
-    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 0, 3: 1, 2: 2}
+    assert ocb.features_bucket_mapping_.get("EDUCATION").map == {1: 2, 2: 0, 3: 1}
 
 
 def test_specials(df):
