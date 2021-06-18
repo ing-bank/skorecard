@@ -76,6 +76,7 @@ class OptimalBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -172,7 +173,7 @@ class OptimalBucketer(BaseBucketer):
                 splits = binner.splits
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -196,7 +197,7 @@ class OptimalBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -275,6 +276,7 @@ class EqualWidthBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -326,7 +328,7 @@ class EqualWidthBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -348,7 +350,7 @@ class EqualWidthBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
 
                 assert isinstance(missing_bucket, int)
@@ -428,6 +430,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -489,7 +492,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -511,7 +514,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -583,6 +586,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values..
@@ -643,7 +647,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 boundaries = boundaries.tolist()
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -665,7 +669,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
 
                 # Repeat above procedure now we know the bucket distribution
@@ -762,6 +766,7 @@ class DecisionTreeBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -842,7 +847,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 splits = []
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -864,7 +869,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -965,6 +970,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -1050,7 +1056,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             mapping = dict(zip(normalized_counts.index, range(0, len(normalized_counts))))
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1068,7 +1074,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                 X, y, column=feature, bucket_mapping=features_bucket_mapping_.get(feature)
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -1139,6 +1145,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -1182,7 +1189,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
             mapping = dict(zip(unq, range(0, len(unq))))
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1200,7 +1207,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
                 X, y, column=feature, bucket_mapping=features_bucket_mapping_.get(feature)
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
 
                 # Repeat above procedure now we know the bucket distribution
@@ -1274,6 +1281,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
+                    neutral: Missing values are put into the bucket with WoE closest to 0.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values..
@@ -1321,7 +1329,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 raise NotPreBucketedError(msg)
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -1343,7 +1351,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(

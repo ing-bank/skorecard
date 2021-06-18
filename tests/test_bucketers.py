@@ -128,6 +128,15 @@ def test_missings_set(bucketer, df_with_missings) -> None:
         safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
         assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
 
+    BUCK_neutral = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="neutral")
+    BUCK_neutral.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the bucket with WoE closest to 0
+        table = BUCK_norisk.bucket_table(feature)
+        table["WoE"] = np.abs(table["WoE"])
+        closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_neutral.bucket_table(feature)[BUCK_neutral.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
 def test_missings_without_set(bucketer, df_with_missings) -> None:
@@ -160,6 +169,15 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
         safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
         assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
 
+    BUCK_neutral = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="neutral")
+    BUCK_neutral.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the bucket with WoE closest to 0
+        table = BUCK_norisk.bucket_table(feature)
+        table["WoE"] = np.abs(table["WoE"])
+        closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_neutral.bucket_table(feature)[BUCK_neutral.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
 def test_type_error_input(bucketer, df):
