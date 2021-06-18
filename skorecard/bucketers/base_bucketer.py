@@ -1,5 +1,6 @@
 from typing import Optional, Dict, List, TypeVar
 import pandas as pd
+import numpy as np
 import itertools
 import pathlib
 
@@ -29,7 +30,7 @@ class BaseBucketer(
     @staticmethod
     def _is_allowed_missing_treatment(missing_treatment):
         # checks if the argument for missing_values is valid
-        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky"]
+        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]
 
         if type(missing_treatment) == str:
             if missing_treatment not in allowed_str_missing:
@@ -94,7 +95,7 @@ class BaseBucketer(
 
     def _find_missing_bucket(self, feature):
         """
-        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky"]
+        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky", "neutral"]
 
         Calculates the new bucket for us to put the missing values in.
         """
@@ -131,6 +132,16 @@ class BaseBucketer(
                 .reset_index(drop=True)
                 .iloc[0]["bucket_id"]
             )
+        
+        elif self.missing_treatment in ["neutral"]:
+            table = self.bucket_tables_[feature]
+            table["WoE"] = np.abs(table["WoE"])
+            missing_bucket = int(
+                table[table["Count"] > 0]
+                .sort_values("WoE")
+                .reset_index(drop=True)
+                .iloc[0]["bucket_id"]
+                )
 
         return missing_bucket
 
