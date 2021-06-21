@@ -138,6 +138,18 @@ def test_missings_set(bucketer, df_with_missings) -> None:
         closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)['bucket'][0]
         assert 'Missing' in BUCK_neutral.bucket_table(feature)[BUCK_neutral.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
 
+
+    BUCK_similar = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="similar")
+    BUCK_similar.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the bucket with WoE closest to 0
+        table = BUCK_norisk.bucket_table(feature)
+        missing_WoE = table[table['label'] == 'Missing']['WoE'].values[0]
+        table['New_WoE'] = np.abs(table["WoE"] - missing_WoE)
+        closest_bucket = table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_similar.bucket_table(feature)[BUCK_similar.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
+
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
 def test_missings_without_set(bucketer, df_with_missings) -> None:
     """Test all missing methods work for bucketers without set bins."""
@@ -178,6 +190,17 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
         table["WoE"] = np.abs(table["WoE"])
         closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)['bucket'][0]
         assert 'Missing' in BUCK_neutral.bucket_table(feature)[BUCK_neutral.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
+    
+    BUCK_similar = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="similar")
+    BUCK_similar.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the bucket with WoE closest to 0
+        table = BUCK_norisk.bucket_table(feature)
+        missing_WoE = table[table['label'] == 'Missing']['WoE'].values[0]
+        table['New_WoE'] = np.abs(table["WoE"] - missing_WoE)
+        closest_bucket = table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True)['bucket'][0]
+        assert 'Missing' in BUCK_similar.bucket_table(feature)[BUCK_similar.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
 def test_type_error_input(bucketer, df):
