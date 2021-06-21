@@ -30,7 +30,7 @@ class BaseBucketer(
     @staticmethod
     def _is_allowed_missing_treatment(missing_treatment):
         # checks if the argument for missing_values is valid
-        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]
+        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky", "neutral", "similar"]
 
         if type(missing_treatment) == str:
             if missing_treatment not in allowed_str_missing:
@@ -95,7 +95,7 @@ class BaseBucketer(
 
     def _find_missing_bucket(self, feature):
         """
-        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky", "neutral"]
+        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky", "neutral", "similar"]
 
         Calculates the new bucket for us to put the missing values in.
         """
@@ -139,6 +139,17 @@ class BaseBucketer(
             missing_bucket = int(
                 table[table["Count"] > 0]
                 .sort_values("WoE")
+                .reset_index(drop=True)
+                .iloc[0]["bucket_id"]
+                )
+
+        elif self.missing_treatment in ["similar"]:
+            table = self.bucket_tables_[feature]
+            missing_WoE = table[table['label'] == 'Missing']['WoE'].values[0]
+            table['New_WoE'] = np.abs(table["WoE"] - missing_WoE)
+            missing_bucket = int(
+                table[table['label'] != "Missing"]
+                .sort_values("New_WoE")
                 .reset_index(drop=True)
                 .iloc[0]["bucket_id"]
                 )
