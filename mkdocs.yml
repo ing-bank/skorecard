@@ -65,8 +65,7 @@ nav:
         - Index: index.md
         - Contributing: contributing.md
     - Tutorials:
-        - Basic Bucketer:
-            - Background: tutorials/background.ipynb
+        - Bucketing a feature:
             - The Basics: tutorials/the_basics.ipynb
             - Missing Values: tutorials/missing_values.ipynb
             - Special Values: tutorials/specials.ipynb
@@ -75,17 +74,15 @@ nav:
         - BucketingProcess: tutorials/using-bucketing-process.ipynb
         - Reporting: tutorials/reporting.ipynb
         - Skorecard from A-Z:
-            - Intro: tutorials/intro.md
-            - Bucketing step: tutorials/1_bucketing.ipynb
+            - Bucketing features: tutorials/1_bucketing.ipynb
             - Selecting features: tutorials/2_feature_selection.ipynb
             - Scorecard model: tutorials/3_skorecard_model.ipynb
     - How to:
-        - Save bucketers to file: howto/save_buckets_to_file.ipynb
-        - Create bucketer from file: howto/create_bucketer_from_file.ipynb
         - Manually defining buckets: howto/using_manually_defined_buckets.ipynb
+        - Read/write buckets to file: howto/save_buckets_to_file.ipynb
         - Assessing bucket quality: howto/psi_and_iv.ipynb
         - Optimizations in the bucketing process: howto/Optimizations.ipynb
-    - API: 
+    - API:
         - bucketers:
             - api/bucketers/OptimalBucketer.md
             - api/bucketers/AgglomerativeClusteringBucketer.md
@@ -104,18 +101,15 @@ nav:
         - preprocessing:
             - api/preprocessing/ColumnSelector.md
             - api/preprocessing/WoeEncoder.md
-        # # - apps:
-        #     - api/apps/BucketTweakerApp.md
         - linear_model:
             - api/linear_model/LogisticRegression.md
         - reporting:
             - api/reporting/iv.md
             - api/reporting/psi.md
+        - rescale:
+            - api/rescale/rescale.md 
         - datasets:
             - api/datasets/load_uci_credit_card.md
-    - Discussion:
-        - discussion/scorecard_concepts.md
-
 
 markdown_extensions:
     - codehilite:
