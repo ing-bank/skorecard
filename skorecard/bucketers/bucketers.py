@@ -75,6 +75,7 @@ class OptimalBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -87,7 +88,7 @@ class OptimalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
             kwargs: Other parameters passed to optbinning.OptimalBinning. Passed to optbinning.OptimalBinning.
-        """
+        """  # noqa
         self._is_allowed_missing_treatment(missing_treatment)
         assert variables_type in ["numerical", "categorical"]
         assert remainder in ["passthrough", "drop"]
@@ -221,13 +222,14 @@ class EqualWidthBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
             remainder: How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-        """
+        """  # noqa
         assert isinstance(variables, list)
         assert isinstance(n_bins, int)
         assert n_bins >= 1
@@ -323,6 +325,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -330,7 +333,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
             kwargs: Other parameters passed to AgglomerativeBucketer
-        """
+        """  # noqa
         assert isinstance(variables, list)
         assert isinstance(n_bins, int)
         assert n_bins >= 1
@@ -430,13 +433,14 @@ class EqualFrequencyBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values..
             remainder: How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-        """
+        """  # noqa
         assert isinstance(variables, list)
         assert isinstance(n_bins, int)
         assert n_bins >= 1
@@ -561,6 +565,7 @@ class DecisionTreeBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -714,6 +719,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -843,13 +849,14 @@ class AsIsCategoricalBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
             remainder: How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-        """
+        """  # noqa
         assert isinstance(variables, list)
         assert remainder in ["passthrough", "drop"]
         self._is_allowed_missing_treatment(missing_treatment)
@@ -934,6 +941,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
+                    similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values..

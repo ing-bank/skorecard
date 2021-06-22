@@ -30,7 +30,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
     @staticmethod
     def _is_allowed_missing_treatment(missing_treatment):
         # checks if the argument for missing_values is valid
-        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]
+        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky", "neutral", "similar"]
 
         if type(missing_treatment) == str:
             if missing_treatment not in allowed_str_missing:
@@ -85,7 +85,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     def _find_missing_bucket(self, feature):
         """
-        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky", "neutral"].
+        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky", "neutral", "similar"].
 
         Calculates the new bucket for us to put the missing values in.
         """
@@ -123,6 +123,14 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             table["WoE"] = np.abs(table["WoE"])
             missing_bucket = int(
                 table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True).iloc[0]["bucket_id"]
+            )
+
+        elif self.missing_treatment in ["similar"]:
+            table = self.bucket_tables_[feature]
+            missing_WoE = table[table["label"] == "Missing"]["WoE"].values[0]
+            table["New_WoE"] = np.abs(table["WoE"] - missing_WoE)
+            missing_bucket = int(
+                table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True).iloc[0]["bucket_id"]
             )
 
         return missing_bucket
@@ -181,7 +189,14 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             splits, right = self._get_feature_splits(feature, X=X_flt, y=y_flt, X_unfiltered=X)
 
             # Deal with missing values
-            if self.missing_treatment in ["separate", "most_frequent", "most_risky", "least_risky", "neutral"]:
+            if self.missing_treatment in [
+                "separate",
+                "most_frequent",
+                "most_risky",
+                "least_risky",
+                "neutral",
+                "similar",
+            ]:
                 missing_bucket = None
             if isinstance(self.missing_treatment, dict):
                 missing_bucket = self.missing_treatment.get(feature)
@@ -203,7 +218,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral"]:
+            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral", "similar"]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
