@@ -347,6 +347,8 @@ def to_skorecard_pipeline(pipeline: Pipeline) -> SkorecardPipeline:
     ```python
     from skorecard.pipeline.pipeline import SkorecardPipeline, to_skorecard_pipeline
     from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
+    from skorecard import datasets
+
     from sklearn.pipeline import make_pipeline
 
     pipe = make_pipeline(

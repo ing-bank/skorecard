@@ -9,9 +9,16 @@ def load_uci_credit_card(return_X_y=False, as_frame=False):
 
     This dataset contains a sample of [Default of Credit Card Clients Dataset](https://www.kaggle.com/uciml/default-of-credit-card-clients-dataset).
 
+    Example:
+
+    ```python
+    from skorecard import datasets
+    df = datasets.load_uci_credit_card(as_frame=True)
+    ```
+
     Args:
-        return_X_y:  (bool) If True, returns ``(data, target)`` instead of a dict object.
-        as_frame: (bool) give the pandas dataframe instead of X, y matrices (default=False).
+        return_X_y (bool): If True, returns `(data, target)` instead of a dict object.
+        as_frame (bool): give the pandas dataframe instead of X, y matrices (default=False).
 
     Returns: (pd.DataFrame, dict or tuple) features and target, with as follows:
         - if as_frame is True: returns pd.DataFrame with y as a target
