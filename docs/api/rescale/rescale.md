@@ -1,0 +1,4 @@
+# ScoreCardPoints
+
+::: skorecard.rescale.ScoreCardPoints
+
