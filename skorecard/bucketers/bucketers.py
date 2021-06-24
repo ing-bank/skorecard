@@ -7,7 +7,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import _tree
 
-from typing import Any, List, Dict
+from typing import List
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.features_bucket_mapping import FeaturesBucketMapping
 from skorecard.utils import NotInstalledError, NotPreBucketedError
@@ -105,9 +105,6 @@ class OptimalBucketer(BaseBucketer):
 
         self.kwargs = kwargs
 
-        # To be able to access any fitted estimators per feature
-        self.binners: Dict[str, Any] = {}
-
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
         Finds the splits for a single feature.
@@ -124,7 +121,7 @@ class OptimalBucketer(BaseBucketer):
             splits, right (tuple): The splits (dict or array), and whether right=True or False.
         """
         # Normally Optbinning uses a DecisionTreeBucketer to do automatic prebinning
-        # We  require the user to pre-bucket explictly before using this.
+        # We require the user to pre-bucket explictly before using this.
         if self.variables_type == "numerical":
             uniq_values = np.sort(np.unique(X.values))
             if len(uniq_values) > 100:
@@ -157,7 +154,6 @@ class OptimalBucketer(BaseBucketer):
             **self.kwargs,
         )
         binner.fit(X.values, y)
-        self.binners[feature] = binner
 
         # Extract fitted boundaries
         if self.variables_type == "categorical":
@@ -291,9 +287,6 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
     bucketer = AgglomerativeClusteringBucketer(n_bins = 10, variables=['LIMIT_BAL'], specials=specials)
     bucketer.fit_transform(X)
     bucketer.fit_transform(X)['LIMIT_BAL'].value_counts()
-
-    # You can also access the fitted AgglomerativeClustering per feature:
-    bucketer.binners['LIMIT_BAL']
     ```
     """  # noqa
 
@@ -348,7 +341,6 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
         self.kwargs = kwargs
 
         self.variables_type = "numerical"
-        self.binners: Dict[str, Any] = {}
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -368,7 +360,6 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
         # Fit the estimator
         ab = AgglomerativeClustering(n_clusters=self.n_bins, **self.kwargs)
         ab.fit(X.values.reshape(-1, 1), y=None)
-        self.binners[feature] = ab
 
         # Find the boundaries
         df = pd.DataFrame({"x": X.values, "label": ab.labels_}).sort_values(by="x")
@@ -523,9 +514,6 @@ class DecisionTreeBucketer(BaseBucketer):
     dt_bucketer.fit(X, y)
 
     dt_bucketer.fit_transform(X, y)['LIMIT_BAL'].value_counts()
-
-    # You can also access the fitted DecisionTreeClassifier per feature:
-    dt_bucketer.binners['LIMIT_BAL']
     ```
     """  # noqa
 
@@ -589,7 +577,6 @@ class DecisionTreeBucketer(BaseBucketer):
         self.remainder = remainder
 
         self.variables_type = "numerical"
-        self.binners: Dict[str, Any] = {}
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -635,7 +622,6 @@ class DecisionTreeBucketer(BaseBucketer):
                 **self.kwargs,
             )
             binner.fit(X.values.reshape(-1, 1), y)
-            self.binners[feature] = binner
 
             # Extract fitted boundaries
             splits = np.unique(binner.tree_.threshold[binner.tree_.feature != _tree.TREE_UNDEFINED])
