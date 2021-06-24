@@ -124,7 +124,7 @@ class OptimalBucketer(BaseBucketer):
             splits, right (tuple): The splits (dict or array), and whether right=True or False.
         """
         # Normally Optbinning uses a DecisionTreeBucketer to do automatic prebinning
-        # We  require the user to pre-bucket explictly before using this.
+        # We require the user to pre-bucket explictly before using this.
         if self.variables_type == "numerical":
             uniq_values = np.sort(np.unique(X.values))
             if len(uniq_values) > 100:
