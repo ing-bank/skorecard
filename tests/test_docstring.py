@@ -21,14 +21,12 @@ import skorecard.preprocessing
 import skorecard.metrics
 import skorecard.bucket_mapping
 import skorecard.utils
+import skorecard.rescale
+import skorecard.datasets
 
 # List of all classes and functions we want tested
 MODULES_TO_TEST = [skorecard.apps.interactive_bucketing]
 CLASSES_TO_TEST = [
-    # skorecard.apps.BucketTweakerApp,
-    skorecard.linear_model.LogisticRegression,
-    skorecard.pipeline.KeepPandas,
-    # skorecard.pipeline.bucketing_process,
     skorecard.bucketers.OptimalBucketer,
     skorecard.bucketers.EqualWidthBucketer,
     skorecard.bucketers.AgglomerativeClusteringBucketer,
@@ -38,7 +36,14 @@ CLASSES_TO_TEST = [
     skorecard.bucketers.UserInputBucketer,
     skorecard.bucketers.AsIsCategoricalBucketer,
     skorecard.bucketers.AsIsNumericalBucketer,
+    skorecard.bucketers.UserInputBucketer,
+    skorecard.pipeline.KeepPandas,
+    skorecard.pipeline.BucketingProcess,
+    skorecard.pipeline.SkorecardPipeline,
+    skorecard.preprocessing.ColumnSelector,
     skorecard.preprocessing.WoeEncoder,
+    skorecard.linear_model.LogisticRegression,
+    skorecard.rescale.ScoreCardPoints,
     skorecard.features_bucket_mapping.FeaturesBucketMapping,
     skorecard.bucket_mapping.BucketMapping,
     skorecard.utils.DimensionalityError,
@@ -51,6 +56,8 @@ FUNCTIONS_TO_TEST = [
     skorecard.reporting.build_bucket_table,
     skorecard.reporting.iv,
     skorecard.reporting.psi,
+    skorecard.pipeline.to_skorecard_pipeline,
+    skorecard.datasets.load_uci_credit_card,
 ]
 
 
