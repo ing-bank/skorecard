@@ -33,7 +33,7 @@ docs_dep = [
 
 # Packages that are not a set together
 # We recommend users to just install that package when it is used
-utils_dep = ["optbinning>=0.10.0"]
+utils_dep = ["optbinning>=0.8.0"]
 
 setup(
     name="skorecard",
