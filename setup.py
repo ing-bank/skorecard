@@ -3,12 +3,7 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="UTF-8") as fh:
     long_description = fh.read()
 
-base_packages = [
-    "scipy>=1.5.2",
-    "numpy>=1.20.3",
-    "pandas>=1.2.4",
-    "scikit-learn>=0.23.2",
-]
+base_packages = ["scipy>=1.5.2", "numpy>=1.19.5", "pandas>=1.1.5", "scikit-learn>=0.23.2", "dataclasses", "pyyaml"]
 
 dashboard_dep = [
     "dash>=1.20.0",
@@ -38,23 +33,24 @@ docs_dep = [
 
 # Packages that are not a set together
 # We recommend users to just install that package when it is used
-utils_dep = ["optbinning>=0.10.0"]
+utils_dep = ["optbinning>=0.8.0"]
 
 setup(
     name="skorecard",
-    version="0.5",
+    version="0.5.1",
     description="Tools for building scorecard models in python, with a sklearn-compatible API",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="ING Bank",
     author_email="daniel.timbrell@ing.com",
     license="MIT license",
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
