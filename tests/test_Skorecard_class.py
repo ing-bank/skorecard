@@ -103,6 +103,25 @@ def test_skorecard_with_num_bucketers(df):
     run_checks(X, y, bucketer, features, expected_probas)
 
 
+def test_passing_kwargs(df):
+    """Test passing keyword args to LR."""
+    X = df.drop("default", axis=1)
+    y = df["default"]
+
+    features = ["LIMIT_BAL", "BILL_AMT1"]
+    bucketer = DecisionTreeBucketer(variables=features, max_n_bins=5)
+
+    skorecard_model = Skorecard(
+        bucketing=bucketer,
+        selected_features=features,
+        lr_kwargs={"penalty": "none", "C": 1, "multi_class": "ovr", "n_jobs": 1, "max_iter": int(1e3)},
+    )
+    skorecard_model.fit(X, y)
+
+    assert skorecard_model.bucket_transform(X).shape == X.shape
+    assert skorecard_model.woe_transform(X).shape == X.shape
+
+
 def test_skorecard_with_bucketing_process(df):
     """Test a workflow, with Bucketin Process."""
     X = df.drop("default", axis=1)
