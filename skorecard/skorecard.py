@@ -108,6 +108,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         selected_features: List = None,
         cat_features: List = None,
         verbose: int = 0,
+        lr_kwargs: dict = None,
     ):
         """
         Init the class.
@@ -127,6 +128,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             selected_features (list): list of features to fit the model on. Defaults to None (all features selected).
             cat_features (list): list of  categorical features. Used only if bucketing=None.
             verbose (int): verbosity, set to 0 to avoid warning methods.
+            lr_kwargs (dict): Settings passed to sklearn.linear_model.LogisticRegression.
+                By default no settings are passed.
         """
         if isinstance(bucketing, Pipeline):
             bucketing = to_skorecard_pipeline(bucketing)
@@ -137,6 +140,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.cat_features = cat_features
         self._use_default_bucketing = False
         self.verbose = verbose
+        self.lr_kwargs = lr_kwargs
         self.repr_msg = ""
 
     def __repr__(self):
@@ -187,12 +191,17 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         else:
             raise NotImplementedError(f"Encoder {self.encoder} not supported. Please use woe")
 
+        if self.lr_kwargs:
+            lr_model = LogisticRegression(**self.lr_kwargs)
+        else:
+            lr_model = LogisticRegression()
+
         self.pipeline = Pipeline(
             [
                 ("bucketer", self.bucketing),
                 ("encoder", encoder),
                 ("column_selector", ColumnSelector(self.selected_features)),
-                ("model", LogisticRegression()),
+                ("model", lr_model),
             ]
         )
 
