@@ -43,6 +43,9 @@ class BaseBucketer(
             y = y.values.reshape(
                 -1,
             )
+        
+        elif isinstance(y, pd.core.series.Series):
+            y = y.values
 
         elif isinstance(y, np.ndarray):
             if y.ndim > 2:
