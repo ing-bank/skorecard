@@ -16,7 +16,9 @@ from skorecard.reporting import build_bucket_table
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
 
-class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTableMethod, SummaryMethod):
+class BaseBucketer(
+    BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTableMethod, SummaryMethod
+):
     """Base class for bucket transformers."""
 
     @staticmethod
@@ -28,23 +30,74 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         return X.copy()
 
     @staticmethod
+    def _check_y(y):
+        # checks that y is an appropriate type and shape
+        if y is None:
+            return y
+        y = y.copy()
+        if isinstance(y, pd.DataFrame):
+            if y.shape[1] != 1:
+                raise AttributeError(
+                    "If passing y as a DataFrame, it must be 1 column."
+                )
+            y = y.values.reshape(
+                -1,
+            )
+        
+        elif isinstance(y, pd.core.series.Series):
+            y = y.values
+
+        elif isinstance(y, np.ndarray):
+            if y.ndim > 2:
+                raise AttributeError(
+                    "If passing y as a Numpy array, y must be a 1-dimensional"
+                )
+            elif y.ndim == 2:
+                if y.shape[1] != 1:
+                    raise AttributeError(
+                        "If passing y as a Numpy array, y must be a 1-dimensional"
+                    )
+                else:
+                    y = y.reshape(
+                        -1,
+                    )
+        else:
+            raise TypeError("y must be either a Pandas column or a Numpy array")
+        return y
+
+    @staticmethod
     def _is_allowed_missing_treatment(missing_treatment):
         # checks if the argument for missing_values is valid
-        allowed_str_missing = ["separate", "most_frequent", "most_risky", "least_risky", "neutral", "similar"]
+        allowed_str_missing = [
+            "separate",
+            "most_frequent",
+            "most_risky",
+            "least_risky",
+            "neutral",
+            "similar",
+        ]
 
         if type(missing_treatment) == str:
             if missing_treatment not in allowed_str_missing:
-                raise ValueError(f"missing_treatment must be in {allowed_str_missing} or a dict")
+                raise ValueError(
+                    f"missing_treatment must be in {allowed_str_missing} or a dict"
+                )
 
         elif type(missing_treatment) == dict:
             for _, v in enumerate(missing_treatment):
                 if missing_treatment[v] < 0:
-                    raise ValueError("As an integer, missing_treatment must be greater than 0")
+                    raise ValueError(
+                        "As an integer, missing_treatment must be greater than 0"
+                    )
                 elif type(missing_treatment[v]) != int:
-                    raise ValueError("Values of the missing_treatment dict must be integers")
+                    raise ValueError(
+                        "Values of the missing_treatment dict must be integers"
+                    )
 
         else:
-            raise ValueError(f"missing_treatment must be in {allowed_str_missing} or a dict")
+            raise ValueError(
+                f"missing_treatment must be in {allowed_str_missing} or a dict"
+            )
 
     @staticmethod
     def _check_contains_na(X, variables: Optional[List]):
@@ -53,7 +106,9 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         vars_missing = has_missings[has_missings].index.tolist()
 
         if vars_missing:
-            raise ValueError(f"The variables {vars_missing} contain missing values. Consider using an imputer first.")
+            raise ValueError(
+                f"The variables {vars_missing} contain missing values. Consider using an imputer first."
+            )
 
     @staticmethod
     def _check_variables(X, variables: Optional[List]):
@@ -91,7 +146,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         """
         if self.missing_treatment == "most_frequent":
             most_frequent_row = (
-                self.bucket_tables_[feature].sort_values("Count", ascending=False).reset_index(drop=True).iloc[0]
+                self.bucket_tables_[feature]
+                .sort_values("Count", ascending=False)
+                .reset_index(drop=True)
+                .iloc[0]
             )
             if most_frequent_row["label"] != "Missing":
                 missing_bucket = int(most_frequent_row["bucket_id"])
@@ -109,7 +167,9 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 ascending = False
             # if fitted with .fit(X) and not .fit(X, y)
             if "Event" not in self.bucket_tables_[feature].columns:
-                raise AttributeError("bucketer must be fit with y to determine the risk rates")
+                raise AttributeError(
+                    "bucketer must be fit with y to determine the risk rates"
+                )
 
             missing_bucket = int(
                 self.bucket_tables_[feature]
@@ -122,7 +182,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             table = self.bucket_tables_[feature]
             table["WoE"] = np.abs(table["WoE"])
             missing_bucket = int(
-                table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True).iloc[0]["bucket_id"]
+                table[table["Count"] > 0]
+                .sort_values("WoE")
+                .reset_index(drop=True)
+                .iloc[0]["bucket_id"]
             )
 
         elif self.missing_treatment in ["similar"]:
@@ -130,7 +193,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             missing_WoE = table[table["label"] == "Missing"]["WoE"].values[0]
             table["New_WoE"] = np.abs(table["WoE"] - missing_WoE)
             missing_bucket = int(
-                table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True).iloc[0]["bucket_id"]
+                table[table["label"] != "Missing"]
+                .sort_values("New_WoE")
+                .reset_index(drop=True)
+                .iloc[0]["bucket_id"]
             )
 
         return missing_bucket
@@ -156,11 +222,14 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         """
         diff = set(specials.keys()).difference(set(variables))
         if len(diff) > 0:
-            raise ValueError(f"Features {diff} are defined in the specials dictionary, but not in the variables.")
+            raise ValueError(
+                f"Features {diff} are defined in the specials dictionary, but not in the variables."
+            )
 
     def fit(self, X, y=None):
         """Fit X, y."""
         X = self._is_dataframe(X)
+        y = self._check_y(y)
         self.variables = self._check_variables(X, self.variables)
         self._verify_specials_variables(self.specials, X.columns)
 
@@ -175,7 +244,9 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             # filter specials for the fit
             if feature in self.specials.keys():
                 special = self.specials[feature]
-                X_flt, y_flt = self._filter_specials_for_fit(X=X[feature], y=y, specials=special)
+                X_flt, y_flt = self._filter_specials_for_fit(
+                    X=X[feature], y=y, specials=special
+                )
             else:
                 X_flt, y_flt = X[feature], y
                 special = {}
@@ -186,7 +257,9 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             # Find the splits
             # This method is implemented by each bucketer
             assert isinstance(X_flt, pd.Series)
-            splits, right = self._get_feature_splits(feature, X=X_flt, y=y_flt, X_unfiltered=X)
+            splits, right = self._get_feature_splits(
+                feature, X=X_flt, y=y_flt, X_unfiltered=X
+            )
 
             # Deal with missing values
             if self.missing_treatment in [
@@ -218,7 +291,13 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 bucket_mapping=features_bucket_mapping_.get(feature),
             )
 
-            if self.missing_treatment in ["most_frequent", "most_risky", "least_risky", "neutral", "similar"]:
+            if self.missing_treatment in [
+                "most_frequent",
+                "most_risky",
+                "least_risky",
+                "neutral",
+                "similar",
+            ]:
                 missing_bucket = self._find_missing_bucket(feature=feature)
                 # Repeat above procedure now we know the bucket distribution
                 features_bucket_mapping_[feature] = BucketMapping(
@@ -256,6 +335,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         """
         check_is_fitted(self)
         X = self._is_dataframe(X)
+        y = self._check_y(y)
 
         for feature in self.variables:
             bucket_mapping = self.features_bucket_mapping_.get(feature)
