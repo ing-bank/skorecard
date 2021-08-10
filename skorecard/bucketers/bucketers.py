@@ -1023,6 +1023,7 @@ class UserInputBucketer(BaseBucketer):
         self,
         features_bucket_mapping,
         variables: List = [],
+        remainder="passthrough",
     ) -> None:
         """
         Initialise the user-defined boundaries with a dictionary.
@@ -1036,11 +1037,16 @@ class UserInputBucketer(BaseBucketer):
                 If a dict, it will be converted to an internal FeaturesBucketMapping object.
                 If a string or path, which will attempt to load the file as a yaml and convert to FeaturesBucketMapping object.
             variables (list): The features to bucket. Uses all features in features_bucket_mapping if not defined.
+            remainder (str): How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
+                passthrough (Default): all columns that were not specified in "variables" will be passed through.
+                drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
         # Assigning the variable in the init to the attribute with the same name is a requirement of
         # sklearn.base.BaseEstimator. See the notes in
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
+        assert remainder in ["passthrough", "drop"]
+        self.remainder = remainder
 
         if isinstance(features_bucket_mapping, str):
             buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
@@ -1063,9 +1069,6 @@ class UserInputBucketer(BaseBucketer):
         self.variables = variables
         if variables == []:
             self.variables = list(self.features_bucket_mapping_.maps.keys())
-
-        # Set passthrough remainder for transform()
-        self.remainder = "passthrough"
 
     def fit(self, X, y=None):
         """Init the class."""

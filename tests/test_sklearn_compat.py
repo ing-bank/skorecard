@@ -11,6 +11,10 @@ from skorecard.pipeline import (
     BucketingProcess,
 )
 
+from skorecard.preprocessing import WoeEncoder
+
+import pytest
+
 
 def test_cross_val(df):
     """
@@ -41,3 +45,31 @@ def test_cross_val(df):
     pipe = make_pipeline(bucketing_process, StandardScaler(), LogisticRegression(solver="liblinear", random_state=0))
 
     cross_val_score(pipe, X, y, cv=5, scoring="roc_auc")
+
+
+def test_cv_pipeline(df):
+    """
+    Another CV.
+    """
+    y = df["default"].values
+    X = df.drop(columns=["default", "pet_ownership"])
+
+    specials = {"EDUCATION": {"Some specials": [1, 2]}}
+
+    bucketing_process = BucketingProcess(
+        prebucketing_pipeline=make_pipeline(
+            DecisionTreeBucketer(max_n_bins=100, min_bin_size=0.05),
+        ),
+        bucketing_pipeline=make_pipeline(
+            OptimalBucketer(max_n_bins=10, min_bin_size=0.05),
+        ),
+        specials=specials,
+    )
+
+    pipe = make_pipeline(bucketing_process, WoeEncoder(), LogisticRegression(solver="liblinear", random_state=0))
+
+    with pytest.warns(None) as record:
+        cross_val_score(pipe, X, y, cv=5, scoring="roc_auc")
+
+    # also make sure no warnings were raised
+    assert len(record) == 0

@@ -2,7 +2,7 @@ import logging
 
 import pandas as pd
 import numpy as np
-from typing import Dict
+from typing import Dict, List
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
@@ -198,7 +198,13 @@ def get_features_bucket_mapping(pipe: Pipeline) -> FeaturesBucketMapping:
     return FeaturesBucketMapping(features_bucket_mapping)
 
 
-def _get_all_steps(pipeline):
+def _get_all_steps(pipeline: Pipeline) -> List:
+    """
+    Returns a list of steps in a sklearn pipeline.
+
+    Args:
+        pipeline (Pipeline): A scikitlearn pipeline.
+    """
     steps = []
     for step in pipeline.steps:
         if type(step) == tuple:

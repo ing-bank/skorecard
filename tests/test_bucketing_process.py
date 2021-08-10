@@ -98,7 +98,7 @@ def test_bucketing_optimization(df):
 
     X_bins = bucketing_process.fit_transform(X, y)
 
-    X_prebucketed = bucketing_process.prebucketing_pipeline.transform(X)
+    X_prebucketed = bucketing_process.pre_pipeline.transform(X)
     for col in num_cols + cat_cols:
         assert X_bins[col].nunique() <= X_prebucketed[col].nunique()
         assert X_bins[col].nunique() > 1
@@ -129,7 +129,7 @@ def test_bucketing_with_specials(df):
     _ = bucketing_process.fit_transform(X, y)
 
     # Make sure all the prebucketers have the specials assigned
-    for step in bucketing_process.prebucketing_pipeline:
+    for step in bucketing_process.pre_pipeline:
         assert step.specials == the_specials
 
     # Test the specials in the prebucket table
@@ -310,6 +310,56 @@ def test_bucketing_process_summary(df):
     assert table[table["column"] == "pet_ownership"]["num_buckets"].values[0] == "not_bucketed"
     assert len(table["dtype"].unique()) == 3
     assert all(table["IV_score"] >= 0)
+
+
+def test_bucketing_process_remainder(df):
+    """
+    Test bucketing process.
+
+    Test we get expected results for .summary()
+    """
+    y = df["default"]
+    X = df.drop(columns=["default", "pet_ownership"])
+
+    num_cols = ["LIMIT_BAL"]  # left out "BILL_AMT1"
+    cat_cols = ["EDUCATION"]  # left out "MARRIAGE"
+
+    # Don't drop variables.
+    # If we specify bucketingprocess.variables
+    # other variables should not be altered by prebucketing or bucketing pipeline
+    bucketing_process = BucketingProcess(
+        variables=num_cols + cat_cols,
+        remainder="passthrough",
+        specials={"EDUCATION": {"=0": [0]}},
+        prebucketing_pipeline=make_pipeline(
+            DecisionTreeBucketer(max_n_bins=100, min_bin_size=0.05),  # note we didnt specify variables here!
+        ),
+        bucketing_pipeline=make_pipeline(
+            OptimalBucketer(max_n_bins=10, min_bin_size=0.05),  # note we didnt specify variables here!
+        ),
+    )
+    new_X = bucketing_process.fit_transform(X, y)
+    assert new_X["MARRIAGE"].equals(X["MARRIAGE"])
+    assert len(new_X.columns) == 4
+
+    # now with remainder drop
+    bucketing_process = BucketingProcess(
+        variables=num_cols + cat_cols,
+        remainder="drop",
+        specials={"EDUCATION": {"=0": [0]}},
+        prebucketing_pipeline=make_pipeline(
+            DecisionTreeBucketer(variables=num_cols, max_n_bins=100, min_bin_size=0.05),
+            DecisionTreeBucketer(
+                variables=cat_cols, max_n_bins=100, min_bin_size=0.05
+            ),  # note it's now treated as a numerical feature
+        ),
+        bucketing_pipeline=make_pipeline(
+            OptimalBucketer(variables=num_cols, max_n_bins=10, min_bin_size=0.05),
+            OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=10, min_bin_size=0.05),
+        ),
+    )
+    new_X = bucketing_process.fit_transform(X, y)
+    assert len(new_X.columns) == 2
 
 
 def test_remapping_specials():
