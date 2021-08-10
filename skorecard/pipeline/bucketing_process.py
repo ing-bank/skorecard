@@ -1,6 +1,9 @@
 import pathlib
 import pandas as pd
 import numpy as np
+import warnings
+
+from copy import deepcopy
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -86,35 +89,45 @@ class BucketingProcess(
         specials={},
     ):
         """
-        Init the class.
+        Define a BucketingProcess to first prebucket and then bucket multiple columns in one go.
 
         Args:
+            prebucketing_pipeline (Pipeline): The scikit-learn pipeline that does pre-bucketing.
+                Defaults to an all-numeric DecisionTreeBucketer pipeline.
+            bucketing_pipeline (Pipeline): The scikit-learn pipeline that does bucketing.
+                Defaults to an all-numeric OptimalBucketer pipeline.
+                Must transform same features as the prebucketing pipeline.
             specials: (nested) dictionary of special values that require their own binning.
+                Will merge when specials are also defined in any bucketers in a (pre)bucketing pipeline, and overwrite in case there are shared keys.
                 The dictionary has the following format:
                  {"<column name>" : {"name of special bucket" : <list with 1 or more values>}}
                 For every feature that needs a special value, a dictionary must be passed as value.
                 This dictionary contains a name of a bucket (key) and an array of unique values that should be put
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
-            prebucketing_pipeline (Pipeline): The scikit-learn pipeline that does pre-bucketing.
-                Defaults to an all-numeric DecisionTreeBucketer pipeline.
-            bucketing_pipeline (Pipeline): The scikit-learn pipeline that does bucketing.
-                Defaults to an all-numeric OptimalBucketer pipeline.
-                Must transform same features as the prebucketing pipeline.
-        """
+        """  # noqa
+        # Save original input params
+        # We overwrite the input later, so we need to save
+        # original so we can clone instances
+        # https://scikit-learn.org/dev/developers/develop.html#cloning
+        self.original_prebucketing_pipeline = prebucketing_pipeline
+        self.original_bucketing_pipeline = bucketing_pipeline
+
         # Convert to skorecard pipelines
         # This does some checks on the pipelines
         # and adds some convenience methods to the pipeline.
-        self.prebucketing_pipeline = to_skorecard_pipeline(prebucketing_pipeline)
-        self.bucketing_pipeline = to_skorecard_pipeline(bucketing_pipeline)
+        self.prebucketing_pipeline = to_skorecard_pipeline(deepcopy(prebucketing_pipeline))
+        self.bucketing_pipeline = to_skorecard_pipeline(deepcopy(bucketing_pipeline))
 
         # Add/Overwrite specials to all pre-bucketers
         for step in _get_all_steps(self.prebucketing_pipeline):
-            if len(step.specials) != 0:
-                raise ValueError(
-                    f"Specials should be defined on the BucketingProcess level, remove the specials from {step}"
-                )
-            step.specials = specials
+            if hasattr(step, "specials") and len(step.specials) != 0:
+                # note, specials defined BucketingProcess level
+                # will overwrite any specials on bucketer level.
+                warnings.warn(f"Overwriting specials of {step} with specials of bucketingprocess", UserWarning)
+                step.specials = {**step.specials, **specials}
+            else:
+                step.specials = specials
 
         # Assigning the variable in the init to the attribute with the same name is a requirement of
         # sklearn.base.BaseEstimator. See the notes in
@@ -123,6 +136,24 @@ class BucketingProcess(
         self._prebucketing_specials = self.specials
         self._bucketing_specials = dict()  # will be determined later.
         self.name = "bucketingprocess"  # to be able to identity the bucketingprocess in a pipeline
+
+    def get_params(self, deep=True):
+        """
+        Get parameters for this estimator.
+
+        References:
+
+        - [sklearn.base.BaseEstimator](https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator)
+        - [get and set params](https://scikit-learn.org/dev/developers/develop.html#get-params-and-set-params)
+        - [Cloning sklearn estimators](https://scikit-learn.org/dev/developers/develop.html#cloning)
+        """  # noqa
+        if deep:
+            raise NotImplementedError("Not yet implemented")
+        return {
+            "prebucketing_pipeline": self.original_prebucketing_pipeline,
+            "bucketing_pipeline": self.original_bucketing_pipeline,
+            "specials": self.specials,
+        }
 
     def fit(self, X, y=None):
         """
