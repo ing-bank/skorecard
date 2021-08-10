@@ -18,7 +18,7 @@ from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 
-from typing import Dict, TypeVar
+from typing import Dict, TypeVar, List
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
@@ -86,7 +86,9 @@ class BucketingProcess(
         self,
         prebucketing_pipeline=make_pipeline(DecisionTreeBucketer(max_n_bins=50, min_bin_size=0.02)),
         bucketing_pipeline=make_pipeline(OptimalBucketer(max_n_bins=6, min_bin_size=0.05)),
-        specials={},
+        variables: List = [],
+        specials: Dict = {},
+        remainder="passthrough",
     ):
         """
         Define a BucketingProcess to first prebucket and then bucket multiple columns in one go.
@@ -97,6 +99,7 @@ class BucketingProcess(
             bucketing_pipeline (Pipeline): The scikit-learn pipeline that does bucketing.
                 Defaults to an all-numeric OptimalBucketer pipeline.
                 Must transform same features as the prebucketing pipeline.
+            variables (list): The features to bucket. Uses all features if not defined.
             specials: (nested) dictionary of special values that require their own binning.
                 Will merge when specials are also defined in any bucketers in a (pre)bucketing pipeline, and overwrite in case there are shared keys.
                 The dictionary has the following format:
@@ -105,6 +108,9 @@ class BucketingProcess(
                 This dictionary contains a name of a bucket (key) and an array of unique values that should be put
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
+            remainder (str): How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
+                passthrough (Default): all columns that were not specified in "variables" will be passed through.
+                drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
         # Save original input params
         # We overwrite the input later, so we need to save
@@ -113,6 +119,9 @@ class BucketingProcess(
         # https://scikit-learn.org/dev/developers/develop.html#get-params-and-set-params
         self.prebucketing_pipeline = prebucketing_pipeline
         self.bucketing_pipeline = bucketing_pipeline
+        assert remainder in ["passthrough", "drop"]
+        self.remainder = remainder
+        self.variables = variables
 
         # Convert to skorecard pipelines
         # This does some checks on the pipelines
@@ -130,12 +139,24 @@ class BucketingProcess(
             else:
                 step.specials = specials
 
+            if len(self.variables) != 0:
+                if len(step.variables) != 0:
+                    warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
+                step.variables = self.variables
+
+        # Overwrite variables to all bucketers
+        if len(self.variables) != 0:
+            for step in _get_all_steps(self.pipeline):
+                if len(step.variables) != 0:
+                    warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
+                step.variables = self.variables
+
         # Assigning the variable in the init to the attribute with the same name is a requirement of
         # sklearn.base.BaseEstimator. See the notes in
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.specials = specials
         self._prebucketing_specials = self.specials
-        self._bucketing_specials = dict()  # will be determined later.
+        self._bucketing_specials: Dict = dict()  # will be determined later.
         self.name = "bucketingprocess"  # to be able to identity the bucketingprocess in a pipeline
 
     def fit(self, X, y=None):
@@ -252,7 +273,13 @@ class BucketingProcess(
         """
         check_is_fitted(self)
         X_prebucketed = self.pre_pipeline.transform(X)
-        return self.pipeline.transform(X_prebucketed)
+
+        new_X = self.pipeline.transform(X_prebucketed)
+
+        if self.remainder == "drop":
+            return new_X[self.variables]
+        else:
+            return new_X
 
     def save_yml(self, fout: PathLike) -> None:
         """
