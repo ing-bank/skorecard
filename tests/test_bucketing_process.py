@@ -180,7 +180,7 @@ def test_bucketing_process_with_numerical_specials(df):
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
 
-    with pytest.raises(ValueError):
+    with pytest.warns(UserWarning):
         bucketing_process = BucketingProcess(
             prebucketing_pipeline=make_pipeline(
                 DecisionTreeBucketer(
