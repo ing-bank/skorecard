@@ -110,6 +110,8 @@ nav:
             - api/rescale/rescale.md 
         - datasets:
             - api/datasets/load_uci_credit_card.md
+    - Discussion:
+        - Benchmarks: discussion/benchmarks.ipynb
 
 markdown_extensions:
     - codehilite:
