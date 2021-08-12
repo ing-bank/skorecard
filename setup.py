@@ -6,9 +6,9 @@ with open("README.md", "r", encoding="UTF-8") as fh:
 base_packages = ["scipy>=1.5.2", "numpy>=1.19.5", "pandas>=1.1.5", "scikit-learn>=0.23.2", "dataclasses", "pyyaml"]
 
 dashboard_dep = [
-    "dash>=1.20.0",
+    "dash>=1.21.0",
     "jupyter-dash>=0.4.0",
-    "dash_bootstrap_components>=0.12.2",
+    "dash_bootstrap_components>=0.13",
 ]
 
 reporting_dep = ["plotly>=4.5.1"]

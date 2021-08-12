@@ -70,6 +70,7 @@ nav:
             - Missing Values: tutorials/missing_values.ipynb
             - Special Values: tutorials/specials.ipynb
             - Categoricals: tutorials/categoricals.ipynb
+            - Interactive: tutorials/interactive_bucketing.ipynb
             - Methods: tutorials/methods.ipynb
         - BucketingProcess: tutorials/using-bucketing-process.ipynb
         - Reporting: tutorials/reporting.ipynb
