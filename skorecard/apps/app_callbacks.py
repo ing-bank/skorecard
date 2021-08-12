@@ -120,10 +120,11 @@ def add_bucketing_callbacks(self, X, y):
         # Update the fit for this specific column
         special = self.features_bucket_mapping_.get(col).specials
         right = self.features_bucket_mapping_.get(col).right
-        # Note we passed X, y to add_bucketing_callbacks()
-        self._update_column_fit(X, y, col, special, input_map, right)
+        # Note we passed X, y to add_bucketing_callbacks() so they are available here.
         # make sure to re-generate the summary table
-        self._generate_summary(X, y)
+        self._update_column_fit(
+            X=X, y=y, feature=col, special=special, splits=input_map, right=right, generate_summary=True
+        )
 
         # Retrieve the new bucket tables and plots
         table = self.bucket_table(col)
@@ -145,7 +146,8 @@ def add_bucketing_callbacks(self, X, y):
         col_type = self.features_bucket_mapping_.get(col).type
 
         if col_type == "categorical":
-            str_repr = json.dumps(input_map, indent=4)
+            str_repr = ",\n\t".join([f"{k}: {v}" for k, v in input_map.items()])
+            str_repr = f"{{\n\t{str_repr}\n}}"
         else:
             str_repr = str(input_map)
         return [str_repr]

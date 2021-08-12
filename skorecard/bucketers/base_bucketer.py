@@ -244,7 +244,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
         return self
 
-    def _update_column_fit(self, X, y, feature, special, splits, right):
+    def _update_column_fit(self, X, y, feature, special, splits, right, generate_summary=False):
         """
         Extract out part of the fit for a column.
 
@@ -309,6 +309,9 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 column=feature,
                 bucket_mapping=self.features_bucket_mapping_.get(feature),
             )
+
+        if generate_summary:
+            self._generate_summary(X, y)
 
     def fit_interactive(self, X, y=None, mode="external"):
         """
