@@ -83,6 +83,7 @@ nav:
         - Read/write buckets to file: howto/save_buckets_to_file.ipynb
         - Assessing bucket quality: howto/psi_and_iv.ipynb
         - Optimizations in the bucketing process: howto/Optimizations.ipynb
+        - Mixed usage with other packages: howto/mix_with_other_packages.ipynb
     - API:
         - bucketers:
             - api/bucketers/OptimalBucketer.md
