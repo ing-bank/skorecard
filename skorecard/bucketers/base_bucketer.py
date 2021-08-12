@@ -13,6 +13,7 @@ from skorecard.features_bucket_mapping import FeaturesBucketMapping
 from skorecard.bucket_mapping import BucketMapping
 from skorecard.reporting import build_bucket_table
 from skorecard.utils.exceptions import NotInstalledError
+from skorecard.utils.validation import is_fitted
 
 # JupyterDash
 try:
@@ -309,7 +310,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 bucket_mapping=self.features_bucket_mapping_.get(feature),
             )
 
-    def fit_interactive(self, X, y=None, mode="inline"):
+    def fit_interactive(self, X, y=None, mode="external"):
         """
         Fit a bucketer and then interactive edit the fit using a dash app.
 
@@ -321,7 +322,11 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         - 'jupyterlab': Start dash app as a new tab inside jupyterlab
 
         """
-        self.fit(X, y)
+        # We need to make sure we only fit if not already fitted
+        # This prevents a user loosing manually defined boundaries
+        # when re-running .fit_interactive()
+        if not is_fitted(self):
+            self.fit(X, y)
 
         import dash_bootstrap_components as dbc
 

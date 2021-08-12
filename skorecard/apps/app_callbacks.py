@@ -150,6 +150,13 @@ def add_bucketing_callbacks(self, X, y):
             str_repr = str(input_map)
         return [str_repr]
 
+    @app.callback(
+        [Output("code_export", "content")],
+        [Input("input_map", "value")],
+    )
+    def update_code_export(input_map):
+        return [f"UserInputBucketer({self.features_bucket_mapping_.as_dict()})"]
+
 
 def add_callbacks(self):
     """

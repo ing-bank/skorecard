@@ -51,7 +51,7 @@ def add_basic_layout(self):
 
     sidebar = html.Div(
         [
-            html.H2("Settings", style=TEXT_STYLE),
+            html.H5(f"{type(self).__name__}", style=TEXT_STYLE),
             html.Hr(),
             dbc.Label("Select feature", html_for="input_column"),
             dcc.Dropdown(
@@ -74,6 +74,23 @@ def add_basic_layout(self):
                     dbc.FormFeedback("Feedback will be given here", valid=False, id="input_map_feedback"),
                 ]
             ),
+            html.H5("Export"),
+            html.P(
+                [
+                    "Your updated buckets are saved to the class instance, ",
+                    "which means you can safely close this app. See also ",
+                    dcc.Link(
+                        "working with manually defined buckets",
+                        href="https://ing-bank.github.io/skorecard/howto/using_manually_defined_buckets/",
+                    ),
+                ]
+            ),
+            html.P(
+                [
+                    "For convenience, you can also copy this snippet defining a skorecard.bucketers.UserInputBucketer:",
+                    dcc.Clipboard(content="hi", title="code snippet", style={"font-size": "120%"}, id="code_export"),
+                ]
+            ),
         ],
         style=SIDEBAR_STYLE,
     )
@@ -81,7 +98,7 @@ def add_basic_layout(self):
         children=[
             dbc.Row(
                 [
-                    html.H2("Current column", id="column_title", style=TEXT_STYLE),
+                    html.H3("Current column", id="column_title", style=TEXT_STYLE),
                 ]
             ),
             html.Br(),
