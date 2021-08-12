@@ -11,7 +11,18 @@ from sklearn.utils.validation import check_is_fitted
 from skorecard.features_bucket_mapping import FeaturesBucketMapping
 from skorecard.reporting.plotting import PlotBucketMethod
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
-from skorecard.utils import BucketingPipelineError, NotBucketObjectError
+from skorecard.utils import BucketingPipelineError, NotBucketObjectError, NotInstalledError
+from skorecard.utils.validation import is_fitted
+
+# JupyterDash
+try:
+    from jupyter_dash import JupyterDash
+except ModuleNotFoundError:
+    JupyterDash = NotInstalledError("jupyter-dash", "dashboard")
+
+
+from skorecard.apps.app_layout import add_basic_layout
+from skorecard.apps.app_callbacks import add_bucketing_callbacks
 
 
 class KeepPandas(BaseEstimator, TransformerMixin):
@@ -227,6 +238,7 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
     - `.bucket_table()`: Table with buckets of a column
     - `.save_to_yaml()`: Save information necessary for bucketing to a YAML file
     - `.features_bucket_mapping_`: Access bucketing information
+    - `.fit_interactive()`: Edit fitted buckets interactively in a dash app
 
     ```python
     from skorecard.pipeline.pipeline import SkorecardPipeline
@@ -340,6 +352,56 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
                 msg = "All bucketing steps must be skorecard bucketers."
                 msg += f"Remove {step} from the pipeline."
                 raise NotBucketObjectError(msg)
+
+    @property
+    def variables(self):
+        """
+        Helper function to show which features are in scope of this pipeline.
+        """
+        return self.features_bucket_mapping_.columns
+
+    def fit_interactive(self, X, y=None, mode="external"):
+        """
+        Fit a bucketer and then interactively edit the fit using a dash app.
+
+        Note we are using a [jupyterdash](https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e) app,
+        which supports 3 different modes:
+
+        - 'external' (default): Start dash server and print URL
+        - 'inline': Start dash app inside an Iframe in the jupyter notebook
+        - 'jupyterlab': Start dash app as a new tab inside jupyterlab
+
+        """
+        # We need to make sure we only fit if not already fitted
+        # This prevents a user losing manually defined boundaries
+        # when re-running .fit_interactive()
+        if not is_fitted(self):
+            self.fit(X, y)
+
+        import dash_bootstrap_components as dbc
+
+        self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+        add_basic_layout(self)
+        add_bucketing_callbacks(self, X, y)
+        self.app.run_server(mode=mode)
+
+    def _update_column_fit(self, X, y, feature, special, splits, right, generate_summary=False):
+        """
+        Extract out part of the fit for a column.
+
+        Useful when we want to interactively update the fit.
+        """
+        for step in self.steps:
+            if feature in step[1].variables:
+                step[1]._update_column_fit(
+                    X=X,
+                    y=y,
+                    feature=feature,
+                    special=special,
+                    splits=splits,
+                    right=right,
+                    generate_summary=generate_summary,
+                )
 
 
 def to_skorecard_pipeline(pipeline: Pipeline) -> SkorecardPipeline:
