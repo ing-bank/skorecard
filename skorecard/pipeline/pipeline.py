@@ -362,7 +362,7 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
 
     def fit_interactive(self, X, y=None, mode="external"):
         """
-        Fit a bucketer and then interactive edit the fit using a dash app.
+        Fit a bucketer and then interactively edit the fit using a dash app.
 
         Note we are using a [jupyterdash](https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e) app,
         which supports 3 different modes:
@@ -373,7 +373,7 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
 
         """
         # We need to make sure we only fit if not already fitted
-        # This prevents a user loosing manually defined boundaries
+        # This prevents a user losing manually defined boundaries
         # when re-running .fit_interactive()
         if not is_fitted(self):
             self.fit(X, y)
