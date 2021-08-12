@@ -1,3 +1,4 @@
+import ast
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
@@ -37,7 +38,23 @@ def is_monotonic_increasing(x):
     Helper function to determine if a list is monotonically increasing.
     """
     dx = np.diff(x)
+    return np.all(dx >= 0)
+
+
+def is_increasing(x):
+    """
+    Helper function to determine if a list is increasing.
+    """
+    dx = np.diff(x)
     return np.all(dx > 0)
+
+
+def is_sequential(x):
+    """
+    Helper function to determine if a list is monotonically increasing with step size 1.
+    """
+    dx = np.diff(x)
+    return np.all(np.isin(dx, [0, 1]))
 
 
 def add_bucketing_callbacks(self, X, y):
@@ -59,21 +76,46 @@ def add_bucketing_callbacks(self, X, y):
         return [f"Feature '{title}'"]
 
     @app.callback(
-        [Output("bucket_table", "data"), Output("graph-bucket", "figure"), Output("input_map", "invalid")],
+        [
+            Output("bucket_table", "data"),
+            Output("graph-bucket", "figure"),
+            Output("input_map", "invalid"),
+            Output("input_map_feedback", "children"),
+        ],
         [Input("input_map", "value")],
         [State("input_column", "value")],
     )
     def get_prebucket_table(input_map, col):
         """Loads the table and the figure, when the input_map changes."""
-        # Load the object from text into python object
-        try:
-            input_map = json.loads(input_map)
-            assert len(input_map) > 0
-        except Exception:
-            return no_update, no_update, True
+        col_type = self.features_bucket_mapping_.get(col).type
 
-        if not is_monotonic_increasing(input_map):
-            return no_update, no_update, True
+        # Load the object from text input into python object
+        if col_type == "numerical":
+            try:
+                input_map = json.loads(input_map)
+                assert len(input_map) > 0
+            except Exception:
+                msg = "Make sure the input is properly formatted as a list"
+                return no_update, no_update, True, [msg]
+            # validate input
+            if not is_increasing(input_map):
+                return no_update, no_update, True, ["Make sure the list values are in increasing order"]
+        else:
+            try:
+                # note using ast.literal_eval is not safe
+                # for use when you don't trust the user input
+                # in this case, it's a local user using his/her own kernel
+                input_map = ast.literal_eval(input_map)
+            except Exception:
+                msg = "Make sure the input is properly formatted as a dictionary"
+                return no_update, no_update, True, [msg]
+            # validate input
+            if not min(input_map.values()) == 0:
+                msg = "Dictionary values (buckets) must start at 0"
+                return no_update, no_update, True, [msg]
+            if not is_sequential(list(input_map.values())):
+                msg = "Dictionary values (buckets) must be sequentially increasing with steps of 1"
+                return no_update, no_update, True, [msg]
 
         # Update the fit for this specific column
         special = self.features_bucket_mapping_.get(col).specials
@@ -87,7 +129,9 @@ def add_bucketing_callbacks(self, X, y):
         table = self.bucket_table(col)
         table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         fig = self.plot_bucket(col)
-        return table.to_dict("records"), fig, False
+        # remove title from plot
+        fig.update_layout(title="")
+        return table.to_dict("records"), fig, False, no_update
 
     @app.callback(
         [Output("input_map", "value")],
@@ -97,7 +141,14 @@ def add_bucketing_callbacks(self, X, y):
     )
     def update_input_map(col):
         """Update bucketer map."""
-        return [str(self.features_bucket_mapping_.get(col).map)]
+        input_map = self.features_bucket_mapping_.get(col).map
+        col_type = self.features_bucket_mapping_.get(col).type
+
+        if col_type == "categorical":
+            str_repr = json.dumps(input_map, indent=4)
+        else:
+            str_repr = str(input_map)
+        return [str_repr]
 
 
 def add_callbacks(self):

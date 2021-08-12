@@ -63,15 +63,15 @@ def add_basic_layout(self):
             dbc.FormGroup(
                 [
                     dbc.Label("Map", html_for="input_map"),
-                    dbc.Textarea(id="input_map"),
+                    dbc.Textarea(
+                        id="input_map",
+                        style={"minHeight": 160},
+                    ),
                     dbc.FormText(
                         "You can manually set different boundaries",
                         color="secondary",
                     ),
-                    dbc.FormFeedback(
-                        "Make sure the list is properly formatted and monotonically increasing",
-                        valid=False,
-                    ),
+                    dbc.FormFeedback("Feedback will be given here", valid=False, id="input_map_feedback"),
                 ]
             ),
         ],
@@ -84,7 +84,7 @@ def add_basic_layout(self):
                     html.H2("Current column", id="column_title", style=TEXT_STYLE),
                 ]
             ),
-            html.Hr(),
+            html.Br(),
             dbc.Row(
                 [
                     html.H4("Bucket plot", style=TEXT_STYLE),
@@ -96,6 +96,7 @@ def add_basic_layout(self):
                     html.H4("Bucket table", style=TEXT_STYLE),
                 ]
             ),
+            html.Br(),
             dbc.Row(
                 [
                     dash_table.DataTable(
