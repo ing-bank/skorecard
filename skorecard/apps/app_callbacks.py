@@ -8,6 +8,7 @@ from skorecard.utils.exceptions import NotInstalledError
 # Dash + dependencies
 try:
     from dash.dependencies import Input, Output, State
+    from dash import no_update
     import dash_table
 except ModuleNotFoundError:
     Input = NotInstalledError("dash", "dashboard")
@@ -27,6 +28,76 @@ try:
     from plotly.subplots import make_subplots
 except ModuleNotFoundError:
     px = NotInstalledError("plotly", "reporting")
+
+import json
+
+
+def is_monotonic_increasing(x):
+    """
+    Helper function to determine if a list is monotonically increasing.
+    """
+    dx = np.diff(x)
+    return np.all(dx > 0)
+
+
+def add_bucketing_callbacks(self, X, y):
+    """
+    Adds callbacks to the interactive bucketing app.
+
+    Meant for normal bucketers, not two step BucketingProcess.
+    """
+    app = self.app
+
+    @app.callback(
+        [Output("column_title", "children")],
+        [
+            Input("input_column", "value"),
+        ],
+    )
+    def update_column_title(title):
+        """Update the content title."""
+        return [f"Feature '{title}'"]
+
+    @app.callback(
+        [Output("bucket_table", "data"), Output("graph-bucket", "figure"), Output("input_map", "invalid")],
+        [Input("input_map", "value")],
+        [State("input_column", "value")],
+    )
+    def get_prebucket_table(input_map, col):
+        """Loads the table and the figure, when the input_map changes."""
+        # Load the object from text into python object
+        try:
+            input_map = json.loads(input_map)
+            assert len(input_map) > 0
+        except Exception:
+            return no_update, no_update, True
+
+        if not is_monotonic_increasing(input_map):
+            return no_update, no_update, True
+
+        # Update the fit for this specific column
+        special = self.features_bucket_mapping_.get(col).specials
+        right = self.features_bucket_mapping_.get(col).right
+        # Note we passed X, y to add_bucketing_callbacks()
+        self._update_column_fit(X, y, col, special, input_map, right)
+        # make sure to re-generate the summary table
+        self._generate_summary(X, y)
+
+        # Retrieve the new bucket tables and plots
+        table = self.bucket_table(col)
+        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        fig = self.plot_bucket(col)
+        return table.to_dict("records"), fig, False
+
+    @app.callback(
+        [Output("input_map", "value")],
+        [
+            Input("input_column", "value"),
+        ],
+    )
+    def update_input_map(col):
+        """Update bucketer map."""
+        return [str(self.features_bucket_mapping_.get(col).map)]
 
 
 def add_callbacks(self):
