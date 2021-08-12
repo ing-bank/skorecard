@@ -66,14 +66,18 @@ def add_bucketing_callbacks(self, X, y):
     app = self.app
 
     @app.callback(
-        [Output("column_title", "children")],
+        [
+            Output("column_title", "children"),
+            Output("column_type", "children"),
+        ],
         [
             Input("input_column", "value"),
         ],
     )
-    def update_column_title(title):
+    def update_column_title(col):
         """Update the content title."""
-        return [f"Feature '{title}'"]
+        col_type = self.features_bucket_mapping_.get(col).type
+        return [f"Feature '{col}'"], [col_type]
 
     @app.callback(
         [

@@ -98,7 +98,13 @@ def add_basic_layout(self):
         children=[
             dbc.Row(
                 [
-                    html.H3("Current column", id="column_title", style=TEXT_STYLE),
+                    html.H3(
+                        [
+                            html.Span("Current column", id="column_title"),
+                            dbc.Badge("tbd", id="column_type", className="ml-1"),
+                        ],
+                        style=TEXT_STYLE,
+                    ),
                 ]
             ),
             html.Br(),
