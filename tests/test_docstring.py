@@ -13,7 +13,6 @@ pytest tests/test_docstring.py --verbose
 
 # from skorecard.pipeline import bucketing_process
 import pytest
-import skorecard.apps
 import skorecard.linear_model
 import skorecard.bucketers
 import skorecard.pipeline
@@ -25,7 +24,6 @@ import skorecard.rescale
 import skorecard.datasets
 
 # List of all classes and functions we want tested
-MODULES_TO_TEST = [skorecard.apps.interactive_bucketing]
 CLASSES_TO_TEST = [
     skorecard.bucketers.OptimalBucketer,
     skorecard.bucketers.EqualWidthBucketer,
@@ -94,14 +92,14 @@ def handle_docstring(doc, indent):
             exec(code_part)
 
 
-@pytest.mark.parametrize("m", MODULES_TO_TEST)
-def test_module_docstrings(m):
-    """
-    Take the docstring of a given module.
+# @pytest.mark.parametrize("m", MODULES_TO_TEST)
+# def test_module_docstrings(m):
+#     """
+#     Take the docstring of a given module.
 
-    The test passes if the usage examples causes no errors.
-    """
-    handle_docstring(m.__doc__, indent=0)
+#     The test passes if the usage examples causes no errors.
+#     """
+#     handle_docstring(m.__doc__, indent=0)
 
 
 @pytest.mark.parametrize("c", CLASSES_TO_TEST)
