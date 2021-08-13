@@ -185,7 +185,7 @@ def test_labels():
     # labels with specials for categorical are not so nice
     # we cannot include the special name because item become part of self.map
     assert labels[in_series == "truck"].equals(labels[labels == "Special: is truck"])
-    assert labels[(in_series.isin(["car", "boat"]))].equals(labels[labels == "car, boat"])
+    assert labels[(in_series.isin(["car", "boat"]))].equals(labels[labels == "boat, car"])
 
     # test with numerical categories
     # Limited map with NA's
@@ -500,7 +500,7 @@ def test_missing_other_bucket():
     """
     a = BucketMapping("feature1", "categorical", map={"car": 0, "boat": 0}, specials={"is truck": ["truck"]})
     x = ["car", "motorcycle", "boat", "truck", "truck", np.nan]
-    assert a.labels == {0: "car, boat", -2: "Other", -1: "Missing", -3: "Special: is truck"}
+    assert a.labels == {0: "boat, car", -2: "Other", -1: "Missing", -3: "Special: is truck"}
     assert a.transform(x)[1] == -2  # other
     assert a.transform(x)[4] == -3  # special
     assert a.transform(x)[5] == -1  # missing

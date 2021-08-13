@@ -65,6 +65,7 @@ class BucketMapping:
         # Input validation
         assert self.type in ["numerical", "categorical"]
         assert len(self.map) is not None, "Please set a 'map' first"
+        assert isinstance(self.specials, dict) or isinstance(self.specials, list)
         if self.missing_bucket is not None:
             assert isinstance(self.missing_bucket, int)
 
@@ -134,15 +135,8 @@ class BucketMapping:
             self._validate_categorical_map()
             self.map = dict(self.map)  # type: Dict
 
-            # # Assign the specials to the map
-            # max_bucket = -1 if len(self.map.values()) == 0 else max(self.map.values())
-            # special_counter = max_bucket
-            # for label, values in self.specials.items():
-            #     special_counter += 1
-            #     for v in values:
-            #         self.map[v] = special_counter
-            # # reset the specials
-            # self.specials = {}
+            # Python 3.7+ has dicts that are OrderedDicts. Let's have a pretty ordering
+            self.map = dict(sorted(self.map.items(), key=lambda x: (x[1], x[0])))
 
             # Set 'other' bucket
             if self.other_bucket is not None:
@@ -381,6 +375,9 @@ def build_cat_labels(
         for k, v in specials.items():
             labels[start_special_bucket] = "Special: " + str(k)
             start_special_bucket -= 1
+
+    # Make sure labels dict is nicely sorted by value, key
+    labels = dict(sorted(labels.items(), key=lambda x: (x[1], x[0])))
 
     return labels
 
