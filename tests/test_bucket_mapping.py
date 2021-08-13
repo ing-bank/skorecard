@@ -616,3 +616,17 @@ def test_merge_buckets_on_data(df):
 
     for feature in X.columns:
         assert all(c.get(feature).transform(X[feature]) == pipe.transform(X)[feature].values)
+
+
+def test_item_assignment():
+    """
+    Test if assignment bucket mappings by feature name works properly.
+    """
+    bm = FeaturesBucketMapping()
+    a = BucketMapping("feature1", "categorical", map={310: 0, 311: 1, 312: 2}, specials={"is 313": [313]})
+    b = BucketMapping("feature1", "categorical", map={310: 0, 311: 1, 312: 2}, specials={"is 999": [313]})
+
+    bm.append(a)
+    bm["feature1"] = b
+    assert len(bm) == 1
+    assert bm.get("feature1") == b
