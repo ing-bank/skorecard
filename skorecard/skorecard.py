@@ -3,9 +3,11 @@ import numpy as np
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.utils.validation import check_is_fitted
 
 from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
+from skorecard.utils.validation import is_fitted
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 from skorecard.preprocessing import WoeEncoder
 from skorecard.bucketers import (
@@ -14,7 +16,6 @@ from skorecard.bucketers import (
     OptimalBucketer,
 )
 from skorecard.preprocessing import ColumnSelector
-from sklearn.utils.validation import check_is_fitted
 
 from typing import List
 
@@ -278,9 +279,28 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.is_fitted_ = True  # sklearn convention to signal model has been fitted.
         return self
 
+    def fit_interactive(self, X, y=None, mode="external", **server_kwargs):
+        """
+        Fit a bucketer and then interactive edit the fit using a dash app.
+
+        Note we are using a [jupyterdash](https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e) app,
+        which supports 3 different modes:
+
+        - 'external' (default): Start dash server and print URL
+        - 'inline': Start dash app inside an Iframe in the jupyter notebook
+        - 'jupyterlab': Start dash app as a new tab inside jupyterlab
+
+        """
+        # We need to make sure we only fit if not already fitted
+        # This prevents a user losing manually defined boundaries
+        # when re-running .fit_interactive()
+        if not is_fitted(self):
+            self.fit(X, y)
+        self.bucketing.fit_interactive(X=X, y=y, mode=mode, **server_kwargs)
+
     def bucket_transform(self, X):
         """Transform X through the bucketing pipelines."""
-        # Retrun the buckets
+        # Rerun the buckets
         return self.pipeline[0].transform(X)
 
     def woe_transform(self, X):

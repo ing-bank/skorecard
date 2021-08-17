@@ -17,8 +17,22 @@ from skorecard.reporting import build_bucket_table
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
+from skorecard.utils.validation import is_fitted
+from skorecard.utils.exceptions import NotInstalledError
 
 from typing import Dict, TypeVar, List
+
+
+# JupyterDash
+try:
+    from jupyter_dash import JupyterDash
+except ModuleNotFoundError:
+    JupyterDash = NotInstalledError("jupyter-dash", "dashboard")
+
+
+from skorecard.apps.app_layout import add_bucketing_process_layout
+from skorecard.apps.app_callbacks import add_bucketing_process_callbacks
+
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
@@ -234,6 +248,31 @@ class BucketingProcess(
         self._generate_summary(X, y)
 
         return self
+
+    def fit_interactive(self, X, y=None, mode="external", **server_kwargs):
+        """
+        Fit a bucketer and then interactive edit the fit using a dash app.
+
+        Note we are using a [jupyterdash](https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e) app,
+        which supports 3 different modes:
+
+        - 'external' (default): Start dash server and print URL
+        - 'inline': Start dash app inside an Iframe in the jupyter notebook
+        - 'jupyterlab': Start dash app as a new tab inside jupyterlab
+
+        """
+        # We need to make sure we only fit if not already fitted
+        # This prevents a user losing manually defined boundaries
+        # when re-running .fit_interactive()
+        if not is_fitted(self):
+            self.fit(X, y)
+
+        import dash_bootstrap_components as dbc
+
+        self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+        add_bucketing_process_layout(self)
+        add_bucketing_process_callbacks(self, X, y)
+        self.app.run_server(mode=mode, **server_kwargs)
 
     def _set_bucket_mapping(self, features_bucket_mapping, X_prebucketed, y):
         """

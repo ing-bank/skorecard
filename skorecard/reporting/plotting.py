@@ -64,9 +64,7 @@ def make_plot_figure(bucket_table: pd.DataFrame):
     # that means a prebucket table without information on the corresponding buckets
     # wont have bars colorized.
     if "bucket" in bucket_table.columns:
-        bucket_colors = get_bucket_colors() * 4  # We repeat the colors in case there are lots of buckets
-        buckets = [b for b in bucket_table["bucket"].values]
-        bar_colors = [bucket_colors[i] for i in buckets]
+        bar_colors = [get_bucket_color(i) for i in bucket_table["bucket"].values]
         fig.update_traces(marker=dict(color=bar_colors), selector=dict(type="bar"))
 
     # Other stuff
@@ -134,7 +132,7 @@ def plot_bucket_table(bucket_table, column="", format=None, scale=None, width=No
     return fig
 
 
-def get_bucket_colors():
+def get_bucket_color(i):
     """Return diverging color for unique buckets.
 
     Generated using:
@@ -148,17 +146,30 @@ def get_bucket_colors():
             f"rgb({int(r*255)},{int(g*255)},{int(b*255)})"
         )
     ```
+
+    Args:
+        i: number to return a color string for
     """
-    return [
-        "rgb(102,194,165)",
-        "rgb(252,141,98)",
-        "rgb(141,160,203)",
-        "rgb(231,138,195)",
-        "rgb(166,216,84)",
-        "rgb(255,217,47)",
-        "rgb(229,196,148)",
-        "rgb(179,179,179)",
-    ]
+    if i < 0:
+        return "rgb(189,189,189)"  # light grey for specials
+    elif i % 8 == 0:
+        return "rgb(102,194,165)"
+    elif i % 8 == 1:
+        return "rgb(252,141,98)"
+    elif i % 8 == 2:
+        return "rgb(141,160,203)"
+    elif i % 8 == 3:
+        return "rgb(231,138,195)"
+    elif i % 8 == 4:
+        return "rgb(166,216,84)"
+    elif i % 8 == 5:
+        return "rgb(255,217,47)"
+    elif i % 8 == 6:
+        return "rgb(229,196,148)"
+    elif i % 8 == 7:
+        return "rgb(179,179,179)"
+    else:
+        raise NotImplementedError("")
 
 
 class PlotPreBucketMethod:
