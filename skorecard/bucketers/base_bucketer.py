@@ -263,15 +263,13 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         if isinstance(self.missing_treatment, dict):
             missing_bucket = self.missing_treatment.get(feature)
 
-        self.features_bucket_mapping_.append(
-            BucketMapping(
-                feature_name=feature,
-                type=self.variables_type,
-                map=splits,
-                right=right,
-                specials=special,
-                missing_bucket=missing_bucket,
-            )
+        self.features_bucket_mapping_[feature] = BucketMapping(
+            feature_name=feature,
+            type=self.variables_type,
+            map=splits,
+            right=right,
+            specials=special,
+            missing_bucket=missing_bucket,
         )
 
         # Calculate the bucket table
@@ -291,15 +289,13 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         ]:
             missing_bucket = self._find_missing_bucket(feature=feature)
             # Repeat above procedure now we know the bucket distribution
-            self.features_bucket_mapping_.append(
-                BucketMapping(
-                    feature_name=feature,
-                    type=self.variables_type,
-                    map=splits,
-                    right=right,
-                    specials=special,
-                    missing_bucket=missing_bucket,
-                )
+            self.features_bucket_mapping_[feature] = BucketMapping(
+                feature_name=feature,
+                type=self.variables_type,
+                map=splits,
+                right=right,
+                specials=special,
+                missing_bucket=missing_bucket,
             )
 
             # Recalculate the bucket table with the new bucket for missings
@@ -313,7 +309,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         if generate_summary:
             self._generate_summary(X, y)
 
-    def fit_interactive(self, X, y=None, mode="external"):
+    def fit_interactive(self, X, y=None, mode="external", **server_kwargs):
         """
         Fit a bucketer and then interactive edit the fit using a dash app.
 
@@ -336,7 +332,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         add_basic_layout(self)
         add_bucketing_callbacks(self, X, y)
-        self.app.run_server(mode=mode)
+        self.app.run_server(mode=mode, **server_kwargs)
 
     def transform(self, X: pd.DataFrame, y=None) -> pd.DataFrame:
         """Transforms an array into the corresponding buckets fitted by the Transformer.

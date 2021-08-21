@@ -79,6 +79,18 @@ class FeaturesBucketMapping:
         """
         return self.maps == other.maps
 
+    def __getitem__(self, key):
+        """
+        Retrieve BucketMappings by feature name.
+        """
+        return self.maps[key]
+
+    def __setitem__(self, key, value):
+        """
+        Set a bucketmapping using the feature name.
+        """
+        self.maps[key] = value
+
     def get(self, col: str):
         """Get BucketMapping for a column.
 

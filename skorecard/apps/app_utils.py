@@ -1,10 +1,13 @@
 import pandas as pd
+import numpy as np
 
 from skorecard.bucket_mapping import BucketMapping
-from skorecard.reporting.plotting import get_bucket_colors
+from skorecard.reporting.plotting import get_bucket_color
+
+from typing import Union, List, Dict
 
 
-def determine_boundaries(df: pd.DataFrame, bucket_mapping: BucketMapping) -> list:
+def determine_boundaries(df: pd.DataFrame, bucket_mapping: BucketMapping) -> Union[List, Dict]:
     """
     Determine mapping boundaries.
 
@@ -26,16 +29,24 @@ def determine_boundaries(df: pd.DataFrame, bucket_mapping: BucketMapping) -> lis
     assert "pre_buckets" in df.columns
     assert "buckets" in df.columns
 
-    # if bucket_mapping.type != "numerical":
-    #     raise NotImplementedError("todo")
+    # filter out specials
+    df = df[df["buckets"] >= 0]
 
+    # Categoricals are an easy 1 on 1 relationship
+    if bucket_mapping.type == "categorical":
+        return dict(zip(df["pre_buckets"].values, df["buckets"].values))
+
+    # For numerical, for have right = True
+    # We can simply take the max pre-bucket for each bucket
     dfg = df.groupby(["buckets"]).agg(["max"])
     dfg.columns = dfg.columns.get_level_values(1)
     boundaries = dfg["max"]
+
+    # For numerical with right = False
+    # because the prebuckets are integers
+    # we can safely add 1 to make sure the
+    # map includes the right prebuckets
     if bucket_mapping.right is False:
-        # the prebuckets are integers
-        # So we can safely add 1 to make sure the
-        # map includes the right prebuckets
         boundaries += 1
 
     # Drop the last value,
@@ -43,8 +54,6 @@ def determine_boundaries(df: pd.DataFrame, bucket_mapping: BucketMapping) -> lis
     # instead of a new one
     boundaries = list(boundaries)[:-1]
 
-    # Removed this because of the categoricals
-    # assert sorted(boundaries) == boundaries, "buckets must be sorted"
     return boundaries
 
 
@@ -126,10 +135,8 @@ def colorize_cell(column):
     We can safely assume max 20 buckets, as features are often binned to 3-7 buckets.
     We will cycle through them.
     """
-    colors = get_bucket_colors()
-
     styles = []
-    for i in range(21):
+    for i in range(-10, 21):
         styles.append(
             {
                 "if": {
@@ -137,8 +144,32 @@ def colorize_cell(column):
                     "filter_query": f"{{{column}}} = '{i}'",
                     "column_id": column,
                 },
-                "backgroundColor": colors[i % len(colors)],
+                "backgroundColor": get_bucket_color(i),
                 "color": "white",
             }
         )
     return styles
+
+
+def is_monotonic_increasing(x):
+    """
+    Helper function to determine if a list is monotonically increasing.
+    """
+    dx = np.diff(x)
+    return np.all(dx >= 0)
+
+
+def is_increasing(x):
+    """
+    Helper function to determine if a list is increasing.
+    """
+    dx = np.diff(x)
+    return np.all(dx > 0)
+
+
+def is_sequential(x):
+    """
+    Helper function to determine if a list is monotonically increasing with step size 1.
+    """
+    dx = np.diff(x)
+    return np.all(np.isin(dx, [0, 1]))
