@@ -99,6 +99,7 @@ def add_bucketing_callbacks(self, X, y):
                 # note using ast.literal_eval is not safe
                 # for use when you don't trust the user input
                 # in this case, it's a local user using his/her own kernel
+                # note: we're using literal_eval because JSON enforces quoted keys
                 input_map = ast.literal_eval(input_map)
                 # re-sort on value, key
                 input_map = dict(sorted(input_map.items(), key=lambda x: (x[1], x[0])))
