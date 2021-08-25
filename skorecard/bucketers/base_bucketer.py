@@ -59,8 +59,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                     raise AttributeError("If passing y as a Numpy array, y must be a 1-dimensional")
                 else:
                     y = y.reshape(-1, 1)
-        else:
-            raise TypeError("y must be either a Pandas column or a Numpy array")
 
         y = check_array(y, ensure_2d=False)
 
