@@ -27,8 +27,15 @@ def ensure_dataframe(X: pd.DataFrame) -> pd.DataFrame:
         # as you'll lose column name info.
         # but bucketer will still work on numpy matrix
         # also required for full scikitlearn compatibility
-        return pd.DataFrame(X)
+        X = pd.DataFrame(X)
     else:
         # Create a copy
         # important not to transform the original dataset.
-        return X.copy()
+        X = X.copy()
+
+    if X.shape[0] == 0:
+        raise ValueError("Dataset has no rows!")
+    if X.shape[1] == 0:
+        raise ValueError(f"0 feature(s) (shape=({X.shape[0]}, 0)) while a minimum of 1 is required.")
+
+    return X

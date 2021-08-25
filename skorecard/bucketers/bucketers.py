@@ -526,7 +526,7 @@ class DecisionTreeBucketer(BaseBucketer):
         min_bin_size=0.05,
         random_state=42,
         remainder="passthrough",
-        **kwargs,
+        dt_kwargs={},
     ) -> None:
         """Init the class.
 
@@ -561,7 +561,7 @@ class DecisionTreeBucketer(BaseBucketer):
             remainder (str): How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-            kwargs: Other parameters passed to DecisionTreeClassifier
+            dt_kwargs: Other parameters passed to DecisionTreeClassifier
         """  # noqa
         assert isinstance(variables, list)
         assert remainder in ["passthrough", "drop"]
@@ -569,14 +569,19 @@ class DecisionTreeBucketer(BaseBucketer):
 
         self.variables = variables
         self.specials = specials
-        self.kwargs = kwargs
+        self.dt_kwargs = dt_kwargs
         self.max_n_bins = max_n_bins
         self.missing_treatment = missing_treatment
         self.min_bin_size = min_bin_size
         self.random_state = random_state
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -619,7 +624,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 max_leaf_nodes=(self.max_n_bins - n_special_bins),
                 min_samples_leaf=min_bin_size,
                 random_state=self.random_state,
-                **self.kwargs,
+                **self.dt_kwargs,
             )
             binner.fit(X.values.reshape(-1, 1), y)
 

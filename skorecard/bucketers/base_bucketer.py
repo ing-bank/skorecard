@@ -5,7 +5,7 @@ import itertools
 import pathlib
 
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_array
 
 from skorecard.reporting.plotting import PlotBucketMethod
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
@@ -42,29 +42,28 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         # checks that y is an appropriate type and shape
         if y is None:
             return y
-        y = y.copy()
+
         if isinstance(y, pd.DataFrame):
             if y.shape[1] != 1:
                 raise AttributeError("If passing y as a DataFrame, it must be 1 column.")
-            y = y.values.reshape(
-                -1,
-            )
+            y = y.values.reshape(-1)
 
-        elif isinstance(y, pd.core.series.Series):
+        if isinstance(y, pd.core.series.Series):
             y = y.values
 
-        elif isinstance(y, np.ndarray):
+        if isinstance(y, np.ndarray):
             if y.ndim > 2:
                 raise AttributeError("If passing y as a Numpy array, y must be a 1-dimensional")
             elif y.ndim == 2:
                 if y.shape[1] != 1:
                     raise AttributeError("If passing y as a Numpy array, y must be a 1-dimensional")
                 else:
-                    y = y.reshape(
-                        -1,
-                    )
+                    y = y.reshape(-1, 1)
         else:
             raise TypeError("y must be either a Pandas column or a Numpy array")
+
+        y = check_array(y, ensure_2d=False)
+
         return y
 
     @staticmethod
@@ -394,4 +393,4 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
         See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
         """  # noqa
-        return {"binary_only": True}
+        return {"binary_only": True, "allow_nan": True}

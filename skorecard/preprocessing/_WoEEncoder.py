@@ -2,8 +2,9 @@ import numpy as np
 
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.metrics.metrics import woe_1d
+from skorecard.utils.validation import ensure_dataframe
 
-from sklearn.utils.validation import check_is_fitted, ensure_dataframe
+from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -66,7 +67,7 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
 
         self.variables = BaseBucketer._check_variables(X, self.variables)
 
-        X = BaseBucketer._is_dataframe(X)
+        X = ensure_dataframe(X)
         # TODO: WoE should treat missing values as a separate bin and thus handled seamlessly.
         BaseBucketer._check_contains_na(X, self.variables)
 
