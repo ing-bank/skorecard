@@ -139,10 +139,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.encoder = encoder
         self.selected_features = selected_features
         self.cat_features = cat_features
-        self._use_default_bucketing = False
         self.verbose = verbose
         self.lr_kwargs = lr_kwargs
-        self.repr_msg = ""
 
     def __repr__(self):
         """Pretty print self.
@@ -156,8 +154,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                 v = str(v.__class__.__name__)  # get only the class name of the bucketer
             vars += f"{k}={v}, "
 
-        self.repr_msg = f"{self.__class__.__name__}({vars})"
-        return self.repr_msg
+        return f"{self.__class__.__name__}({vars})"
 
     def _build_default_bucketing_process(self):
         """Make the default bucketing step of Skorecard as a BucketingProcess."""
@@ -212,7 +209,6 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         This is called within the fit method, as the dataset X is needed to extract other default attributes.
         """
         if self.bucketing is None:
-            self._use_default_bucketing = True
             setup_msg = "\nNo bucketing passed. Using predefined bucketer."
 
             if self.cat_features is None:
