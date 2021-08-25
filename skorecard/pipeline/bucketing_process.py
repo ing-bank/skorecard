@@ -17,7 +17,7 @@ from skorecard.reporting import build_bucket_table
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
-from skorecard.utils.validation import is_fitted
+from skorecard.utils.validation import is_fitted, ensure_dataframe
 from skorecard.utils.exceptions import NotInstalledError
 
 from typing import Dict, TypeVar, List
@@ -186,6 +186,7 @@ class BucketingProcess(
             X (pd.DataFrame): Data to fit on.
             y (np.array, optional): target. Defaults to None.
         """
+        X = ensure_dataframe(X)
         # Fit the prebucketing pipeline
         X_prebucketed_ = self.pre_pipeline.fit_transform(X, y)
         assert isinstance(X_prebucketed_, pd.DataFrame)

@@ -1,5 +1,6 @@
 import warnings
 import numpy as np
+import pandas as pd
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
@@ -208,6 +209,10 @@ class Skorecard(BaseEstimator, ClassifierMixin):
 
         This is called within the fit method, as the dataset X is needed to extract other default attributes.
         """
+        # Convert X to pd.DataFrame. Not recommended, as you'll lose column name info.
+        if not isinstance(X, pd.DataFrame):
+            X = pd.DataFrame(X)
+
         if self.bucketing is None:
             setup_msg = "\nNo bucketing passed. Using predefined bucketer."
 
@@ -256,6 +261,9 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             X (pd.DataFrame): features
             y (pd.Series, optional): target. Defaults to None.
         """
+        # Store the classes seen during fit
+        self.classes_ = np.unique(y)
+
         self._setup(X)
         try:
             self.pipeline.fit(X, y)

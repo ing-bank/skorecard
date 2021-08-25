@@ -140,7 +140,7 @@ class OptimalBucketer(BaseBucketer):
 
         # Fit estimator
         binner = OptimalBinning(
-            name=feature,
+            name=str(feature),
             dtype=self.variables_type,
             solver="cp",
             monotonic_trend="auto_asc_desc",

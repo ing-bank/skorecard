@@ -29,20 +29,13 @@ except ModuleNotFoundError:
 
 from skorecard.apps.app_layout import add_basic_layout
 from skorecard.apps.app_callbacks import add_bucketing_callbacks
+from skorecard.utils.validation import ensure_dataframe
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
 
 class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTableMethod, SummaryMethod):
     """Base class for bucket transformers."""
-
-    @staticmethod
-    def _is_dataframe(X: pd.DataFrame):
-        # checks if the input is a dataframe. Also creates a copy,
-        # important not to transform the original dataset.
-        if not isinstance(X, pd.DataFrame):
-            raise TypeError("The data set should be a pandas dataframe")
-        return X.copy()
 
     @staticmethod
     def _check_y(y):
@@ -214,7 +207,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     def fit(self, X, y=None):
         """Fit X, y."""
-        X = self._is_dataframe(X)
+        X = ensure_dataframe(X)
         y = self._check_y(y)
         self.variables = self._check_variables(X, self.variables)
         self._verify_specials_variables(self.specials, X.columns)
@@ -348,7 +341,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             df (pd.DataFrame): dataset with transformed features
         """
         check_is_fitted(self)
-        X = self._is_dataframe(X)
+        X = ensure_dataframe(X)
         y = self._check_y(y)
 
         for feature in self.variables:
