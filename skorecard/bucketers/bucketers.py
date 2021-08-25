@@ -1069,18 +1069,20 @@ class UserInputBucketer(BaseBucketer):
                     "'features_bucket_mapping' must be a dict, str, path, or FeaturesBucketMapping instance"
                 )
 
-        # If user did not specify any variables,
-        # use all the variables defined in the features_bucket_mapping
         self.variables = variables
-        if variables == []:
-            self.variables = list(self.features_bucket_mapping_.maps.keys())
 
     def fit(self, X, y=None):
         """Init the class."""
         # bucket tables can only be computed on fit().
         # so a user will have to .fit() if she/he wants .plot_buckets() and .bucket_table()
         self.bucket_tables_ = {}
-        for feature in self.variables:
+
+        # and if user did not specify any variables
+        # use all the variables defined in the features_bucket_mapping
+        if self.variables == []:
+            self.variables_ = list(self.features_bucket_mapping_.maps.keys())
+
+        for feature in self.variables_:
             # Calculate the bucket table
             self.bucket_tables_[feature] = build_bucket_table(
                 X,

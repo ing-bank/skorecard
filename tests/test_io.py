@@ -93,7 +93,9 @@ def test_decision_tree_bucketer_to_file(df, tmpdir):
     X = df[features]
     y = df["default"]
 
-    tbt = DecisionTreeBucketer(variables=features, max_n_bins=5, criterion="entropy", min_impurity_decrease=0.001)
+    tbt = DecisionTreeBucketer(
+        variables=features, max_n_bins=5, dt_kwargs={"criterion": "entropy", "min_impurity_decrease": 0.001}
+    )
     X_trans = tbt.fit_transform(X, y)
 
     # Test save to yaml in bucketer
@@ -130,7 +132,9 @@ def test_bucketers_with_sklearn_pipeline(df, tmpdir):
     y = df["default"]
 
     bucketing = make_pipeline(
-        DecisionTreeBucketer(variables=[features[0]], max_n_bins=5, criterion="entropy", min_impurity_decrease=0.001),
+        DecisionTreeBucketer(
+            variables=[features[0]], max_n_bins=5, dt_kwargs={"criterion": "entropy", "min_impurity_decrease": 0.001}
+        ),
         DecisionTreeBucketer(variables=[features[1]], max_n_bins=3),
     )
 

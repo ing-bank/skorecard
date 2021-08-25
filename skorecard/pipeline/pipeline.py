@@ -358,13 +358,6 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
                 msg += f"Remove {step} from the pipeline."
                 raise NotBucketObjectError(msg)
 
-    @property
-    def variables(self):
-        """
-        Helper function to show which features are in scope of this pipeline.
-        """
-        return self.features_bucket_mapping_.columns
-
     def fit_interactive(self, X, y=None, mode="external"):
         """
         Fit a bucketer and then interactively edit the fit using a dash app.

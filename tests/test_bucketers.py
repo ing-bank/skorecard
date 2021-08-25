@@ -76,6 +76,7 @@ def test_error_input(bucketer):
     with pytest.raises(AssertionError):
         bucketer(n_bins=4.2, variables=["MARRIAGE"])
 
+
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
 def test_missings_set(bucketer, df_with_missings) -> None:
     """Test all missing methods work for bucketers with set bins."""
@@ -107,8 +108,11 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     BUCK.fit(X, y)
 
     for feature in ["MARRIAGE", "LIMIT_BAL"]:
-        assert "Missing" in BUCK.bucket_table(feature).sort_values('Count', ascending=False).reset_index(drop=True)['label'][0]
-    
+        assert (
+            "Missing"
+            in BUCK.bucket_table(feature).sort_values("Count", ascending=False).reset_index(drop=True)["label"][0]
+        )
+
     BUCK_risk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="most_risky")
     BUCK_risk.fit(X, y)
 
@@ -117,16 +121,34 @@ def test_missings_set(bucketer, df_with_missings) -> None:
 
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the riskiest bucket when missings are in a separate bucket
-        riskiest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=False).reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == riskiest_bucket].reset_index()['label'][0]
-    
+        riskiest_bucket = (
+            BUCK_norisk.bucket_table(feature)
+            .sort_values("Event Rate", ascending=False)
+            .reset_index(drop=True)["bucket"][0]
+        )
+        assert (
+            "Missing"
+            in BUCK_risk.bucket_table(feature)[
+                BUCK_risk.bucket_table(feature)["bucket"] == riskiest_bucket
+            ].reset_index()["label"][0]
+        )
+
     BUCK_risk = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="least_risky")
     BUCK_risk.fit(X, y)
 
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the safest bucket when missings are in a separate bucket
-        safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
+        safest_bucket = (
+            BUCK_norisk.bucket_table(feature)
+            .sort_values("Event Rate", ascending=True)
+            .reset_index(drop=True)["bucket"][0]
+        )
+        assert (
+            "Missing"
+            in BUCK_risk.bucket_table(feature)[
+                BUCK_risk.bucket_table(feature)["bucket"] == safest_bucket
+            ].reset_index()["label"][0]
+        )
 
     BUCK_neutral = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="neutral")
     BUCK_neutral.fit(X, y)
@@ -135,9 +157,13 @@ def test_missings_set(bucketer, df_with_missings) -> None:
         # look at the bucket with WoE closest to 0
         table = BUCK_norisk.bucket_table(feature)
         table["WoE"] = np.abs(table["WoE"])
-        closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_neutral.bucket_table(feature)[BUCK_neutral.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
-
+        closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)["bucket"][0]
+        assert (
+            "Missing"
+            in BUCK_neutral.bucket_table(feature)[
+                BUCK_neutral.bucket_table(feature)["bucket"] == closest_bucket
+            ].reset_index()["label"][0]
+        )
 
     BUCK_similar = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="similar")
     BUCK_similar.fit(X, y)
@@ -145,10 +171,16 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the bucket with WoE closest to 0
         table = BUCK_norisk.bucket_table(feature)
-        missing_WoE = table[table['label'] == 'Missing']['WoE'].values[0]
-        table['New_WoE'] = np.abs(table["WoE"] - missing_WoE)
-        closest_bucket = table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_similar.bucket_table(feature)[BUCK_similar.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
+        missing_WoE = table[table["label"] == "Missing"]["WoE"].values[0]
+        table["New_WoE"] = np.abs(table["WoE"] - missing_WoE)
+        closest_bucket = table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True)["bucket"][0]
+        assert (
+            "Missing"
+            in BUCK_similar.bucket_table(feature)[
+                BUCK_similar.bucket_table(feature)["bucket"] == closest_bucket
+            ].reset_index()["label"][0]
+        )
+
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
 def test_missings_without_set(bucketer, df_with_missings) -> None:
@@ -160,8 +192,11 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
     BUCK.fit(X, y)
 
     for feature in ["MARRIAGE", "EDUCATION"]:
-        assert "Missing" in BUCK.bucket_table(feature).sort_values('Count', ascending=False).reset_index(drop=True)['label'][0]
-    
+        assert (
+            "Missing"
+            in BUCK.bucket_table(feature).sort_values("Count", ascending=False).reset_index(drop=True)["label"][0]
+        )
+
     BUCK_risk = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="most_risky")
     BUCK_risk.fit(X, y)
 
@@ -170,16 +205,34 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
 
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the riskiest bucket when missings are in a separate bucket
-        riskiest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=False).reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == riskiest_bucket].reset_index()['label'][0]
-    
+        riskiest_bucket = (
+            BUCK_norisk.bucket_table(feature)
+            .sort_values("Event Rate", ascending=False)
+            .reset_index(drop=True)["bucket"][0]
+        )
+        assert (
+            "Missing"
+            in BUCK_risk.bucket_table(feature)[
+                BUCK_risk.bucket_table(feature)["bucket"] == riskiest_bucket
+            ].reset_index()["label"][0]
+        )
+
     BUCK_risk = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="least_risky")
     BUCK_risk.fit(X, y)
 
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the safest bucket when missings are in a separate bucket
-        safest_bucket = BUCK_norisk.bucket_table(feature).sort_values('Event Rate', ascending=True).reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_risk.bucket_table(feature)[BUCK_risk.bucket_table(feature)['bucket'] == safest_bucket].reset_index()['label'][0]
+        safest_bucket = (
+            BUCK_norisk.bucket_table(feature)
+            .sort_values("Event Rate", ascending=True)
+            .reset_index(drop=True)["bucket"][0]
+        )
+        assert (
+            "Missing"
+            in BUCK_risk.bucket_table(feature)[
+                BUCK_risk.bucket_table(feature)["bucket"] == safest_bucket
+            ].reset_index()["label"][0]
+        )
 
     BUCK_neutral = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="neutral")
     BUCK_neutral.fit(X, y)
@@ -188,19 +241,30 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
         # look at the bucket with WoE closest to 0
         table = BUCK_norisk.bucket_table(feature)
         table["WoE"] = np.abs(table["WoE"])
-        closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_neutral.bucket_table(feature)[BUCK_neutral.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
-    
+        closest_bucket = table[table["Count"] > 0].sort_values("WoE").reset_index(drop=True)["bucket"][0]
+        assert (
+            "Missing"
+            in BUCK_neutral.bucket_table(feature)[
+                BUCK_neutral.bucket_table(feature)["bucket"] == closest_bucket
+            ].reset_index()["label"][0]
+        )
+
     BUCK_similar = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="similar")
     BUCK_similar.fit(X, y)
 
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the bucket with WoE closest to 0
         table = BUCK_norisk.bucket_table(feature)
-        missing_WoE = table[table['label'] == 'Missing']['WoE'].values[0]
-        table['New_WoE'] = np.abs(table["WoE"] - missing_WoE)
-        closest_bucket = table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True)['bucket'][0]
-        assert 'Missing' in BUCK_similar.bucket_table(feature)[BUCK_similar.bucket_table(feature)['bucket'] == closest_bucket].reset_index()['label'][0]
+        missing_WoE = table[table["label"] == "Missing"]["WoE"].values[0]
+        table["New_WoE"] = np.abs(table["WoE"] - missing_WoE)
+        closest_bucket = table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True)["bucket"][0]
+        assert (
+            "Missing"
+            in BUCK_similar.bucket_table(feature)[
+                BUCK_similar.bucket_table(feature)["bucket"] == closest_bucket
+            ].reset_index()["label"][0]
+        )
+
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
 def test_type_error_input(bucketer, df):
@@ -210,7 +274,7 @@ def test_type_error_input(bucketer, df):
         StandardScaler(),
         bucketer(variables=["BILL_AMT1"]),
     )
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         pipe.fit_transform(df)
 
 

@@ -208,7 +208,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         """Fit X, y."""
         X = ensure_dataframe(X)
         y = self._check_y(y)
-        self.variables = self._check_variables(X, self.variables)
+        if y is not None:
+            assert len(y) == X.shape[0], "y and X not same length"
+
+        self.variables_ = self._check_variables(X, self.variables)
         self._verify_specials_variables(self.specials, X.columns)
 
         if isinstance(y, pd.Series):
@@ -217,7 +220,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         self.features_bucket_mapping_ = FeaturesBucketMapping()
         self.bucket_tables_ = {}
 
-        for feature in self.variables:
+        for feature in self.variables_:
 
             # filter specials for the fit
             if feature in self.specials.keys():
@@ -342,13 +345,24 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         check_is_fitted(self)
         X = ensure_dataframe(X)
         y = self._check_y(y)
+        if y is not None:
+            assert len(y) == X.shape[0], "y and X not same length"
 
-        for feature in self.variables:
+        # Some bucketers do not have a .fit() method
+        # and if user did not specify any variables
+        # use all the variables defined in the features_bucket_mapping
+        if not hasattr(self, "variables_"):
+            if self.variables == []:
+                self.variables_ = list(self.features_bucket_mapping_.maps.keys())
+            else:
+                self.variables_ = self.variables
+
+        for feature in self.variables_:
             bucket_mapping = self.features_bucket_mapping_.get(feature)
             X[feature] = bucket_mapping.transform(X[feature])
 
         if self.remainder == "drop":
-            return X[self.variables]
+            return X[self.variables_]
         else:
             return X
 
