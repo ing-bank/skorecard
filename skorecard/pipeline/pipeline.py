@@ -20,6 +20,11 @@ try:
 except ModuleNotFoundError:
     JupyterDash = NotInstalledError("jupyter-dash", "dashboard")
 
+try:
+    import dash_bootstrap_components as dbc
+except ModuleNotFoundError:
+    dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
+
 
 from skorecard.apps.app_layout import add_basic_layout
 from skorecard.apps.app_callbacks import add_bucketing_callbacks
@@ -377,8 +382,6 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
         # when re-running .fit_interactive()
         if not is_fitted(self):
             self.fit(X, y)
-
-        import dash_bootstrap_components as dbc
 
         self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         add_basic_layout(self)

@@ -12,7 +12,7 @@ from sklearn.pipeline import make_pipeline
 from skorecard.utils import NotPreBucketedError, NotBucketedError
 from skorecard.pipeline import to_skorecard_pipeline
 from skorecard.pipeline.pipeline import _get_all_steps
-from skorecard.bucketers import UserInputBucketer, DecisionTreeBucketer, OptimalBucketer
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.reporting import build_bucket_table
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
@@ -28,6 +28,11 @@ try:
     from jupyter_dash import JupyterDash
 except ModuleNotFoundError:
     JupyterDash = NotInstalledError("jupyter-dash", "dashboard")
+
+try:
+    import dash_bootstrap_components as dbc
+except ModuleNotFoundError:
+    dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
 
 
 from skorecard.apps.app_layout import add_bucketing_process_layout
@@ -267,44 +272,10 @@ class BucketingProcess(
         if not is_fitted(self):
             self.fit(X, y)
 
-        import dash_bootstrap_components as dbc
-
         self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         add_bucketing_process_layout(self)
         add_bucketing_process_callbacks(self, X, y)
         self.app.run_server(mode=mode, **server_kwargs)
-
-    def _set_bucket_mapping(self, features_bucket_mapping, X_prebucketed, y):
-        """
-        Replace the bucket mapping in the bucketing_pipeline.
-
-        This is meant for use internally in the dash app, where we manually edit
-        `features_bucket_mapping_`.
-
-        To be able to update the bucketingprocess, use something like:
-
-        >>> X_prebucketed = bucketingprocess.prebucket_pipeline.transform(X)
-        >>> feature_bucket_mapping # your edited bucketingprocess.features_bucket_mapping_
-        >>> bucketingprocess._set_bucket_mapping(feature_bucket_mapping, X_prebucketed, y)
-        """
-        # Step 1: replace the bucketing pipeline with a UI bucketer that uses the new mapping
-        self.pipeline = UserInputBucketer(features_bucket_mapping)
-
-        # Step 2: Recalculate the bucket tables
-        # Step 3: Update summary table
-        self.bucket_tables_ = dict()
-        for column in X_prebucketed.columns:
-            if column in self.pipeline.features_bucket_mapping_.maps.keys():
-                self.bucket_tables_[column] = build_bucket_table(
-                    X_prebucketed,
-                    y,
-                    column=column,
-                    bucket_mapping=self.pipeline.features_bucket_mapping_.get(column),
-                )
-                assert column in self.summary_dict.keys()
-                # Update bucket_number in summary table
-                # See _generate_summary
-                self.summary_dict[column][1] = len(self.bucket_tables_[column]["bucket_id"].unique())
 
     def transform(self, X):
         """
