@@ -24,7 +24,7 @@ def df_with_missings(df):
     """
     df_with_missings = df.copy()
 
-    for col in df_with_missings.columns:
+    for col in ["EDUCATION", "MARRIAGE", "BILL_AMT1", "LIMIT_BAL", "pet_ownership"]:
         df_with_missings.loc[df_with_missings.sample(frac=0.2, random_state=42).index, col] = np.nan
 
     # Make sure there are 8 unique values (7 unique plus some NA)
