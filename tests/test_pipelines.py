@@ -160,7 +160,7 @@ def test_pipeline_errors(df):
     bu = EqualWidthBucketer(n_bins=4, variables=["LIMIT_BAL", "BILL_AMT1"])
     with pytest.raises(NotFittedError):
         bu.transform(X)  # not fitted yet
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         bu.fit_transform(np.array([1, 2, 3]), y)
 
 

@@ -89,10 +89,6 @@ class OptimalBucketer(BaseBucketer):
                 drop: all remaining columns that were not specified in "variables" will be dropped.
             kwargs: Other parameters passed to optbinning.OptimalBinning. Passed to optbinning.OptimalBinning.
         """  # noqa
-        self._is_allowed_missing_treatment(missing_treatment)
-        assert variables_type in ["numerical", "categorical"]
-        assert remainder in ["passthrough", "drop"]
-
         self.variables = variables
         self.specials = specials
         self.variables_type = variables_type
@@ -226,19 +222,18 @@ class EqualWidthBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert isinstance(n_bins, int)
-        assert n_bins >= 1
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.missing_treatment = missing_treatment
         self.variables = variables
         self.n_bins = n_bins
         self.specials = specials
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -327,12 +322,6 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 drop: all remaining columns that were not specified in "variables" will be dropped.
             kwargs: Other parameters passed to AgglomerativeBucketer
         """  # noqa
-        assert isinstance(variables, list)
-        assert isinstance(n_bins, int)
-        assert n_bins >= 1
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.n_bins = n_bins
         self.specials = specials
@@ -340,7 +329,12 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
         self.remainder = remainder
         self.kwargs = kwargs
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -432,19 +426,18 @@ class EqualFrequencyBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert isinstance(n_bins, int)
-        assert n_bins >= 1
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.n_bins = n_bins
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -563,10 +556,6 @@ class DecisionTreeBucketer(BaseBucketer):
                 drop: all remaining columns that were not specified in "variables" will be dropped.
             dt_kwargs: Other parameters passed to DecisionTreeClassifier
         """  # noqa
-        assert isinstance(variables, list)
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.specials = specials
         self.dt_kwargs = dt_kwargs
@@ -718,18 +707,6 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert encoding_method in ["frequency", "ordered"]
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
-        if tol < 0 or tol > 1:
-            raise ValueError("tol takes values between 0 and 1")
-
-        if max_n_categories is not None:
-            if max_n_categories < 0 or not isinstance(max_n_categories, int):
-                raise ValueError("max_n_categories takes only positive integer numbers")
-
         self.tol = tol
         self.max_n_categories = max_n_categories
         self.variables = variables
@@ -738,7 +715,12 @@ class OrdinalCategoricalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "categorical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "categorical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -848,16 +830,17 @@ class AsIsCategoricalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "categorical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "categorical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -940,17 +923,18 @@ class AsIsNumericalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.right = right
         self.variables = variables
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -1050,7 +1034,6 @@ class UserInputBucketer(BaseBucketer):
         # sklearn.base.BaseEstimator. See the notes in
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
-        assert remainder in ["passthrough", "drop"]
         self.remainder = remainder
 
         if isinstance(features_bucket_mapping, str):
@@ -1094,3 +1077,11 @@ class UserInputBucketer(BaseBucketer):
         self._generate_summary(X, y)
 
         return self
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True, "allow_nan": True, "requires_fit": False}

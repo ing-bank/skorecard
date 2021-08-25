@@ -6,6 +6,7 @@ import pathlib
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.multiclass import unique_labels
 
 from skorecard.reporting.plotting import PlotBucketMethod
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
@@ -204,17 +205,38 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     def fit(self, X, y=None):
         """Fit X, y."""
+        # Do __init__ validation.
+        # See https://scikit-learn.org/stable/developers/develop.html#parameters-and-init
+        assert self.remainder in ["passthrough", "drop"]
+        if hasattr(self, "missing_treatment"):
+            self._is_allowed_missing_treatment(self.missing_treatment)
+        if hasattr(self, "n_bins"):
+            assert isinstance(self.n_bins, int)
+            assert self.n_bins >= 1
+        if hasattr(self, "encoding_method"):
+            assert self.encoding_method in ["frequency", "ordered"]
+        if hasattr(self, "tol"):
+            if self.tol < 0 or self.tol > 1:
+                raise ValueError("tol takes values between 0 and 1")
+        if hasattr(self, "max_n_categories"):
+            if self.max_n_categories is not None:
+                if self.max_n_categories < 0 or not isinstance(self.max_n_categories, int):
+                    raise ValueError("max_n_categories takes only positive integer numbers")
+
+        # Do data validation
         X = ensure_dataframe(X)
         y = self._check_y(y)
         if y is not None:
             assert len(y) == X.shape[0], "y and X not same length"
+            # Store the classes seen during fit
+            self.classes_ = unique_labels(y)
+
+        # scikit-learn requires checking that X has same shape on transform
+        # this is because scikit-learn is still positional based (no column names used)
+        self.n_train_features_ = X.shape[1]
 
         self.variables_ = self._check_variables(X, self.variables)
         self._verify_specials_variables(self.specials, X.columns)
-
-        if isinstance(y, pd.Series):
-            y = y.values
-
         self.features_bucket_mapping_ = FeaturesBucketMapping()
         self.bucket_tables_ = {}
 
@@ -345,6 +367,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         y = self._check_y(y)
         if y is not None:
             assert len(y) == X.shape[0], "y and X not same length"
+        # If bucketer was fitted, make sure X has same columns as train
+        if hasattr(self, "n_train_features_"):
+            if X.shape[1] != self.n_train_features_:
+                raise ValueError("number of features in transform is different from the number of features in fit")
 
         # Some bucketers do not have a .fit() method
         # and if user did not specify any variables

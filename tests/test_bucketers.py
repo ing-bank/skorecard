@@ -69,12 +69,15 @@ def test_three_bins(bucketer, df) -> None:
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
 def test_error_input(bucketer):
-    """Test that a non-int leads to problems in bins."""
+    """Test that a non-int leads to problems in bins.
+
+    Note input validation is done on fit, but before data validation.
+    """
     with pytest.raises(AssertionError):
-        bucketer(n_bins=[2])
+        bucketer(n_bins=[2]).fit(X=1, y=1)
 
     with pytest.raises(AssertionError):
-        bucketer(n_bins=4.2, variables=["MARRIAGE"])
+        bucketer(n_bins=4.2, variables=["MARRIAGE"]).fit(X=1, y=1)
 
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITH_SET_BINS)
@@ -85,7 +88,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
 
     BUCK = bucketer(n_bins=2, variables=["MARRIAGE"])
     BUCK.fit(X, y)
-    X["MARRIAGE_trans"] = BUCK.transform(X[["MARRIAGE"]])
+    X["MARRIAGE_trans"] = BUCK.transform(X)["MARRIAGE"]
     assert len(X["MARRIAGE_trans"].unique()) == 3
     assert X[np.isnan(X["MARRIAGE"])].shape[0] == X[X["MARRIAGE_trans"] == -1].shape[0]
 
@@ -94,7 +97,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
 
     BUCK = bucketer(n_bins=3, variables=["MARRIAGE", "LIMIT_BAL"], missing_treatment={"LIMIT_BAL": 1, "MARRIAGE": 0})
     BUCK.fit(X, y)
-    X_trans = BUCK.transform(X[["MARRIAGE", "LIMIT_BAL"]])
+    X_trans = BUCK.transform(X)
     assert len(X_trans["MARRIAGE"].unique()) == 3
     assert len(X_trans["LIMIT_BAL"].unique()) == 3
 
@@ -269,13 +272,14 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
 def test_type_error_input(bucketer, df):
     """Test that input is always a dataFrame."""
-    df = df.drop(columns=["pet_ownership"])
+    y = df["default"].values
+    X = df.drop(columns=["pet_ownership", "default"])
     pipe = make_pipeline(
         StandardScaler(),
         bucketer(variables=["BILL_AMT1"]),
     )
     with pytest.raises(AssertionError):
-        pipe.fit_transform(df)
+        pipe.fit_transform(X, y)
 
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)

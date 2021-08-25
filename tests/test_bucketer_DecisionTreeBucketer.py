@@ -98,7 +98,7 @@ def test_missing_default(df_with_missings) -> None:
 
     BUCK = DecisionTreeBucketer(variables=["LIMIT_BAL"], random_state=1)
     BUCK.fit(X, y)
-    X["LIMIT_BAL_trans"] = BUCK.transform(X[["LIMIT_BAL"]])
+    X["LIMIT_BAL_trans"] = BUCK.transform(X)["LIMIT_BAL"]
 
     missing_bucket = [f for f in BUCK.features_bucket_mapping_.get("LIMIT_BAL").labels.keys()][-1]
     assert BUCK.features_bucket_mapping_.get("LIMIT_BAL").labels[missing_bucket] == "Missing"
@@ -112,6 +112,6 @@ def test_missing_manual(df_with_missings) -> None:
 
     bucketer = DecisionTreeBucketer(variables=["LIMIT_BAL"], random_state=1, missing_treatment={"LIMIT_BAL": 0})
     bucketer.fit(X, y)
-    X["LIMIT_BAL_trans"] = bucketer.transform(X[["LIMIT_BAL"]])
+    X["LIMIT_BAL_trans"] = bucketer.transform(X)["LIMIT_BAL"]
 
     assert X[np.isnan(X["LIMIT_BAL_trans"])]["LIMIT_BAL"].sum() == 0
