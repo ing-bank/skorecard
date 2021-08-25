@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn.utils import check_array
 
 
 def is_fitted(estimator) -> bool:
@@ -27,6 +28,7 @@ def ensure_dataframe(X: pd.DataFrame) -> pd.DataFrame:
         # as you'll lose column name info.
         # but bucketer will still work on numpy matrix
         # also required for full scikitlearn compatibility
+        X = check_array(X, force_all_finite=False, accept_sparse=False)
         X = pd.DataFrame(X)
     else:
         # Create a copy
