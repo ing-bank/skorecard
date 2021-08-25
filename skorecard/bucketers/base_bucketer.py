@@ -387,3 +387,11 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             FeaturesBucketMapping(self.features_bucket_mapping_).save_yml(fout)
         else:
             self.features_bucket_mapping_.save_yml(fout)
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True}

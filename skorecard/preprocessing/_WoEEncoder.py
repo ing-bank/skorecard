@@ -3,7 +3,7 @@ import numpy as np
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.metrics.metrics import woe_1d
 
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, ensure_dataframe
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -86,10 +86,18 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
             X (pd.DataFrame): dataset
         """
         check_is_fitted(self)
-        X = BaseBucketer._is_dataframe(X)
+        X = ensure_dataframe(X)
 
         for feature in self.variables:
             woe_dict = self.woe_mapping_.get(feature)
             X[feature] = X[feature].map(woe_dict)
 
         return X
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True}

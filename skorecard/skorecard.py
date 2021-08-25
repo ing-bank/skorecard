@@ -382,3 +382,11 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             column: (str). column name
         """
         return self.bucketing.plot_bucket(column)
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True}

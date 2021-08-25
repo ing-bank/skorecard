@@ -369,6 +369,14 @@ class BucketingProcess(
 
         return table
 
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True}
+
 
 def _find_remapped_specials(bucket_labels: Dict, var_specials: Dict) -> Dict:
     """
