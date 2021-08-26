@@ -1,7 +1,12 @@
+import collections
+import pytest
+import itertools
+
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
+from sklearn.utils import estimator_checks
 
 from skorecard.bucketers import (
     DecisionTreeBucketer,
@@ -13,7 +18,117 @@ from skorecard.pipeline import (
 
 from skorecard.preprocessing import WoeEncoder
 
-import pytest
+from tests.conftest import TRANSFORMERS
+
+# checks lists shamelessly copied from
+# https://github.com/koaning/human-learn/blob/master/tests/conftest.py
+classifier_checks = (
+    estimator_checks.check_classifier_data_not_an_array,
+    estimator_checks.check_classifiers_one_label,
+    estimator_checks.check_classifiers_classes,
+    estimator_checks.check_estimators_partial_fit_n_features,
+    estimator_checks.check_classifiers_train,
+    estimator_checks.check_supervised_y_2d,
+    estimator_checks.check_supervised_y_no_nan,
+    estimator_checks.check_estimators_unfitted,
+    estimator_checks.check_non_transformer_estimators_n_iter,
+    estimator_checks.check_decision_proba_consistency,
+)
+
+transformer_checks = (
+    estimator_checks.check_transformer_data_not_an_array,
+    estimator_checks.check_transformer_general,
+    estimator_checks.check_transformers_unfitted,
+)
+
+general_checks = (
+    estimator_checks.check_fit2d_predict1d,
+    estimator_checks.check_methods_subset_invariance,
+    estimator_checks.check_fit2d_1sample,
+    estimator_checks.check_fit2d_1feature,
+    estimator_checks.check_fit1d,
+    estimator_checks.check_get_params_invariance,
+    estimator_checks.check_set_params,
+    estimator_checks.check_dict_unchanged,
+    estimator_checks.check_dont_overwrite_parameters,
+)
+
+nonmeta_checks = (
+    estimator_checks.check_estimators_dtypes,
+    estimator_checks.check_fit_score_takes_y,
+    estimator_checks.check_dtype_object,
+    estimator_checks.check_sample_weights_pandas_series,
+    estimator_checks.check_sample_weights_list,
+    estimator_checks.check_estimators_fit_returns_self,
+    estimator_checks.check_complex_data,
+    estimator_checks.check_estimators_empty_data_messages,
+    estimator_checks.check_pipeline_consistency,
+    estimator_checks.check_estimators_nan_inf,
+    estimator_checks.check_estimators_overwrite_params,
+    estimator_checks.check_estimator_sparse_data,
+    estimator_checks.check_estimators_pickle,
+)
+
+
+def select_tests(include, exclude=[]):
+    """Return an iterable of include with all tests whose name is not in exclude.
+
+    Credits: https://github.com/koaning/human-learn/blob/master/tests/conftest.py
+    """
+    for test in include:
+        if test.__name__ not in exclude:
+            yield test
+
+
+def flatten(nested_iterable):
+    """
+    Returns an iterator of flattened values from an arbitrarily nested iterable.
+
+    Usage:
+
+    ```python
+    from hulearn.common import flatten
+    res1 = list(flatten([['test1', 'test2'], ['a', 'b', ['c', 'd']]]))
+    res2 = list(flatten(['test1', ['test2']]))
+    assert res1 == ['test1', 'test2', 'a', 'b', 'c', 'd']
+    assert res2 == ['test1', 'test2']
+    ```
+
+    Credits: https://github.com/koaning/human-learn/blob/master/hulearn/common.py
+    """  # noqa
+    for el in nested_iterable:
+        if isinstance(el, collections.abc.Iterable) and not isinstance(el, (str, bytes)):
+            yield from flatten(el)
+        else:
+            yield el
+
+
+@pytest.mark.parametrize(
+    "transformer,test_fn",
+    list(
+        itertools.product(
+            TRANSFORMERS,
+            select_tests(
+                include=flatten([general_checks, transformer_checks, nonmeta_checks]),
+                exclude=[
+                    "check_estimators_nan_inf",
+                    "check_estimators_empty_data_messages",
+                    "check_transformer_data_not_an_array",
+                    "check_dtype_object",
+                    "check_complex_data",
+                    "check_fit1d",
+                    "check_transformers_unfitted",
+                ],
+            ),
+        )
+    ),
+)
+def test_transformer_checks(transformer, test_fn):
+    """
+    Runs a scikitlearn check on a skorecard transformer.
+    """
+    t = transformer()
+    test_fn(t.__class__.__name__, t)
 
 
 def test_cross_val(df):

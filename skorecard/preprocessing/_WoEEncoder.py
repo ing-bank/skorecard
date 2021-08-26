@@ -12,7 +12,7 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
     """
     Transformer that encodes unique values in features to their Weight of Evidence estimation.
 
-    Only works for binary classification.
+    Only works for binary classification (target y has 0 and 1 values).
 
     The weight of evidence is given by: `np.log( p(1) / p(0) )`
     The target probability ratio is given by: `p(1) / p(0)`
@@ -62,20 +62,24 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
             X (np.array): (binned) features
             y (np.array): target
         """
+        # Check data
         assert y is not None, "WoEBucketer needs a target y"
-        assert len(np.unique(y)) == 2, "WoEBucketer is only suited for binary classification"
-
-        self.variables = BaseBucketer._check_variables(X, self.variables)
-
+        y = BaseBucketer._check_y(y)
+        if len(np.unique(y)) > 2:
+            raise AssertionError("WoEBucketer is only suited for binary classification")
         X = ensure_dataframe(X)
-        # TODO: WoE should treat missing values as a separate bin and thus handled seamlessly.
+        self.variables_ = BaseBucketer._check_variables(X, self.variables)
+        # WoE currently does not support NAs
+        # We could treat missing values as a separate bin and thus handled seamlessly.
+        # This is also flagged in self._more_tags()
         BaseBucketer._check_contains_na(X, self.variables)
+        # scikit-learn requires checking that X has same shape on transform
+        # this is because scikit-learn is still positional based (no column names used)
+        self.n_train_features_ = X.shape[1]
 
         self.woe_mapping_ = {}
-
-        for var in self.variables:
+        for var in self.variables_:
             t = woe_1d(X[var], y, epsilon=self.epsilon)
-
             self.woe_mapping_[var] = t["woe"].to_dict()
 
         return self
@@ -88,8 +92,12 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
         """
         check_is_fitted(self)
         X = ensure_dataframe(X)
+        if X.shape[1] != self.n_train_features_:
+            msg = f"Number of features in X ({X.shape[1]}) is different "
+            msg += f"from the number of features in X during fit ({self.n_train_features_})"
+            raise ValueError(msg)
 
-        for feature in self.variables:
+        for feature in self.variables_:
             woe_dict = self.woe_mapping_.get(feature)
             X[feature] = X[feature].map(woe_dict)
 
@@ -101,4 +109,4 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
 
         See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
         """  # noqa
-        return {"binary_only": True}
+        return {"binary_only": True, "allow_nan": False}

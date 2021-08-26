@@ -2,17 +2,19 @@ import warnings
 import yaml
 import numpy as np
 import pandas as pd
+from typing import List
 
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import _tree
+from sklearn.utils.multiclass import unique_labels
 
-from typing import List
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.features_bucket_mapping import FeaturesBucketMapping
+from skorecard.reporting import build_bucket_table
 from skorecard.utils import NotInstalledError, NotPreBucketedError
 from skorecard.utils.exceptions import ApproximationWarning
-from skorecard.reporting import build_bucket_table
+from skorecard.utils.validation import ensure_dataframe
 
 try:
     from optbinning import OptimalBinning
@@ -1010,7 +1012,7 @@ class UserInputBucketer(BaseBucketer):
 
     def __init__(
         self,
-        features_bucket_mapping,
+        features_bucket_mapping=None,
         variables: List = [],
         remainder="passthrough",
     ) -> None:
@@ -1021,7 +1023,7 @@ class UserInputBucketer(BaseBucketer):
         - features_bucket_mapping is stored without the trailing underscore (_) because it is not fitted.
 
         Args:
-            features_bucket_mapping (Dict, FeaturesBucketMapping, str or Path): Contains the feature name and boundaries
+            features_bucket_mapping (None, Dict, FeaturesBucketMapping, str or Path): Contains the feature name and boundaries
                 defined for this feature.
                 If a dict, it will be converted to an internal FeaturesBucketMapping object.
                 If a string or path, which will attempt to load the file as a yaml and convert to FeaturesBucketMapping object.
@@ -1035,8 +1037,11 @@ class UserInputBucketer(BaseBucketer):
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
         self.remainder = remainder
+        self.variables = variables
 
-        if isinstance(features_bucket_mapping, str):
+        if features_bucket_mapping is None:
+            self.features_bucket_mapping_ = FeaturesBucketMapping()
+        elif isinstance(features_bucket_mapping, str):
             buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
             self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
         elif isinstance(features_bucket_mapping, dict):
@@ -1049,13 +1054,21 @@ class UserInputBucketer(BaseBucketer):
                 self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
             except Exception:
                 raise TypeError(
-                    "'features_bucket_mapping' must be a dict, str, path, or FeaturesBucketMapping instance"
+                    "'features_bucket_mapping' must be a None, dict, str, path, or FeaturesBucketMapping instance"
                 )
-
-        self.variables = variables
 
     def fit(self, X, y=None):
         """Init the class."""
+        X = ensure_dataframe(X)
+        if y is not None:
+            assert len(y) == X.shape[0], "y and X not same length"
+            # Store the classes seen during fit
+            self.classes_ = unique_labels(y)
+
+        # scikit-learn requires checking that X has same shape on transform
+        # this is because scikit-learn is still positional based (no column names used)
+        self.n_train_features_ = X.shape[1]
+
         # bucket tables can only be computed on fit().
         # so a user will have to .fit() if she/he wants .plot_buckets() and .bucket_table()
         self.bucket_tables_ = {}

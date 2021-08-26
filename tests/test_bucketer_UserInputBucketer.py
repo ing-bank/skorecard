@@ -25,6 +25,15 @@ def example_features_bucket_map():
     }
 
 
+def test_no_transformation(df):
+    """Test that we can use the transformer with no input."""
+    X = df
+    ui_bucketer = UserInputBucketer()
+
+    new_X = ui_bucketer.transform(X)
+    assert X.equals(new_X)
+
+
 def test_manual_transformation(df, example_features_bucket_map):
     """Test that we can use an example dict for ManualBucketTransformer."""
     X = df

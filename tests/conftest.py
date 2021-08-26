@@ -4,6 +4,65 @@ import pytest
 
 from skorecard import datasets
 
+import skorecard.linear_model
+import skorecard.bucketers
+import skorecard.pipeline
+import skorecard.preprocessing
+import skorecard.metrics
+import skorecard.bucket_mapping
+import skorecard.utils
+import skorecard.rescale
+import skorecard.datasets
+
+
+BUCKETERS = [
+    skorecard.bucketers.OptimalBucketer,
+    skorecard.bucketers.EqualWidthBucketer,
+    skorecard.bucketers.AgglomerativeClusteringBucketer,
+    skorecard.bucketers.EqualFrequencyBucketer,
+    skorecard.bucketers.DecisionTreeBucketer,
+    skorecard.bucketers.OrdinalCategoricalBucketer,
+    skorecard.bucketers.UserInputBucketer,
+    skorecard.bucketers.AsIsCategoricalBucketer,
+    skorecard.bucketers.AsIsNumericalBucketer,
+    skorecard.bucketers.UserInputBucketer,
+]
+
+TRANSFORMERS = BUCKETERS + [
+    skorecard.pipeline.BucketingProcess,
+    skorecard.preprocessing.ColumnSelector,
+    skorecard.preprocessing.WoeEncoder,
+]
+
+CLASSIFIERS = [
+    skorecard.Skorecard,
+    skorecard.linear_model.LogisticRegression,
+]
+
+# List of all classes and functions we want tested for the docstrings
+CLASSES_TO_TEST = (
+    TRANSFORMERS
+    + CLASSIFIERS
+    + [
+        skorecard.pipeline.KeepPandas,
+        skorecard.pipeline.SkorecardPipeline,
+        skorecard.rescale.ScoreCardPoints,
+        skorecard.features_bucket_mapping.FeaturesBucketMapping,
+        skorecard.bucket_mapping.BucketMapping,
+        skorecard.utils.DimensionalityError,
+        skorecard.pipeline.SkorecardPipeline,
+    ]
+)
+FUNCTIONS_TO_TEST = [
+    skorecard.utils.reshape_1d_to_2d,
+    skorecard.pipeline.get_features_bucket_mapping,
+    skorecard.reporting.build_bucket_table,
+    skorecard.reporting.iv,
+    skorecard.reporting.psi,
+    skorecard.pipeline.to_skorecard_pipeline,
+    skorecard.datasets.load_uci_credit_card,
+]
+
 
 @pytest.fixture()
 def df():
