@@ -1,4 +1,5 @@
 import numpy as np
+from collections import defaultdict
 
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.metrics.metrics import woe_1d
@@ -40,20 +41,20 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
     Credits: Some inspiration taken from [feature_engine.categorical_encoders](https://feature-engine.readthedocs.io/en/latest/encoding/index.html).
     """  # noqa
 
-    def __init__(self, epsilon=0.0001, variables=[]):
+    def __init__(self, epsilon=0.0001, variables=[], handle_unknown="value"):
         """
-        Constructor for WoEBucketer.
+        Constructor for WoEEncoder.
 
         Args:
             epsilon (float): Amount to be added to relative counts in order to avoid division by zero in the WOE
                 calculation.
             variables (list): The features to bucket. Uses all features if not defined.
+            handle_unknown (str): How to handle any new values encountered in X on transform().
+                options are 'return_nan', 'error' and 'value', defaults to 'value', which will assume WOE=0.
         """
-        assert isinstance(variables, list)
-        assert epsilon >= 0
-
         self.epsilon = epsilon
         self.variables = variables
+        self.handle_unknown = handle_unknown
 
     def fit(self, X, y):
         """Calculate the WOE for every column.
@@ -62,17 +63,20 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
             X (np.array): (binned) features
             y (np.array): target
         """
+        assert self.epsilon >= 0
         # Check data
+        X = ensure_dataframe(X)
         assert y is not None, "WoEBucketer needs a target y"
         y = BaseBucketer._check_y(y)
         if len(np.unique(y)) > 2:
             raise AssertionError("WoEBucketer is only suited for binary classification")
-        X = ensure_dataframe(X)
         self.variables_ = BaseBucketer._check_variables(X, self.variables)
+
         # WoE currently does not support NAs
-        # We could treat missing values as a separate bin and thus handled seamlessly.
         # This is also flagged in self._more_tags()
-        BaseBucketer._check_contains_na(X, self.variables)
+        # We could treat missing values as a separate bin (-1) and thus handle seamlessly.
+        BaseBucketer._check_contains_na(X, self.variables_)
+
         # scikit-learn requires checking that X has same shape on transform
         # this is because scikit-learn is still positional based (no column names used)
         self.n_train_features_ = X.shape[1]
@@ -80,7 +84,13 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
         self.woe_mapping_ = {}
         for var in self.variables_:
             t = woe_1d(X[var], y, epsilon=self.epsilon)
-            self.woe_mapping_[var] = t["woe"].to_dict()
+
+            woe_dict = t["woe"].to_dict()
+            # If new categories encountered, returns WoE = 0
+            if self.handle_unknown == "value":
+                woe_dict = defaultdict(int, woe_dict)
+
+            self.woe_mapping_[var] = woe_dict
 
         return self
 
@@ -90,8 +100,10 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
         Args:
             X (pd.DataFrame): dataset
         """
+        assert self.handle_unknown in ["value", "error", "return_nan"]
         check_is_fitted(self)
         X = ensure_dataframe(X)
+
         if X.shape[1] != self.n_train_features_:
             msg = f"Number of features in X ({X.shape[1]}) is different "
             msg += f"from the number of features in X during fit ({self.n_train_features_})"
@@ -99,6 +111,13 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
 
         for feature in self.variables_:
             woe_dict = self.woe_mapping_.get(feature)
+            if self.handle_unknown == "error":
+                new_cats = [x for x in list(X[feature].unique()) if x not in list(woe_dict.keys())]
+                if len(new_cats) > 0:
+                    msg = "WoEEncoder encountered unknown new categories "
+                    msg += f"in column {feature} on .transform(): {new_cats}"
+                    raise AssertionError(msg)
+
             X[feature] = X[feature].map(woe_dict)
 
         return X

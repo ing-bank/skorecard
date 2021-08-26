@@ -28,8 +28,10 @@ def ensure_dataframe(X: pd.DataFrame) -> pd.DataFrame:
         # as you'll lose column name info.
         # but bucketer will still work on numpy matrix
         # also required for full scikitlearn compatibility
+        X = X.copy()
         X = check_array(X, force_all_finite=False, accept_sparse=False, dtype=None)
         X = pd.DataFrame(X)
+        X.columns = list(X.columns)  # sometimes columns can be a RangeIndex..
     else:
         # Create a copy
         # important not to transform the original dataset.
