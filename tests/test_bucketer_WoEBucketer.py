@@ -112,7 +112,9 @@ def test_woe_values(X_y):
         }
     )
 
-    pd.testing.assert_frame_equal(new_X, expected, check_less_precise=3)
+    pd.testing.assert_frame_equal(new_X, expected)
+
+    assert woeb.transform(X).equals(new_X)
 
 
 def test_woe_in_pipeline(df):

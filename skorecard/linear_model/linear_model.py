@@ -74,9 +74,9 @@ class LogisticRegression(lm.LogisticRegression):
         """  # noqa
         X = convert_sparse_matrix(X)
         if isinstance(X, pd.DataFrame):
-            self.names = ["const"] + [f for f in X.columns]
+            self.names_ = ["const"] + [f for f in X.columns]
         else:
-            self.names = ["const"] + [f"x{i}" for i in range(X.shape[1])]
+            self.names_ = ["const"] + [f"x{i}" for i in range(X.shape[1])]
 
         lr = super().fit(X, y, sample_weight=sample_weight, **kwargs)
 
@@ -136,4 +136,4 @@ class LogisticRegression(lm.LogisticRegression):
             "P>|z|": (self.p_val_intercept_.tolist() + self.p_val_coef_.tolist()[0]),
         }
 
-        return pd.DataFrame(data, index=self.names)
+        return pd.DataFrame(data, index=self.names_)

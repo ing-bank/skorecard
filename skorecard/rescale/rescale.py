@@ -97,10 +97,10 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
     def _get_pipeline_elements(self):
 
-        bucketers = self.skorecard_model.pipeline.named_steps["bucketer"]
-        woe_enc = self.skorecard_model.pipeline.named_steps["encoder"]
-        self.features = self.skorecard_model.pipeline["column_selector"].variables
-        self.model = self.skorecard_model.pipeline.named_steps["model"]
+        bucketers = self.skorecard_model.pipeline_.named_steps["bucketer"]
+        woe_enc = self.skorecard_model.pipeline_.named_steps["encoder"]
+        self.features = self.skorecard_model.pipeline_["column_selector"].variables
+        self.model = self.skorecard_model.pipeline_.named_steps["model"]
 
         assert hasattr(self.model, "predict_proba"), (
             f"Expected a model at the end of the pipeline, " f"got {self.model.__class__}"
@@ -160,7 +160,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
     def transform(self, X):
         """Transform the features to the points."""
-        X_buckets = self.skorecard_model.pipeline.named_steps["bucketer"].transform(X)
+        X_buckets = self.skorecard_model.pipeline_.named_steps["bucketer"].transform(X)
 
         bin_points = pd.concat(
             [

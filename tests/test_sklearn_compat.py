@@ -18,7 +18,7 @@ from skorecard.pipeline import (
 
 from skorecard.preprocessing import WoeEncoder
 
-from tests.conftest import TRANSFORMERS
+from tests.conftest import CLASSIFIERS, TRANSFORMERS
 
 # checks lists shamelessly copied from
 # https://github.com/koaning/human-learn/blob/master/tests/conftest.py
@@ -54,6 +54,7 @@ general_checks = (
 )
 
 nonmeta_checks = (
+    estimator_checks.check_estimators_pickle,
     estimator_checks.check_estimators_dtypes,
     estimator_checks.check_fit_score_takes_y,
     estimator_checks.check_dtype_object,
@@ -66,7 +67,6 @@ nonmeta_checks = (
     estimator_checks.check_estimators_nan_inf,
     estimator_checks.check_estimators_overwrite_params,
     estimator_checks.check_estimator_sparse_data,
-    estimator_checks.check_estimators_pickle,
 )
 
 
@@ -111,6 +111,8 @@ def flatten(nested_iterable):
             select_tests(
                 include=flatten([general_checks, transformer_checks, nonmeta_checks]),
                 exclude=[
+                    "check_fit2d_1sample",
+                    "check_methods_subset_invariance",
                     "check_estimators_nan_inf",
                     "check_estimators_empty_data_messages",
                     "check_transformer_data_not_an_array",
@@ -129,6 +131,46 @@ def test_transformer_checks(transformer, test_fn):
     """
     t = transformer()
     test_fn(t.__class__.__name__, t)
+
+
+@pytest.mark.parametrize(
+    "classifier,test_fn",
+    list(
+        itertools.product(
+            CLASSIFIERS,
+            select_tests(
+                include=flatten([general_checks, classifier_checks, nonmeta_checks]),
+                exclude=[
+                    "check_methods_subset_invariance",
+                    "check_fit2d_1sample",
+                    "check_fit2d_1feature",
+                    "check_classifier_data_not_an_array",
+                    "check_classifiers_one_label",
+                    "check_classifiers_classes",
+                    "check_classifiers_train",
+                    "check_supervised_y_2d",
+                    "check_estimators_pickle",
+                    "check_pipeline_consistency",
+                    "check_fit2d_predict1d",
+                    "check_fit1d",
+                    "check_dtype_object",
+                    "check_complex_data",
+                    "check_estimators_empty_data_messages",
+                    "check_estimators_nan_inf",
+                    "check_estimator_sparse_data",
+                    "check_supervised_y_no_nan",
+                    "check_estimators_partial_fit_n_features",
+                ],
+            ),
+        )
+    ),
+)
+def test_classifier_checks(classifier, test_fn):
+    """
+    Runs a scikitlearn check on a skorecard transformer.
+    """
+    clf = classifier()
+    test_fn(clf.__class__.__name__, clf)
 
 
 def test_cross_val(df):

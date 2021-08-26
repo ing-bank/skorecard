@@ -18,21 +18,21 @@ def run_checks(X, y, bucketer, features, expected_probas):
 
     # make sure sklearn recognizes this as fitted
     check_is_fitted(skorecard_model)
-    check_is_fitted(skorecard_model.pipeline.steps[-1][1])
-    if isinstance(skorecard_model.bucketing, Pipeline):
-        check_is_fitted(skorecard_model.bucketing.steps[0][1])
+    check_is_fitted(skorecard_model.pipeline_.steps[-1][1])
+    if isinstance(skorecard_model.bucketing_, Pipeline):
+        check_is_fitted(skorecard_model.bucketing_.steps[0][1])
     else:
-        check_is_fitted(skorecard_model.bucketing)
+        check_is_fitted(skorecard_model.bucketing_)
 
     # Make sure proper attribures are there
-    assert isinstance(skorecard_model.bucketing.features_bucket_mapping_, FeaturesBucketMapping)
-    assert isinstance(skorecard_model.bucketing.bucket_tables_, dict)
+    assert isinstance(skorecard_model.bucketing_.features_bucket_mapping_, FeaturesBucketMapping)
+    assert isinstance(skorecard_model.bucketing_.bucket_tables_, dict)
 
     top_probas = skorecard_model.predict_proba(X)[:2]
     np.testing.assert_array_almost_equal(top_probas, expected_probas, decimal=2)
 
     # assure naming convention is fixed and ordered
-    assert [names for names in skorecard_model.pipeline.named_steps] == [
+    assert [names for names in skorecard_model.pipeline_.named_steps] == [
         "bucketer",
         "encoder",
         "column_selector",
@@ -58,7 +58,7 @@ def run_checks(X, y, bucketer, features, expected_probas):
     assert skorecard_model.bucket_transform(X).shape == X.shape
     assert skorecard_model.woe_transform(X).shape == X.shape
     # Last transformer selects the features
-    assert skorecard_model.pipeline[:-1].transform(X).shape == (X.shape[0], len(features))
+    assert skorecard_model.pipeline_[:-1].transform(X).shape == (X.shape[0], len(features))
 
     # test that the stats showcase only the selected features
     assert skorecard_model.get_stats().index.tolist() == ["const"] + features
@@ -66,11 +66,11 @@ def run_checks(X, y, bucketer, features, expected_probas):
     # Test bucket table works
     assert (
         skorecard_model.bucket_table("LIMIT_BAL").shape[0]
-        == skorecard_model.pipeline[:1].transform(X)["LIMIT_BAL"].nunique() + 1
+        == skorecard_model.pipeline_[:1].transform(X)["LIMIT_BAL"].nunique() + 1
     )
 
     # prebucketing methods
-    if not isinstance(skorecard_model.bucketing, BucketingProcess):
+    if not isinstance(skorecard_model.bucketing_, BucketingProcess):
         # test a BucketerTypeError is raised if the plot_prebucket('LIMIT_BAL') function is called (not defined
         # #for standard bucketers)
         with pytest.raises(BucketerTypeError):
@@ -178,9 +178,7 @@ def test_default_skorecard_class(df):
 
     skorecard_model = Skorecard(verbose=0, selected_features=features)
     skorecard_model.fit(X, y)
-    assert len(skorecard_model.cat_features) == 3
-    assert len(skorecard_model.num_features) == 2
-    assert isinstance(skorecard_model.bucketing, BucketingProcess)
+    assert isinstance(skorecard_model.bucketing_, BucketingProcess)
 
     bucketer = None
     expected_probas = np.array([[0.862, 0.138], [0.748, 0.252]])

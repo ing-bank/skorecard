@@ -185,8 +185,13 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         We need to filter out the missing values from a vector.
 
         Because we don't want to use those values to determine bin boundaries.
+
+        Note pd.DataFrame.isna and pd.DataFrame.isnull are identical
         """
-        flt = pd.isnull(X).values
+        # let's also treat infinite values as NA
+        # scikit-learn's check_estimator might throw those at us
+        with pd.option_context("mode.use_inf_as_na", True):
+            flt = pd.isna(X).values
         X_out = X[~flt]
         if y is not None and len(y) > 0:
             y_out = y[~flt]
