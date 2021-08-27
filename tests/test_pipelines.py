@@ -202,7 +202,8 @@ def test_pipeline_has_no_duplicated_features(df):
     )
     with pytest.raises(BucketingPipelineError):
         p = to_skorecard_pipeline(bucketer)
-        p.fit(X[features_1 + features_2], y)
+        feat = ["LIMIT_BAL", "BILL_AMT1", "EDUCATION", "MARRIAGE"]
+        p.fit(X[feat], y)
 
 
 def test_skorecard_pipeline(df):

@@ -329,16 +329,24 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
         for step in _get_all_steps(pipeline):
             if is_fitted(step):
                 if hasattr(step, "variables_"):
-                    bucketers_vars += step.variables_
+                    if len(step.variables_) == 0:
+                        bucketers_vars += ["**all**"]
+                    else:
+                        bucketers_vars += step.variables_
             else:
                 if hasattr(step, "variables"):
-                    bucketers_vars += step.variables
+                    if len(step.variables) == 0:
+                        bucketers_vars += ["**all**"]
+                    else:
+                        bucketers_vars += step.variables
 
-        if any([x == [] for x in bucketers_vars]):
-            if not all([x == [] for x in bucketers_vars]):
-                raise BucketingPipelineError(
-                    "One of the bucketers applies to all variables, which means a feature will be bucketed twice."
-                )
+        if len(set(bucketers_vars)) > 1 and "**all**" in list(set(bucketers_vars)):
+            msg = "A SkorecardPipeline should bucket each feature only once."
+            msg += "Some bucketers bucket all features, while others specific ones, "
+            msg += "meaning some features would have been bucketed sequentially."
+            msg += "To solve this, either use a BucketingProcess, or remove the duplicates from one of the bucketers."
+            msg += "Remember that if you don't specify 'variables', a bucketer will bucket all columns."
+            raise BucketingPipelineError(msg)
 
         if len(set(bucketers_vars)) != len(bucketers_vars):
             values, counts = np.unique(bucketers_vars, return_counts=True)
