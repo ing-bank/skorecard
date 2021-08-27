@@ -51,8 +51,11 @@ def test_non_bucketer_in_pipeline(df):
     """Test that putting a non-bucketer in bucket_process raises error."""
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
+    X = df[num_cols + cat_cols]
+    y = df["default"].values
 
     with pytest.raises(NotBucketObjectError):
+        # input validation is only done on fit, as per scikitlearn convention
         BucketingProcess(
             prebucketing_pipeline=make_pipeline(
                 DecisionTreeBucketer(variables=num_cols, max_n_bins=100, min_bin_size=0.05)
@@ -62,7 +65,7 @@ def test_non_bucketer_in_pipeline(df):
                 OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=10, min_bin_size=0.05),
                 LogisticRegression(),  # Should break the process
             ),
-        )
+        ).fit(X, y)
 
     with pytest.raises(NotBucketObjectError):
         BucketingProcess(
@@ -74,7 +77,7 @@ def test_non_bucketer_in_pipeline(df):
                 OptimalBucketer(variables=num_cols, max_n_bins=10, min_bin_size=0.05),
                 OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=10, min_bin_size=0.05),
             ),
-        )
+        ).fit(X, y)
 
 
 def test_bucketing_optimization(df):
@@ -98,7 +101,7 @@ def test_bucketing_optimization(df):
 
     X_bins = bucketing_process.fit_transform(X, y)
 
-    X_prebucketed = bucketing_process.pre_pipeline.transform(X)
+    X_prebucketed = bucketing_process.pre_pipeline_.transform(X)
     for col in num_cols + cat_cols:
         assert X_bins[col].nunique() <= X_prebucketed[col].nunique()
         assert X_bins[col].nunique() > 1
@@ -129,7 +132,7 @@ def test_bucketing_with_specials(df):
     _ = bucketing_process.fit_transform(X, y)
 
     # Make sure all the prebucketers have the specials assigned
-    for step in bucketing_process.pre_pipeline:
+    for step in bucketing_process.pre_pipeline_:
         assert step.specials == the_specials
 
     # Test the specials in the prebucket table
@@ -179,24 +182,6 @@ def test_bucketing_process_with_numerical_specials(df):
 
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
-
-    with pytest.warns(UserWarning):
-        bucketing_process = BucketingProcess(
-            prebucketing_pipeline=make_pipeline(
-                DecisionTreeBucketer(
-                    variables=num_cols,
-                    max_n_bins=100,
-                    min_bin_size=0.05,
-                    specials={"LIMIT_BAL": {"=400000.0": [400000.0]}},
-                ),
-                AsIsCategoricalBucketer(variables=cat_cols),
-            ),
-            bucketing_pipeline=make_pipeline(
-                OptimalBucketer(variables=num_cols, max_n_bins=10, min_bin_size=0.05),
-                OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=10, min_bin_size=0.05),
-            ),
-        )
-        bucketing_process.fit(X, y)
 
     bucketing_process = BucketingProcess(
         specials={"LIMIT_BAL": {"=400000.0": [400000.0]}},

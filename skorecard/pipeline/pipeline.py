@@ -327,8 +327,12 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
 
         bucketers_vars = []
         for step in _get_all_steps(pipeline):
-            if hasattr(step, "variables"):
-                bucketers_vars += step.variables
+            if is_fitted(step):
+                if hasattr(step, "variables_"):
+                    bucketers_vars += step.variables_
+            else:
+                if hasattr(step, "variables"):
+                    bucketers_vars += step.variables
 
         if any([x is None for x in bucketers_vars]):
             if not all([x is None for x in bucketers_vars]):

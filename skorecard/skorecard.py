@@ -164,11 +164,20 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         if self.cat_features is None:
             num_cols = X._get_numeric_data().columns
             cat_features = list(set(X.columns) - set(num_cols))
+            num_features = [f for f in X.columns if f not in cat_features]
         else:
             cat_features = self.cat_features
+            num_features = [f for f in X.columns if f not in cat_features]
 
-        if cat_features:
-            num_features = [feat for feat in X.columns if feat not in cat_features]
+        if cat_features is not None and self.selected_features is not None:
+            cat_features = [f for f in cat_features if f in self.selected_features]
+        if num_features is not None and self.selected_features is not None:
+            num_features = [f for f in num_features if f in self.selected_features]
+
+        self.cat_features_ = cat_features
+        self.num_features = num_features
+
+        if cat_features is not None and len(cat_features) > 0:
             prebucketing_pipe = [
                 DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02),
                 OrdinalCategoricalBucketer(variables=cat_features, tol=0.02),
@@ -186,8 +195,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             prebucketing_pipe = [DecisionTreeBucketer(max_n_bins=50, min_bin_size=0.02)]
             bucketing_pipe = [OptimalBucketer(max_n_bins=6, min_bin_size=0.05)]
 
-        prebucketing_pipeline = make_pipeline(*prebucketing_pipe)
-        bucketing_pipeline = make_pipeline(*bucketing_pipe)
+        prebucketing_pipeline = to_skorecard_pipeline(make_pipeline(*prebucketing_pipe))
+        bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))
         bucketing = BucketingProcess(
             specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline
         )

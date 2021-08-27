@@ -136,47 +136,21 @@ class BucketingProcess(
         # original so we can clone instances
         # https://scikit-learn.org/dev/developers/develop.html#cloning
         # https://scikit-learn.org/dev/developers/develop.html#get-params-and-set-params
-        self.prebucketing_pipeline = prebucketing_pipeline
-        self.bucketing_pipeline = bucketing_pipeline
-        assert remainder in ["passthrough", "drop"]
-        self.remainder = remainder
-        self.variables = variables
-
-        # Convert to skorecard pipelines
-        # This does some checks on the pipelines
-        # and adds some convenience methods to the pipeline.
-        self.pre_pipeline = to_skorecard_pipeline(deepcopy(prebucketing_pipeline))
-        self.pipeline = to_skorecard_pipeline(deepcopy(bucketing_pipeline))
-
-        # Add/Overwrite specials to all pre-bucketers
-        for step in _get_all_steps(self.pre_pipeline):
-            if hasattr(step, "specials") and len(step.specials) != 0:
-                # note, specials defined BucketingProcess level
-                # will overwrite any specials on bucketer level.
-                warnings.warn(f"Overwriting specials of {step} with specials of bucketingprocess", UserWarning)
-                step.specials = {**step.specials, **specials}
-            else:
-                step.specials = specials
-
-            if len(self.variables) != 0:
-                if len(step.variables) != 0:
-                    warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
-                step.variables = self.variables
-
-        # Overwrite variables to all bucketers
-        if len(self.variables) != 0:
-            for step in _get_all_steps(self.pipeline):
-                if len(step.variables) != 0:
-                    warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
-                step.variables = self.variables
-
         # Assigning the variable in the init to the attribute with the same name is a requirement of
         # sklearn.base.BaseEstimator. See the notes in
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
+        self.prebucketing_pipeline = prebucketing_pipeline
+        self.bucketing_pipeline = bucketing_pipeline
+        self.remainder = remainder
+        self.variables = variables
         self.specials = specials
-        self._prebucketing_specials = self.specials
-        self._bucketing_specials: Dict = dict()  # will be determined later.
-        self.name = "bucketingprocess"  # to be able to identity the bucketingprocess in a pipeline
+
+    @property
+    def name(self):
+        """
+        To be able to identity the bucketingprocess in a pipeline.
+        """
+        return "bucketingprocess"
 
     def fit(self, X, y=None):
         """
@@ -187,27 +161,62 @@ class BucketingProcess(
             y (np.array, optional): target. Defaults to None.
         """
         X = ensure_dataframe(X)
+
+        # input validation
+        assert self.remainder in ["passthrough", "drop"]
+
+        # Convert to skorecard pipelines
+        # This does some checks on the pipelines
+        # and adds some convenience methods to the pipeline.
+        self.pre_pipeline_ = to_skorecard_pipeline(deepcopy(self.prebucketing_pipeline))
+        self.pipeline_ = to_skorecard_pipeline(deepcopy(self.bucketing_pipeline))
+
+        # Add/Overwrite specials to all pre-bucketers
+        for step in _get_all_steps(self.pre_pipeline_):
+            if hasattr(step, "specials") and len(step.specials) != 0 and len(self.specials) != 0:
+                # note, specials defined BucketingProcess level
+                # will overwrite any specials on bucketer level.
+                warnings.warn(f"Overwriting specials of {step} with specials of bucketingprocess", UserWarning)
+                step.specials = {**step.specials, **self.specials}
+            else:
+                step.specials = self.specials
+
+            if len(self.variables) != 0:
+                if len(step.variables) != 0:
+                    warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
+                step.variables = self.variables
+
+        # Overwrite variables to all bucketers
+        if len(self.variables) != 0:
+            for step in _get_all_steps(self.pipeline_):
+                if len(step.variables) != 0:
+                    warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
+                step.variables = self.variables
+
+        self._prebucketing_specials = self.specials
+        self._bucketing_specials: Dict = dict()  # will be determined later.
+
         # Fit the prebucketing pipeline
-        X_prebucketed_ = self.pre_pipeline.fit_transform(X, y)
+        X_prebucketed_ = self.pre_pipeline_.fit_transform(X, y)
         assert isinstance(X_prebucketed_, pd.DataFrame)
 
         # Calculate the prebucket tables.
         self.prebucket_tables_ = dict()
         for column in X.columns:
-            if column in self.pre_pipeline.features_bucket_mapping_.maps.keys():
+            if column in self.pre_pipeline_.features_bucket_mapping_.maps.keys():
                 self.prebucket_tables_[column] = build_bucket_table(
-                    X, y, column=column, bucket_mapping=self.pre_pipeline.features_bucket_mapping_.get(column)
+                    X, y, column=column, bucket_mapping=self.pre_pipeline_.features_bucket_mapping_.get(column)
                 )
 
         # Find the new bucket numbers of the specials after prebucketing,
         for var, var_specials in self._prebucketing_specials.items():
-            bucket_labels = self.pre_pipeline.features_bucket_mapping_.get(var).labels
+            bucket_labels = self.pre_pipeline_.features_bucket_mapping_.get(var).labels
             new_specials = _find_remapped_specials(bucket_labels, var_specials)
             if len(new_specials):
                 self._bucketing_specials[var] = new_specials
 
         # Then assign the new specials to all bucketers in the bucketing pipeline
-        for step in self.pipeline.steps:
+        for step in self.pipeline_.steps:
             if type(step) != tuple:
                 step.specials = self._bucketing_specials
             else:
@@ -215,12 +224,12 @@ class BucketingProcess(
 
         # Fit the bucketing pipeline
         # And save the bucket mapping
-        self.pipeline.fit(X_prebucketed_, y)
+        self.pipeline_.fit(X_prebucketed_, y)
 
         # Make sure all columns that are bucketed have also been pre-bucketed.
         not_prebucketed = []
-        for col in self.pipeline.features_bucket_mapping_.columns:
-            if col not in self.pre_pipeline.features_bucket_mapping_.columns:
+        for col in self.pipeline_.features_bucket_mapping_.columns:
+            if col not in self.pre_pipeline_.features_bucket_mapping_.columns:
                 not_prebucketed.append(col)
         if len(not_prebucketed):
             msg = f"The following columns are bucketed but have not been pre-bucketed: {', '.join(not_prebucketed)}.\n"
@@ -231,8 +240,8 @@ class BucketingProcess(
 
         # Make sure all columns that have been pre-bucketed also have been bucketed
         not_bucketed = []
-        for col in self.pre_pipeline.features_bucket_mapping_.columns:
-            if col not in self.pipeline.features_bucket_mapping_.columns:
+        for col in self.pre_pipeline_.features_bucket_mapping_.columns:
+            if col not in self.pipeline_.features_bucket_mapping_.columns:
                 not_bucketed.append(col)
         if len(not_bucketed):
             msg = f"The following columns are prebucketed but have not been bucketed: {', '.join(not_bucketed)}.\n"
@@ -242,12 +251,12 @@ class BucketingProcess(
         # calculate the bucket tables.
         self.bucket_tables_ = dict()
         for column in X.columns:
-            if column in self.pipeline.features_bucket_mapping_.maps.keys():
+            if column in self.pipeline_.features_bucket_mapping_.maps.keys():
                 self.bucket_tables_[column] = build_bucket_table(
                     X_prebucketed_,
                     y,
                     column=column,
-                    bucket_mapping=self.pipeline.features_bucket_mapping_.get(column),
+                    bucket_mapping=self.pipeline_.features_bucket_mapping_.get(column),
                 )
 
         # Calculate the summary
@@ -283,9 +292,9 @@ class BucketingProcess(
         Transform `X` through the prebucketing and bucketing pipelines.
         """
         check_is_fitted(self)
-        X_prebucketed = self.pre_pipeline.transform(X)
+        X_prebucketed = self.pre_pipeline_.transform(X)
 
-        new_X = self.pipeline.transform(X_prebucketed)
+        new_X = self.pipeline_.transform(X_prebucketed)
 
         if self.remainder == "drop":
             return new_X[self.variables]
@@ -324,10 +333,10 @@ class BucketingProcess(
         check_is_fitted(self)
         # in .fit() we already make sure all columns that are prebucketed are bucketed, and vice versa
         # this assert is just to be very sure.
-        assert len(self.pre_pipeline.features_bucket_mapping_) == len(self.pipeline.features_bucket_mapping_)
+        assert len(self.pre_pipeline_.features_bucket_mapping_) == len(self.pipeline_.features_bucket_mapping_)
 
         return merge_features_bucket_mapping(
-            self.pre_pipeline.features_bucket_mapping_, self.pipeline.features_bucket_mapping_
+            self.pre_pipeline_.features_bucket_mapping_, self.pipeline_.features_bucket_mapping_
         )
 
     def prebucket_table(self, column: str) -> pd.DataFrame:
@@ -355,7 +364,7 @@ class BucketingProcess(
         table = table.rename(columns={"bucket_id": "pre-bucket"})
 
         # Find bucket for each pre-bucket
-        bucket_mapping = self.pipeline.features_bucket_mapping_.get(column)
+        bucket_mapping = self.pipeline_.features_bucket_mapping_.get(column)
         table["bucket"] = bucket_mapping.transform(table["pre-bucket"])
 
         # Find out missing bucket

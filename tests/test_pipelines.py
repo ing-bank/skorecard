@@ -176,9 +176,9 @@ def test_pipeline_has_no_duplicated_features(df):
         OrdinalCategoricalBucketer(variables=features_2, tol=0.05),
     )
 
-    # before fit
+    # during fit
     with pytest.raises(BucketingPipelineError):
-        to_skorecard_pipeline(bucketer)
+        to_skorecard_pipeline(bucketer).fit(X, y)
 
     # after fit
     bucketer.fit(X, y)
@@ -191,7 +191,7 @@ def test_pipeline_has_no_duplicated_features(df):
                 ("dtb", DecisionTreeBucketer(variables=features_1, max_n_bins=5)),
                 ("ocb", OrdinalCategoricalBucketer(variables=features_2, tol=0.05)),
             ]
-        )
+        ).fit(X, y)
 
 
 def test_skorecard_pipeline(df):
