@@ -13,7 +13,7 @@ def run_checks(X, y, bucketer, features, expected_probas):
     """
     Run some standard asserts on Skorecard instance.
     """
-    skorecard_model = Skorecard(bucketing=bucketer, variables=features)
+    skorecard_model = Skorecard(bucketing=bucketer, variables=features, calculate_stats=True)
     skorecard_model.fit(X, y)
 
     # make sure sklearn recognizes this as fitted

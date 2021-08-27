@@ -34,7 +34,7 @@ class LogisticRegression(lm.LogisticRegression):
 
     pipeline = Pipeline([
         ('bucketer', EqualFrequencyBucketer(n_bins=10)),
-        ('clf', LogisticRegression())
+        ('clf', LogisticRegression(calculate_stats=True))
     ])
     pipeline.fit(X, y)
     assert pipeline.named_steps['clf'].p_val_coef_[0][0] > 0
@@ -51,7 +51,51 @@ class LogisticRegression(lm.LogisticRegression):
 
     """  # noqa
 
-    def fit(self, X, y, sample_weight=None, **kwargs):
+    def __init__(
+        self,
+        penalty="l2",
+        calculate_stats=False,
+        dual=False,
+        tol=0.0001,
+        C=1.0,
+        fit_intercept=True,
+        intercept_scaling=1,
+        class_weight=None,
+        random_state=None,
+        solver="lbfgs",
+        max_iter=100,
+        multi_class="auto",
+        verbose=0,
+        warm_start=False,
+        n_jobs=None,
+        l1_ratio=None,
+    ):
+        """
+        Extends [sklearn.linear_model.LogisticRegression.fit()](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html).
+
+        Args:
+            calculate_stats (bool): If true, calculate statistics like standard error during fit, accessible with .get_stats()
+        """  # noqa
+        super(LogisticRegression, self).__init__(
+            penalty=penalty,
+            dual=dual,
+            tol=tol,
+            C=C,
+            fit_intercept=fit_intercept,
+            intercept_scaling=intercept_scaling,
+            class_weight=class_weight,
+            random_state=random_state,
+            solver=solver,
+            max_iter=max_iter,
+            multi_class=multi_class,
+            verbose=verbose,
+            warm_start=warm_start,
+            n_jobs=n_jobs,
+            l1_ratio=l1_ratio,
+        )
+        self.calculate_stats = calculate_stats
+
+    def fit(self, X, y, sample_weight=None, calculate_stats=False, **kwargs):
         """
         Fit the model.
 
@@ -60,18 +104,23 @@ class LogisticRegression(lm.LogisticRegression):
         In addition to the standard fit by sklearn, this function will compute the covariance of the coefficients.
 
         Args:
-            X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            X (array-like, sparse matrix): Matrix of shape (n_samples, n_features)
                 Training vector, where n_samples is the number of samples and
                 n_features is the number of features.
-            y : array-like of shape (n_samples,)
+            y (array-like): of shape (n_samples,)
                 Target vector relative to X.
-            sample_weight : array-like of shape (n_samples,) default=None
+            sample_weight (array-like): of shape (n_samples,) default=None
                 Array of weights that are assigned to individual samples.
                 If not provided, then each sample is given unit weight.
+            calculate_stats (bool): If true, calculate statistics like standard error during fit, accessible with .get_stats()
 
         Returns:
             self (LogisticRegression): Fitted estimator.
         """  # noqa
+
+        if not self.calculate_stats and not calculate_stats:
+            return super().fit(X, y, sample_weight=sample_weight, **kwargs)
+
         X = convert_sparse_matrix(X)
         if isinstance(X, pd.DataFrame):
             self.names_ = ["const"] + [f for f in X.columns]
@@ -128,6 +177,12 @@ class LogisticRegression(lm.LogisticRegression):
                 the column name
         """
         check_is_fitted(self)
+
+        if not hasattr(self, "std_err_coef_"):
+            msg = "Summary statistics were not calculated on .fit(). Options to fix:\n"
+            msg += "\t- Re-fit using .fit(X, y, calculate_stats=True)\n"
+            msg += "\t- Re-inititialize using LogisticRegression(calculate_stats=True)"
+            raise AssertionError(msg)
 
         data = {
             "Coef.": (self.intercept_.tolist() + self.coef_.tolist()[0]),

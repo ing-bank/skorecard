@@ -23,17 +23,15 @@ class Skorecard(BaseEstimator, ClassifierMixin):
     """Scikit-learn-like estimator that builds a scorecard model.
 
     Usage Examples:
+
     usage of Skorecard() without bucketing
 
     ```python
     from skorecard import Skorecard
     from skorecard.datasets import load_uci_credit_card
+
     X,y = load_uci_credit_card(return_X_y=True)
-
-    num_cols = ["LIMIT_BAL", "BILL_AMT1"]
-    cat_cols = ["EDUCATION", "MARRIAGE"]
-    model = Skorecard(cat_features = cat_cols, variables = num_cols+cat_cols)
-
+    model = Skorecard(variables = ["LIMIT_BAL", "BILL_AMT1","EDUCATION", "MARRIAGE"])
     model.fit(X, y)
     ```
 
@@ -55,14 +53,12 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         OrdinalCategoricalBucketer(variables=cat_cols, tol=0.01)
     )
     bucketing_pipeline = make_pipeline(
-        OptimalBucketer(variables=features, max_n_bins=5, min_bin_size=0.08),
+        OptimalBucketer(variables=num_cols, max_n_bins=5, min_bin_size=0.08),
         OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=5, min_bin_size=0.08)
     )
 
     bucketer = BucketingProcess(prebucketing_pipeline = prebucketing_pipeline, bucketing_pipeline = bucketing_pipeline)
-
     skorecard_model = Skorecard(bucketing=bucketer, variables=num_cols+cat_cols)
-
     skorecard_model.fit(X, y)
 
     # Details
@@ -72,7 +68,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
     skorecard_model.plot_prebucket("LIMIT_BAL")
     ```
 
-    Using it with bucketers
+    Using it with bucketers:
+
      ```python
     from skorecard import Skorecard
     from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
@@ -89,7 +86,6 @@ class Skorecard(BaseEstimator, ClassifierMixin):
     )
 
     skorecard_model = Skorecard(bucketing=bucket_pipe, variables=num_cols+cat_cols)
-
     skorecard_model.fit(X, y)
 
     # Details
@@ -107,7 +103,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         encoder: str = "woe",
         variables: List = [],
         verbose: int = 0,
-        lr_kwargs: dict = None,
+        lr_kwargs: dict = {},
+        calculate_stats: bool = False,
     ):
         """
         Init the class.
@@ -127,8 +124,10 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             encoder (string): indicating the type of encoder. Currently only 'woe' (weight-of-evidence) is supported.
             variables (list): list of features after bucketing to fit the LogisticRegression model on. Defaults to None (all features selected).
             verbose (int): verbosity, set to 0 to avoid warning methods.
-            lr_kwargs (dict): Settings passed to sklearn.linear_model.LogisticRegression.
+            lr_kwargs (dict): Settings passed to skorecard.linear_model.LogisticRegression.
                 By default no settings are passed.
+            calculate_stats (bool): Passed to skorecard.linear_model.LogisticRegression.
+                Will calculate statistic like standard error at the cost of fit() time. Defaults to False.
         """  # noqa
         self.bucketing = bucketing
         self.specials = specials
@@ -136,6 +135,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.variables = variables
         self.verbose = verbose
         self.lr_kwargs = lr_kwargs
+        self.calculate_stats = calculate_stats
 
     def __repr__(self):
         """Pretty print self.
@@ -191,11 +191,6 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         else:
             raise NotImplementedError(f"Encoder {self.encoder} not supported. Please use 'woe'")
 
-        if self.lr_kwargs:
-            lr_model = LogisticRegression(**self.lr_kwargs)
-        else:
-            lr_model = LogisticRegression()
-
         # If a pipeline is specified, convert to SkorecardPipeline
         if self.bucketing is None:
             self.bucketing_ = self._build_default_bucketing_process(X)
@@ -210,7 +205,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                 ("bucketer", self.bucketing_),
                 ("encoder", encoder),
                 ("column_selector", ColumnSelector(self.variables)),
-                ("model", lr_model),
+                ("model", LogisticRegression(calculate_stats=self.calculate_stats, **self.lr_kwargs)),
             ]
         )
 
@@ -294,7 +289,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         return model.get_stats()
 
     def summary(self):
-        """Get the summary of all the buceketers."""
+        """Get the summary of all the bucketers."""
         raise NotImplementedError("Not implemented yet")
         check_is_fitted(self)
         return self.bucketing_.summary()

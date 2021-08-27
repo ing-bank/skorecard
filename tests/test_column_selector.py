@@ -38,7 +38,7 @@ def test_column_selector_in_pipeline(df):
         OrdinalCategoricalBucketer(variables=["MARRIAGE"], tol=0.05),
         WoeEncoder(),
         ColumnSelector(variables=features),
-        LogisticRegression(),
+        LogisticRegression(calculate_stats=True),
     ).fit(X, y)
 
     # test that the model pipe has as many coefficients as there are features.

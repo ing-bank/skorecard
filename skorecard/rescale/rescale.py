@@ -67,13 +67,11 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
     from skorecard import Skorecard
     from skorecard.rescale import ScoreCardPoints
     from skorecard.datasets import load_uci_credit_card
+
     X,y = load_uci_credit_card(return_X_y=True)
-
-    num_cols = ["LIMIT_BAL", "BILL_AMT1"]
-    cat_cols = ["EDUCATION", "MARRIAGE"]
-    model = Skorecard(cat_features = cat_cols, variables = num_cols+cat_cols)
-
+    model = Skorecard(variables = ["LIMIT_BAL", "BILL_AMT1","EDUCATION", "MARRIAGE"])
     model.fit(X, y)
+
     scp = ScoreCardPoints(model)
     scp.transform(X)
     ```
