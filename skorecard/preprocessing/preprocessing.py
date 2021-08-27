@@ -1,3 +1,4 @@
+from typing import List
 from skorecard.utils.validation import ensure_dataframe
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -20,7 +21,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
     ```
     """
 
-    def __init__(self, variables=None):
+    def __init__(self, variables: List = []):
         """Transformer constructor.
 
         Args:
@@ -55,7 +56,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
                 msg += f"from the number of features in X during fit ({self.n_train_features_})"
                 raise ValueError(msg)
 
-        if self.variables is not None:
+        if len(self.variables) > 0:
             return X[self.variables]
         else:
             return X

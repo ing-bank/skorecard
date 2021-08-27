@@ -4,7 +4,6 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.utils.validation import check_is_fitted
 
-
 from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
 from skorecard.utils.validation import ensure_dataframe, is_fitted
@@ -33,7 +32,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
 
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
-    model = Skorecard(cat_features = cat_cols, selected_features = num_cols+cat_cols)
+    model = Skorecard(cat_features = cat_cols, variables = num_cols+cat_cols)
 
     model.fit(X, y)
     ```
@@ -62,7 +61,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
 
     bucketer = BucketingProcess(prebucketing_pipeline = prebucketing_pipeline, bucketing_pipeline = bucketing_pipeline)
 
-    skorecard_model = Skorecard(bucketing=bucketer, selected_features=num_cols+cat_cols)
+    skorecard_model = Skorecard(bucketing=bucketer, variables=num_cols+cat_cols)
 
     skorecard_model.fit(X, y)
 
@@ -89,7 +88,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         OrdinalCategoricalBucketer(variables=cat_cols, tol=0.05)
     )
 
-    skorecard_model = Skorecard(bucketing=bucket_pipe, selected_features=num_cols+cat_cols)
+    skorecard_model = Skorecard(bucketing=bucket_pipe, variables=num_cols+cat_cols)
 
     skorecard_model.fit(X, y)
 
@@ -106,8 +105,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         *,
         specials: dict = {},
         encoder: str = "woe",
-        selected_features: List = None,
-        cat_features: List = None,
+        variables: List = [],
         verbose: int = 0,
         lr_kwargs: dict = None,
     ):
@@ -115,8 +113,9 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         Init the class.
 
         Args:
-            bucketing: bucketing step, can be a bucketer, a pipeline of bucketers or BucketingProcess.
-                    Default value is None. In that case it will generate a predefined BucketingProcess.
+            bucketing: bucketing step, can be a bucketer, a pipeline of bucketers or a BucketingProcess.
+                    Default value is None. In that case it will generate a predefined BucketingProcess where
+                    numerical and categorical columns will attempt to be auto-detected and bucketed accordingly.
             specials: (nested) dictionary of special values that require their own binning.
                     Used only if bucketing=None.
                     The dictionary has the following format:
@@ -126,18 +125,15 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                     in that bucket.
                     When special values are defined, they are not considered in the fitting procedure.
             encoder (string): indicating the type of encoder. Currently only 'woe' (weight-of-evidence) is supported.
-            selected_features (list): list of features to fit the model on. Defaults to None (all features selected).
-            cat_features (list): list of categorical features. Used only if bucketing=None.
-                Will assume all features are numerical if not specified.
+            variables (list): list of features after bucketing to fit the LogisticRegression model on. Defaults to None (all features selected).
             verbose (int): verbosity, set to 0 to avoid warning methods.
             lr_kwargs (dict): Settings passed to sklearn.linear_model.LogisticRegression.
                 By default no settings are passed.
-        """
+        """  # noqa
         self.bucketing = bucketing
         self.specials = specials
         self.encoder = encoder
-        self.selected_features = selected_features
-        self.cat_features = cat_features
+        self.variables = variables
         self.verbose = verbose
         self.lr_kwargs = lr_kwargs
 
@@ -159,25 +155,11 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         """
         A default BucketingProcess to use if not specified by user.
         """
-        # No categorical features specified
-        # There might however be string features that we need to treat as categorical
-        if self.cat_features is None:
-            num_cols = X._get_numeric_data().columns
-            cat_features = list(set(X.columns) - set(num_cols))
-            num_features = [f for f in X.columns if f not in cat_features]
-        else:
-            cat_features = self.cat_features
-            num_features = [f for f in X.columns if f not in cat_features]
+        # Auto-detect cat and numerical columns
+        num_features = list(X._get_numeric_data().columns)
+        cat_features = [f for f in X.columns if f not in num_features]
 
-        if cat_features is not None and self.selected_features is not None:
-            cat_features = [f for f in cat_features if f in self.selected_features]
-        if num_features is not None and self.selected_features is not None:
-            num_features = [f for f in num_features if f in self.selected_features]
-
-        self.cat_features_ = cat_features
-        self.num_features = num_features
-
-        if cat_features is not None and len(cat_features) > 0:
+        if len(cat_features) > 0:
             prebucketing_pipe = [
                 DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02),
                 OrdinalCategoricalBucketer(variables=cat_features, tol=0.02),
@@ -192,16 +174,15 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                 ),
             ]
         else:
-            prebucketing_pipe = [DecisionTreeBucketer(max_n_bins=50, min_bin_size=0.02)]
-            bucketing_pipe = [OptimalBucketer(max_n_bins=6, min_bin_size=0.05)]
+            prebucketing_pipe = [DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02)]
+            bucketing_pipe = [OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05)]
 
         prebucketing_pipeline = to_skorecard_pipeline(make_pipeline(*prebucketing_pipe))
         bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))
-        bucketing = BucketingProcess(
+
+        return BucketingProcess(
             specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline
         )
-
-        return bucketing
 
     def _build_pipeline(self, X):
         """Build the default pipeline."""
@@ -223,11 +204,12 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         else:
             self.bucketing_ = self.bucketing
 
+        # Note ColumnSelector will not select any columns if passed an empty list.
         self.pipeline_ = Pipeline(
             [
                 ("bucketer", self.bucketing_),
                 ("encoder", encoder),
-                ("column_selector", ColumnSelector(self.selected_features)),
+                ("column_selector", ColumnSelector(self.variables)),
                 ("model", lr_model),
             ]
         )
@@ -239,9 +221,11 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             X (pd.DataFrame): features
             y (pd.Series, optional): target. Defaults to None.
         """
-        # Store the classes seen during fit
-        self.classes_ = np.unique(y)
+        # input validation
+        assert isinstance(self.variables, list)
+        # data validation
         X = ensure_dataframe(X)
+
         self._build_pipeline(X)
 
         try:

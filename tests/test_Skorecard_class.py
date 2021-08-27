@@ -13,7 +13,7 @@ def run_checks(X, y, bucketer, features, expected_probas):
     """
     Run some standard asserts on Skorecard instance.
     """
-    skorecard_model = Skorecard(bucketing=bucketer, selected_features=features)
+    skorecard_model = Skorecard(bucketing=bucketer, variables=features)
     skorecard_model.fit(X, y)
 
     # make sure sklearn recognizes this as fitted
@@ -39,13 +39,7 @@ def run_checks(X, y, bucketer, features, expected_probas):
         "model",
     ]
 
-    # assert that non bucketed columns are not changed
-    # removed test: features not in selected_features can still change if the bucketing process touches it.
-    # if features is not None:
-    #     non_bucketed_feats = [col for col in X.columns if col not in features]
-    #     assert skorecard_model.bucket_transform(X)[non_bucketed_feats].equals(X[non_bucketed_feats])
-
-    if features is None:
+    if len(features) == 0:
         features = X.columns.tolist()
 
     # test bucketers did not change
@@ -98,7 +92,7 @@ def test_skorecard_with_num_bucketers(df):
     run_checks(X, y, bucketer, features, expected_probas)
 
     # and with features not defined
-    features = None
+    features = []
     expected_probas = np.array([[0.88, 0.12], [0.73, 0.27]])
     run_checks(X, y, bucketer, features, expected_probas)
 
@@ -113,7 +107,7 @@ def test_passing_kwargs(df):
 
     skorecard_model = Skorecard(
         bucketing=bucketer,
-        selected_features=features,
+        variables=features,
         lr_kwargs={"penalty": "none", "C": 1, "multi_class": "ovr", "n_jobs": 1, "max_iter": int(1e3)},
     )
     skorecard_model.fit(X, y)
@@ -145,7 +139,7 @@ def test_skorecard_with_bucketing_process(df):
     run_checks(X, y, bucketer, features, expected_probas)
 
     # and with features not defined
-    features = None
+    features = []
     expected_probas = np.array([[0.88, 0.12], [0.76, 0.24]])
     run_checks(X, y, bucketer, features, expected_probas)
 
@@ -165,7 +159,7 @@ def test_skorecard_with_pipeline_of_buckets(df):
     expected_probas = np.array([[0.841, 0.159], [0.738, 0.262]])
     run_checks(X, y, bucketer, features, expected_probas)
 
-    features = None
+    features = []
     expected_probas = np.array([[0.877, 0.122], [0.734, 0.266]])
     run_checks(X, y, bucketer, features, expected_probas)
 
@@ -176,7 +170,7 @@ def test_default_skorecard_class(df):
     y = df["default"]
     features = ["LIMIT_BAL", "BILL_AMT1"]
 
-    skorecard_model = Skorecard(verbose=0, selected_features=features)
+    skorecard_model = Skorecard(verbose=0, variables=features)
     skorecard_model.fit(X, y)
     assert isinstance(skorecard_model.bucketing_, BucketingProcess)
 
@@ -185,7 +179,7 @@ def test_default_skorecard_class(df):
     run_checks(X, y, bucketer, features, expected_probas)
 
     bucketer = None
-    features = None
+    features = []
     expected_probas = np.array([[0.895, 0.105], [0.752, 0.248]])
     run_checks(X, y, bucketer, features, expected_probas)
 
@@ -193,7 +187,7 @@ def test_default_skorecard_class(df):
     # bucket transform returns the expected transformation
     features = ["LIMIT_BAL", "BILL_AMT1"]
     X_num = X[features]
-    skorecard_model = Skorecard(selected_features=None, verbose=0)
+    skorecard_model = Skorecard(variables=[], verbose=0)
     skorecard_model.fit(X_num, y)
 
     # Bucketing process as expected for numerical features in the Skorecard class

@@ -71,7 +71,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
-    model = Skorecard(cat_features = cat_cols, selected_features = num_cols+cat_cols)
+    model = Skorecard(cat_features = cat_cols, variables = num_cols+cat_cols)
 
     model.fit(X, y)
     scp = ScoreCardPoints(model)
@@ -99,7 +99,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
         bucketers = self.skorecard_model.pipeline_.named_steps["bucketer"]
         woe_enc = self.skorecard_model.pipeline_.named_steps["encoder"]
-        self.features = self.skorecard_model.pipeline_["column_selector"].variables
+        self.features = self.skorecard_model.variables
         self.model = self.skorecard_model.pipeline_.named_steps["model"]
 
         assert hasattr(self.model, "predict_proba"), (
@@ -110,7 +110,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
         fbm = bucketers.features_bucket_mapping_
 
-        if self.features is None:
+        if len(self.features) == 0:
             # there is no feature selector
             self.features = fbm.columns
         woe_dict = woe_enc.woe_mapping_
