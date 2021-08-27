@@ -334,17 +334,22 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
                 if hasattr(step, "variables"):
                     bucketers_vars += step.variables
 
-        if any([x is None for x in bucketers_vars]):
-            if not all([x is None for x in bucketers_vars]):
+        if any([x == [] for x in bucketers_vars]):
+            if not all([x == [] for x in bucketers_vars]):
                 raise BucketingPipelineError(
                     "One of the bucketers applies to all variables, which means a feature will be bucketed twice."
                 )
 
         if len(set(bucketers_vars)) != len(bucketers_vars):
             values, counts = np.unique(bucketers_vars, return_counts=True)
-            duplicates = set(values[counts > 1])
+            duplicates = list(set(values[counts > 1]))
 
-            raise BucketingPipelineError(f"The features {duplicates} appear in multiple bucketers.")
+            msg = "A SkorecardPipeline should bucket each feature only once."
+            msg += f"The features {duplicates} appear in multiple bucketers, "
+            msg += "meaning they would have been bucketed sequentially."
+            msg += "To solve this, either use a BucketingProcess, or remove the duplicates from one of the bucketers."
+            msg += "Remember that if you don't specify 'variables', a bucketer will bucket all columns."
+            raise BucketingPipelineError(msg)
 
     @staticmethod
     def _check_pipeline_all_bucketers(pipeline: Pipeline) -> None:

@@ -193,6 +193,17 @@ def test_pipeline_has_no_duplicated_features(df):
             ]
         ).fit(X, y)
 
+    # What if one of the pipelines applies to all
+    # And the other to some?
+    # That should also be a conflict
+    bucketer = make_pipeline(
+        DecisionTreeBucketer(max_n_bins=5),
+        OrdinalCategoricalBucketer(variables=features_2, tol=0.05),
+    )
+    with pytest.raises(BucketingPipelineError):
+        p = to_skorecard_pipeline(bucketer)
+        p.fit(X[features_1 + features_2], y)
+
 
 def test_skorecard_pipeline(df):
     """Test that the skorecard Pipeline returns the same results."""
