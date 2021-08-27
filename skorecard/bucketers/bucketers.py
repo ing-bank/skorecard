@@ -56,7 +56,10 @@ class OptimalBucketer(BaseBucketer):
         cat_cutoff=None,
         time_limit=25,
         remainder="passthrough",
-        **kwargs,
+        solver="cp",
+        monotonic_trend="auto_asc_desc",
+        gamma=0,
+        ob_kwargs={},
     ) -> None:
         """Initialize Optimal Bucketer.
 
@@ -69,7 +72,8 @@ class OptimalBucketer(BaseBucketer):
                 This dictionary contains a name of a bucket (key) and an array of unique values that should be put
                 in that bucket.
                 When special values are passed, they are not considered in the fitting procedure.
-            variables_type: Type of the variables
+            variables_type: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Type of the variables. Much be either 'categorical' or 'numerical'.
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
@@ -81,15 +85,34 @@ class OptimalBucketer(BaseBucketer):
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
-            min_bin_size: Minimum fraction of observations in a bucket. Passed to optbinning.OptimalBinning.
-            max_n_bins: Maximum numbers of bins to return. Passed to optbinning.OptimalBinning.
-            cat_cutoff: Threshold ratio (None, or >0 and <=1) below which categories are grouped
-                together in a bucket 'other'. Passed to optbinning.OptimalBinning.
-            time_limit: Time limit in seconds to find an optimal solution. Passed to optbinning.OptimalBinning.
+            min_bin_size: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Minimum fraction of observations in a bucket.
+            max_n_bins: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Maximum numbers of bins to return.
+            cat_cutoff: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Threshold ratio (None, or >0 and <=1) below which categories are grouped
+                together in a bucket 'other'.
+            time_limit (float): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Time limit in seconds to find an optimal solution.
             remainder: How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-            kwargs: Other parameters passed to optbinning.OptimalBinning. Passed to optbinning.OptimalBinning.
+            solver (str): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html): The optimizer to solve the optimal binning problem.
+                Supported solvers are “mip” to choose a mixed-integer programming solver, “cp” (default) to choose a constrained programming solver or “ls” to choose LocalSolver.
+            monotonic_trend (str): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                The event rate monotonic trend. Supported trends are “auto”, “auto_heuristic” and “auto_asc_desc”
+                to automatically determine the trend maximizing IV using a machine learning classifier,
+                “ascending”, “descending”, “concave”, “convex”, “peak” and “peak_heuristic” to allow a peak change point,
+                and “valley” and “valley_heuristic” to allow a valley change point.
+                Trends “auto_heuristic”, “peak_heuristic” and “valley_heuristic” use a heuristic to determine the change point,
+                and are significantly faster for large size instances (max_n_prebins > 20).
+                Trend “auto_asc_desc” is used to automatically select the best monotonic trend
+                between “ascending” and “descending”. If None, then the monotonic constraint is disabled.
+            gamma (float): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Regularization strength to reduce the number of dominating bins.
+                Larger values specify stronger regularization. Default is 0.
+                Option supported by solvers “cp” and “mip”.
+            ob_kwargs (dict): Other parameters passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html).
         """  # noqa
         self.variables = variables
         self.specials = specials
@@ -100,8 +123,10 @@ class OptimalBucketer(BaseBucketer):
         self.cat_cutoff = cat_cutoff
         self.time_limit = time_limit
         self.remainder = remainder
-
-        self.kwargs = kwargs
+        self.solver = solver
+        self.monotonic_trend = monotonic_trend
+        self.gamma = gamma
+        self.ob_kwargs = ob_kwargs
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -140,8 +165,10 @@ class OptimalBucketer(BaseBucketer):
         binner = OptimalBinning(
             name=str(feature),
             dtype=self.variables_type,
-            solver="cp",
-            monotonic_trend="auto_asc_desc",
+            solver=self.solver,
+            monotonic_trend=self.monotonic_trend,
+            gamma=self.gamma,
+            # On user_splits:
             # We want skorecard users to explicitly define pre-binning for numerical features
             # Setting the user_splits prevents OptimalBinning from doing pre-binning again.
             user_splits=user_splits,
@@ -149,7 +176,7 @@ class OptimalBucketer(BaseBucketer):
             max_n_bins=self.max_n_bins,
             cat_cutoff=self.cat_cutoff,
             time_limit=self.time_limit,
-            **self.kwargs,
+            **self.ob_kwargs,
         )
         binner.fit(X.values, y)
 

@@ -171,7 +171,7 @@ def test_specials_optimal_bucketer(df):
 
     specials = {"LIMIT_BAL": {"=50000": [50000], "in [20001,30000]": [20000, 30000]}}
 
-    opt = OptimalBucketer(variables=["LIMIT_BAL"], random_state=1, max_n_bins=3, specials=specials)
+    opt = OptimalBucketer(variables=["LIMIT_BAL"], max_n_bins=3, specials=specials)
     X_bins = opt.fit_transform(X, y)
 
     assert X_bins["LIMIT_BAL"].nunique() == 5
