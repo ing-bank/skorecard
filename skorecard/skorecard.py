@@ -159,23 +159,24 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         num_features = list(X._get_numeric_data().columns)
         cat_features = [f for f in X.columns if f not in num_features]
 
-        if len(cat_features) > 0:
-            prebucketing_pipe = [
-                DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02),
-                OrdinalCategoricalBucketer(variables=cat_features, tol=0.02),
-            ]
-            bucketing_pipe = [
-                OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05),
+        prebucketing_pipe = []
+        bucketing_pipe = []
+
+        if len(num_features) > 0:
+            prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02))
+            bucketing_pipe.append(OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05))
+        elif len(cat_features) > 0:
+            prebucketing_pipe.append(OrdinalCategoricalBucketer(variables=cat_features, tol=0.02))
+            bucketing_pipe.append(
                 OptimalBucketer(
                     variables=cat_features,
                     variables_type="categorical",
                     max_n_bins=6,
                     min_bin_size=0.05,
-                ),
-            ]
+                )
+            )
         else:
-            prebucketing_pipe = [DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02)]
-            bucketing_pipe = [OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05)]
+            raise AssertionError("No numeric or categorical columns detected in X.")
 
         prebucketing_pipeline = to_skorecard_pipeline(make_pipeline(*prebucketing_pipe))
         bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))

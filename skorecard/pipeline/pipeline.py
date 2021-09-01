@@ -326,24 +326,32 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
         assert isinstance(pipeline, Pipeline)
 
         bucketers_vars = []
+        bucketers_on_all = []
+        bucketers_with_vars = []
+
         for step in _get_all_steps(pipeline):
             if is_fitted(step):
                 if hasattr(step, "variables_"):
                     if len(step.variables_) == 0:
                         bucketers_vars += ["**all**"]
+                        bucketers_on_all += [step]
                     else:
                         bucketers_vars += step.variables_
+                        bucketers_with_vars += [step]
             else:
                 if hasattr(step, "variables"):
                     if len(step.variables) == 0:
                         bucketers_vars += ["**all**"]
+                        bucketers_on_all += [step]
                     else:
                         bucketers_vars += step.variables
+                        bucketers_with_vars += [step]
 
-        if len(set(bucketers_vars)) > 1 and "**all**" in list(set(bucketers_vars)):
-            msg = "A SkorecardPipeline should bucket each feature only once."
-            msg += "Some bucketers bucket all features, while others specific ones, "
-            msg += "meaning some features would have been bucketed sequentially."
+        if len(list(set(bucketers_vars))) > 1 and "**all**" in list(set(bucketers_vars)):
+            msg = "A SkorecardPipeline should bucket each feature only once.\n"
+            msg += f"These bucketers bucket all features: {bucketers_on_all}\n"
+            msg += f"While these bucket specific ones: {bucketers_with_vars}\n"
+            msg += "This means some features would have been bucketed sequentially."
             msg += "To solve this, either use a BucketingProcess, or remove the duplicates from one of the bucketers."
             msg += "Remember that if you don't specify 'variables', a bucketer will bucket all columns."
             raise BucketingPipelineError(msg)
@@ -352,7 +360,7 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
             values, counts = np.unique(bucketers_vars, return_counts=True)
             duplicates = list(set(values[counts > 1]))
 
-            msg = "A SkorecardPipeline should bucket each feature only once."
+            msg = "A SkorecardPipeline should bucket each feature only once. "
             msg += f"The features {duplicates} appear in multiple bucketers, "
             msg += "meaning they would have been bucketed sequentially."
             msg += "To solve this, either use a BucketingProcess, or remove the duplicates from one of the bucketers."
