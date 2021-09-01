@@ -125,7 +125,9 @@ def add_bucketing_callbacks(self, X, y):
 
         # Retrieve the new bucket tables and plots
         table = self.bucket_table(col)
-        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        # unsupervised bucketers don't have an event rate.
+        if "Event Rate" in table.columns:
+            table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         fig = self.plot_bucket(col)
         # remove title from plot
         fig.update_layout(title="")
@@ -258,7 +260,9 @@ def add_bucketing_process_callbacks(self, X, y):
 
         # Retrieve the new bucket tables and plots
         table = self.prebucket_table(col)
-        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        # unsupervised bucketers don't have an event rate.
+        if "Event Rate" in table.columns:
+            table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         return table.to_dict("records"), False, no_update
 
     @app.callback(
@@ -317,7 +321,9 @@ def add_bucketing_process_callbacks(self, X, y):
 
         # Get the updated tables and figures
         table = self.bucket_table(col)
-        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        # unsupervised bucketers don't have an event rate.
+        if "Event Rate" in table.columns:
+            table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         prebucket_fig = self.plot_prebucket(col)
         prebucket_fig.update_layout(title="")
         fig = self.plot_bucket(col)
