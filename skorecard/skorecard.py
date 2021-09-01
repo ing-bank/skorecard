@@ -287,7 +287,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
     def decision_function(self, *args, **kwargs):
         """Decision function."""
         check_is_fitted(self)
-        return self.pipeline_[-1].decision_function(*args, **kwargs)
+        return self.pipeline_.decision_function(*args, **kwargs)
 
     def get_stats(self):
         """Get the stats of the fitted model."""
