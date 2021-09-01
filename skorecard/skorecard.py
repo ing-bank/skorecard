@@ -238,6 +238,9 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             )
             raise type(e)(f"{e.args[0]}\n{error_msg}")
 
+        # Save classes
+        self.classes_ = self.pipeline_[-1].classes_
+
         return self
 
     def fit_interactive(self, X, y=None, mode="external", **server_kwargs):
@@ -280,6 +283,11 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         """Predict the class."""
         check_is_fitted(self)
         return self.pipeline_.predict(X)
+
+    def decision_function(self, *args, **kwargs):
+        """Decision function."""
+        check_is_fitted(self)
+        return self.pipeline_[-1].decision_function(*args, **kwargs)
 
     def get_stats(self):
         """Get the stats of the fitted model."""
