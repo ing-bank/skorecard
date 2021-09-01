@@ -23,6 +23,38 @@ Scorecards are ‘traditional’ models used by banks in the credit decision pro
 - Extension to `sklearn.linear_model.LogisticRegression` that is also able to report p-values
 - Plots and reports to speed up analysis and writing technical documentation.
 
+## Quick demo
+
+`skorecard` offers a range of [bucketers](https://ing-bank.github.io/skorecard/api/bucketers/OptimalBucketer/):
+
+```python
+import pandas as pd
+from skorecard.bucketers import EqualWidthBucketer
+
+df = pd.DataFrame({'column' : range(100)})
+
+ewb = EqualWidthBucketer(n_bins=5)
+ewb.fit_transform(df)
+
+ewb.bucket_table('column')
+#>    bucket                       label  Count  Count (%)
+#> 0      -1                     Missing    0.0        0.0
+#> 1       0                (-inf, 19.8]   20.0       20.0
+#> 2       1                (19.8, 39.6]   20.0       20.0
+#> 3       2  (39.6, 59.400000000000006]   20.0       20.0
+#> 4       3  (59.400000000000006, 79.2]   20.0       20.0
+#> 5       4                 (79.2, inf]   20.0       20.0
+```
+
+That also support a dash app to explore and update bucket boundaries:
+
+```python
+ewb.fit_interactive(df)
+#> Dash app running on http://127.0.0.1:8050/
+```
+
+![dash app example](docs/assets/img/dash_app_unsupervised_bucketer.png)
+
 ## Installation
 
 ```shell
