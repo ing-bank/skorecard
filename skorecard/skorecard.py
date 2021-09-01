@@ -10,9 +10,9 @@ from skorecard.utils.validation import ensure_dataframe, is_fitted
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 from skorecard.preprocessing import WoeEncoder
 from skorecard.bucketers import (
-    OrdinalCategoricalBucketer,
     DecisionTreeBucketer,
     OptimalBucketer,
+    AsIsCategoricalBucketer,
 )
 from skorecard.preprocessing import ColumnSelector
 
@@ -163,10 +163,10 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         bucketing_pipe = []
 
         if len(num_features) > 0:
-            prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=50, min_bin_size=0.02))
+            prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=100, min_bin_size=0.02))
             bucketing_pipe.append(OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05))
-        elif len(cat_features) > 0:
-            prebucketing_pipe.append(OrdinalCategoricalBucketer(variables=cat_features, tol=0.02))
+        if len(cat_features) > 0:
+            prebucketing_pipe.append(AsIsCategoricalBucketer(variables=cat_features))
             bucketing_pipe.append(
                 OptimalBucketer(
                     variables=cat_features,
@@ -175,7 +175,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                     min_bin_size=0.05,
                 )
             )
-        else:
+        if len(num_features) == 0 and len(num_features) == 0:
             raise AssertionError("No numeric or categorical columns detected in X.")
 
         prebucketing_pipeline = to_skorecard_pipeline(make_pipeline(*prebucketing_pipe))
@@ -221,6 +221,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         assert isinstance(self.variables, list)
         # data validation
         X = ensure_dataframe(X)
+        self.classes_, y = np.unique(y, return_inverse=True)
 
         self._build_pipeline(X)
 
@@ -238,8 +239,9 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             )
             raise type(e)(f"{e.args[0]}\n{error_msg}")
 
-        # Save classes
-        self.classes_ = self.pipeline_[-1].classes_
+        # Save some stuff for scikitlearn
+        self.coef_ = self.pipeline_[-1].coef_
+        self.n_features_in_ = len(X.columns)
 
         return self
 
