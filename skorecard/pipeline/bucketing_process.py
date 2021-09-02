@@ -229,13 +229,14 @@ class BucketingProcess(
         # Make sure all columns that are bucketed have also been pre-bucketed.
         not_prebucketed = []
         for col in self.pipeline_.features_bucket_mapping_.columns:
-            if col not in self.pre_pipeline_.features_bucket_mapping_.columns:
-                not_prebucketed.append(col)
+            if self.pipeline_.features_bucket_mapping_.get(col).type == "numerical":
+                if col not in self.pre_pipeline_.features_bucket_mapping_.columns:
+                    not_prebucketed.append(col)
         if len(not_prebucketed):
-            msg = f"The following columns are bucketed but have not been pre-bucketed: {', '.join(not_prebucketed)}.\n"
-            msg += "Consider adding an AsIsNumericalBucketer or AsIsCategoricalBucketer to the prebucketing pipeline.\n"
-            msg += "Or add an additional bucketing step after the BucketingProcess:\n"
-            msg += "make_pipeline(BucketingProcess(..), Bucketer())"
+            msg = "These numerical columns are bucketed but have not been pre-bucketed:"
+            msg += f"{', '.join(not_prebucketed)}.\n"
+            msg += "Consider adding a numerical bucketer to the prebucketing pipeline,"
+            msg += "for example AsIsNumericalBucketer or DecisionTreeBucketer."
             raise NotPreBucketedError(msg)
 
         # Make sure all columns that have been pre-bucketed also have been bucketed
