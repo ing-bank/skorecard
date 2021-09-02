@@ -1,9 +1,9 @@
+import warnings
 import numpy as np
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.utils.validation import check_is_fitted
-
 from category_encoders.woe import WOEEncoder
 
 from skorecard.linear_model import LogisticRegression
@@ -17,6 +17,18 @@ from skorecard.bucketers import (
 from skorecard.preprocessing import ColumnSelector
 
 from typing import List
+
+ignores = [
+    (
+        "category_encoders",
+        FutureWarning,
+        "is_categorical is deprecated and will be removed in a future version.  Use is_categorical_dtype instead",
+    )
+    # add addition warnings you want to ignore
+]
+
+for module, category, message in ignores:
+    warnings.filterwarnings("ignore", module=module, category=category, message=message)
 
 
 class Skorecard(BaseEstimator, ClassifierMixin):
