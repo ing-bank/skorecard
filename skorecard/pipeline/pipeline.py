@@ -378,7 +378,7 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
         assert isinstance(pipeline, Pipeline)
 
         for step in _get_all_steps(pipeline):
-            if "skorecard.bucketers" not in str(type(step)):
+            if all(x not in str(type(step)) for x in ["bucketing_process", "skorecard.bucketers"]):
                 msg = "All bucketing steps must be skorecard bucketers."
                 msg += f"Remove {step} from the pipeline."
                 raise NotBucketObjectError(msg)
