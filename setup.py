@@ -41,7 +41,8 @@ docs_dep = [
 
 # Packages that are not a set together
 # We recommend users to just install that package when it is used
-utils_dep = ["optbinning>=0.12.0"]
+# We use optbinning 0.8.0 or later, because later versions drop support for python 3.6
+utils_dep = ["optbinning>=0.8.0"]
 
 setup(
     name="skorecard",
