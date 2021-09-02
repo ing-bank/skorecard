@@ -160,6 +160,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         cat_features = [f for f in X.columns if f not in num_features]
 
         # Features with less than 10 unique values should be treated at categoricals
+        # Because there is probably no point in binning them further.
         for col in num_features:
             if X[col].nunique() < 10:
                 cat_features.append(col)
@@ -179,7 +180,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                     max_n_bins=10,
                 )
             )
-        if len(num_features) == 0 and len(num_features) == 0:
+        if len(num_features) == 0 and len(cat_features) == 0:
             raise AssertionError("No numeric or categorical columns detected in X.")
 
         prebucketing_pipeline = to_skorecard_pipeline(make_pipeline(*prebucketing_pipe))

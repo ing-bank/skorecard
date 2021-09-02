@@ -73,7 +73,7 @@ class OptimalBucketer(BaseBucketer):
                 in that bucket.
                 When special values are passed, they are not considered in the fitting procedure.
             variables_type: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
-                Type of the variables. Much be either 'categorical' or 'numerical'.
+                Type of the variables. Must be either 'categorical' or 'numerical'.
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`

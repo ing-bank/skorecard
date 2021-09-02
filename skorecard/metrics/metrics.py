@@ -53,7 +53,9 @@ def woe_1d(X, y, epsilon=0.00001):
     t["woe"] = np.log(t["non_target"] / t["target"])
 
     if t["woe"].isnull().any():
-        raise ValueError("Woe Calculation produced NaNs!")
+        msg = "Woe Calculation produced NaNs! "
+        msg += "Perhaps check your target distribution contains more than 1 class."
+        raise ValueError(msg)
     return t
 
 
