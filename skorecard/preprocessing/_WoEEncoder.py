@@ -8,10 +8,14 @@ from skorecard.utils.validation import ensure_dataframe
 from sklearn.utils.validation import check_is_fitted
 from sklearn.base import BaseEstimator, TransformerMixin
 
+import warnings
+
 
 class WoeEncoder(BaseEstimator, TransformerMixin):
     """
     Transformer that encodes unique values in features to their Weight of Evidence estimation.
+
+    **This class has been deprecated in favor of category_encoders.woe.WOEEncoder**
 
     Only works for binary classification (target y has 0 and 1 values).
 
@@ -21,6 +25,14 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
     For example in the variable colour, if the mean of the target = 1 for blue is 0.8 and
     the mean of the target = 0 is 0.2, blue will be replaced by: np.log(0.8/0.2) = 1.386
     if log_ratio is selected. Alternatively, blue will be replaced by 0.8 / 0.2 = 4 if ratio is selected.
+
+    More formally:
+
+    - for each unique value 𝑥,  consider the corresponding rows in the training set
+    - compute what percentage of positives is in these rows, compared to the whole set
+    - compute what percentage of negatives is in these rows, compared to the whole set
+    - take the ratio of these percentages
+    - take the natural logarithm of that ratio to get the weight of evidence corresponding to  𝑥,  so that  𝑊𝑂𝐸(𝑥)  is either positive or negative according to whether  𝑥  is more representative of positives or negatives
 
     More details:
 
@@ -56,6 +68,10 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
         self.variables = variables
         self.handle_unknown = handle_unknown
 
+        warnings.warn(
+            "This encoder will be deprecated. Please use category_encoders.woe.WOEEncoder instead.", DeprecationWarning
+        )
+
     def fit(self, X, y):
         """Calculate the WOE for every column.
 
@@ -68,6 +84,8 @@ class WoeEncoder(BaseEstimator, TransformerMixin):
         X = ensure_dataframe(X)
         assert y is not None, "WoEBucketer needs a target y"
         y = BaseBucketer._check_y(y)
+
+        y = y.astype(float)
         if len(np.unique(y)) > 2:
             raise AssertionError("WoEBucketer is only suited for binary classification")
         self.variables_ = BaseBucketer._check_variables(X, self.variables)

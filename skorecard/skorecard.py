@@ -4,11 +4,12 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.utils.validation import check_is_fitted
 
+from category_encoders.woe import WOEEncoder
+
 from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
 from skorecard.utils.validation import ensure_dataframe, is_fitted
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
-from skorecard.preprocessing import WoeEncoder
 from skorecard.bucketers import (
     DecisionTreeBucketer,
     OptimalBucketer,
@@ -102,7 +103,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         encoder: str = "woe",
         variables: List = [],
         verbose: int = 0,
-        lr_kwargs: dict = {},
+        lr_kwargs: dict = {"solver": "lbfgs"},
         calculate_stats: bool = False,
     ):
         """
@@ -158,19 +159,24 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         num_features = list(X._get_numeric_data().columns)
         cat_features = [f for f in X.columns if f not in num_features]
 
+        # Features with less than 10 unique values should be treated at categoricals
+        for col in num_features:
+            if X[col].nunique() < 10:
+                cat_features.append(col)
+                num_features.remove(col)
+
         prebucketing_pipe = []
         bucketing_pipe = []
 
         if len(num_features) > 0:
-            prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=100, min_bin_size=0.02))
-            bucketing_pipe.append(OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05))
+            prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=100, min_bin_size=0.03))
+            bucketing_pipe.append(OptimalBucketer(variables=num_features, max_n_bins=10, min_bin_size=0.05))
         if len(cat_features) > 0:
             bucketing_pipe.append(
                 OptimalBucketer(
                     variables=cat_features,
                     variables_type="categorical",
-                    max_n_bins=6,
-                    min_bin_size=0.05,
+                    max_n_bins=10,
                 )
             )
         if len(num_features) == 0 and len(num_features) == 0:
@@ -186,7 +192,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
     def _build_pipeline(self, X):
         """Build the default pipeline."""
         if self.encoder == "woe":
-            encoder = WoeEncoder()
+            # encoder = WoeEncoder()
+            encoder = WOEEncoder(cols=list(X.columns))
         else:
             raise NotImplementedError(f"Encoder {self.encoder} not supported. Please use 'woe'")
 

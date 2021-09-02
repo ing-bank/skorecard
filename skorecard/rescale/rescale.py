@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.utils.validation import check_is_fitted
 from skorecard.preprocessing import WoeEncoder
+from category_encoders.woe import WOEEncoder
+
 
 from functools import reduce
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -103,7 +105,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         assert hasattr(self.model, "predict_proba"), (
             f"Expected a model at the end of the pipeline, " f"got {self.model.__class__}"
         )
-        if not isinstance(woe_enc, WoeEncoder):
+        if not (isinstance(woe_enc, WoeEncoder) or isinstance(woe_enc, WOEEncoder)):
             raise ValueError("Pipeline must have WoE encoder")
 
         fbm = bucketers.features_bucket_mapping_
@@ -111,7 +113,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         if len(self.features) == 0:
             # there is no feature selector
             self.features = fbm.columns
-        woe_dict = woe_enc.woe_mapping_
+        woe_dict = woe_enc.mapping
 
         self.buckets = {k: fbm.get(k) for k in fbm.columns if k in self.features}
         self.woes = {k: woe_dict[k] for k in woe_dict.keys() if k in self.features}

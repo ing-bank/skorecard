@@ -182,20 +182,3 @@ def test_default_skorecard_class(df):
     features = []
     expected_probas = np.array([[0.895, 0.105], [0.752, 0.248]])
     run_checks(X, y, bucketer, features, expected_probas)
-
-    # Ensure that if no categorical features are present, that the
-    # bucket transform returns the expected transformation
-    features = ["LIMIT_BAL", "BILL_AMT1"]
-    X_num = X[features]
-    skorecard_model = Skorecard(variables=[], verbose=0)
-    skorecard_model.fit(X_num, y)
-
-    # Bucketing process as expected for numerical features in the Skorecard class
-    prebucket_pipe = make_pipeline(DecisionTreeBucketer(variables=features, max_n_bins=50, min_bin_size=0.02))
-    bucketing_pipe = make_pipeline(OptimalBucketer(variables=features, max_n_bins=6, min_bin_size=0.05))
-    bucketing_process = BucketingProcess(prebucketing_pipeline=prebucket_pipe, bucketing_pipeline=bucketing_pipe)
-
-    X_trans = bucketing_process.fit_transform(X_num, y)
-    X_trans_skorecard = skorecard_model.bucket_transform(X_num)
-
-    assert X_trans_skorecard.equals(X_trans)
