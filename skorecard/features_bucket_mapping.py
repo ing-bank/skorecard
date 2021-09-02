@@ -161,15 +161,26 @@ class FeaturesBucketMapping:
 def merge_features_bucket_mapping(a: FeaturesBucketMapping, b: FeaturesBucketMapping) -> FeaturesBucketMapping:
     """
     Merge two sets of sequentual FeatureBucketMapping.
+
+    If there are unique features, we'll add them as-in.
     """
     assert isinstance(a, FeaturesBucketMapping)
     assert isinstance(b, FeaturesBucketMapping)
-    assert a.maps.keys() == b.maps.keys()
+
+    cols_in_both = [col for col in a.columns if col in b.columns]
+    cols_in_a = [col for col in a.columns if col not in b.columns]
+    cols_in_b = [col for col in b.columns if col not in a.columns]
 
     features_bucket_mapping = FeaturesBucketMapping()
 
-    for feature_name, bm in a.maps.items():
-        c = merge_bucket_mapping(bm, b.get(feature_name))
+    for col in cols_in_both:
+        c = merge_bucket_mapping(a.get(col), b.get(col))
         features_bucket_mapping.append(c)
+
+    for col in cols_in_a:
+        features_bucket_mapping.append(a.get(col))
+
+    for col in cols_in_b:
+        features_bucket_mapping.append(b.get(col))
 
     return features_bucket_mapping

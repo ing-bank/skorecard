@@ -595,6 +595,16 @@ def test_merge_features_bucket_mapping():
 
     assert FeaturesBucketMapping([c]) == merge_features_bucket_mapping(af, bf)
 
+    # now wiht new keys in either
+    a = BucketMapping("testfeat", "numerical", map=[1, 3, 5], right=True)
+    b = BucketMapping("testfeat", "numerical", map=[1, 3], right=False)
+    c = BucketMapping("new_feat", "numerical", map=[5, 6], right=False)
+
+    af = FeaturesBucketMapping([a, c])
+    bf = FeaturesBucketMapping([b])
+
+    assert FeaturesBucketMapping([merge_bucket_mapping(a, b), c]) == merge_features_bucket_mapping(af, bf)
+
 
 def test_merge_buckets_on_data(df):
     """

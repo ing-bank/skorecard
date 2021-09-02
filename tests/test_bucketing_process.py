@@ -18,11 +18,26 @@ def test_bucketing_process_order(df):
     X = df[num_cols + cat_cols]
     y = df["default"].values
 
-    # The prebucketing pipeline does not process all columns in bucketing pipeline
+    # The prebucketing pipeline does not process all numerical columns in bucketing pipeline
     bucketing_process = BucketingProcess(
         specials={"LIMIT_BAL": {"=400000.0": [400000.0]}},
         prebucketing_pipeline=make_pipeline(
             DecisionTreeBucketer(variables=num_cols, max_n_bins=100, min_bin_size=0.05),
+        ),
+        bucketing_pipeline=make_pipeline(
+            OptimalBucketer(variables=["LIMIT_BAL"], max_n_bins=10, min_bin_size=0.05),
+            OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=10, min_bin_size=0.05),
+        ),
+    )
+    with pytest.raises(NotBucketedError):
+        bucketing_process.fit(X, y)
+
+    # The bucketing pipeline does not process all numerical columns in prebucketing pipeline
+    bucketing_process = BucketingProcess(
+        specials={"LIMIT_BAL": {"=400000.0": [400000.0]}},
+        prebucketing_pipeline=make_pipeline(
+            DecisionTreeBucketer(variables=["LIMIT_BAL"], max_n_bins=100, min_bin_size=0.05),
+            AsIsCategoricalBucketer(variables=cat_cols),
         ),
         bucketing_pipeline=make_pipeline(
             OptimalBucketer(variables=num_cols, max_n_bins=10, min_bin_size=0.05),
@@ -30,20 +45,6 @@ def test_bucketing_process_order(df):
         ),
     )
     with pytest.raises(NotPreBucketedError):
-        bucketing_process.fit(X, y)
-
-    # The bucketing pipeline does not process all columns in prebucketing pipeline
-    bucketing_process = BucketingProcess(
-        specials={"LIMIT_BAL": {"=400000.0": [400000.0]}},
-        prebucketing_pipeline=make_pipeline(
-            DecisionTreeBucketer(variables=num_cols, max_n_bins=100, min_bin_size=0.05),
-            AsIsCategoricalBucketer(variables=cat_cols),
-        ),
-        bucketing_pipeline=make_pipeline(
-            OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=10, min_bin_size=0.05),
-        ),
-    )
-    with pytest.raises(NotBucketedError):
         bucketing_process.fit(X, y)
 
 

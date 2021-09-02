@@ -233,7 +233,7 @@ class BucketingProcess(
                 if col not in self.pre_pipeline_.features_bucket_mapping_.columns:
                     not_prebucketed.append(col)
         if len(not_prebucketed):
-            msg = "These numerical columns are bucketed but have not been pre-bucketed:"
+            msg = "These numerical columns are bucketed but have not been pre-bucketed: "
             msg += f"{', '.join(not_prebucketed)}.\n"
             msg += "Consider adding a numerical bucketer to the prebucketing pipeline,"
             msg += "for example AsIsNumericalBucketer or DecisionTreeBucketer."
@@ -242,11 +242,13 @@ class BucketingProcess(
         # Make sure all columns that have been pre-bucketed also have been bucketed
         not_bucketed = []
         for col in self.pre_pipeline_.features_bucket_mapping_.columns:
-            if col not in self.pipeline_.features_bucket_mapping_.columns:
-                not_bucketed.append(col)
+            if self.pre_pipeline_.features_bucket_mapping_.get(col).type == "numerical":
+                if col not in self.pipeline_.features_bucket_mapping_.columns:
+                    not_bucketed.append(col)
         if len(not_bucketed):
-            msg = f"The following columns are prebucketed but have not been bucketed: {', '.join(not_bucketed)}.\n"
-            msg += "Consider updating the bucketing pipeline,\n"
+            msg = "These numerical columns are prebucketed but have not been bucketed: "
+            msg += f"{', '.join(not_bucketed)}.\n"
+            msg += "Consider updating the bucketing pipeline."
             raise NotBucketedError(msg)
 
         # calculate the bucket tables.
@@ -332,9 +334,6 @@ class BucketingProcess(
         we'll need to merge both into one.
         """
         check_is_fitted(self)
-        # in .fit() we already make sure all columns that are prebucketed are bucketed, and vice versa
-        # this assert is just to be very sure.
-        assert len(self.pre_pipeline_.features_bucket_mapping_) == len(self.pipeline_.features_bucket_mapping_)
 
         return merge_features_bucket_mapping(
             self.pre_pipeline_.features_bucket_mapping_, self.pipeline_.features_bucket_mapping_

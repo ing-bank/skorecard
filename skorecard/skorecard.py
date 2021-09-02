@@ -12,7 +12,6 @@ from skorecard.preprocessing import WoeEncoder
 from skorecard.bucketers import (
     DecisionTreeBucketer,
     OptimalBucketer,
-    AsIsCategoricalBucketer,
 )
 from skorecard.preprocessing import ColumnSelector
 
@@ -166,7 +165,6 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=100, min_bin_size=0.02))
             bucketing_pipe.append(OptimalBucketer(variables=num_features, max_n_bins=6, min_bin_size=0.05))
         if len(cat_features) > 0:
-            prebucketing_pipe.append(AsIsCategoricalBucketer(variables=cat_features))
             bucketing_pipe.append(
                 OptimalBucketer(
                     variables=cat_features,
