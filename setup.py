@@ -3,7 +3,15 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="UTF-8") as fh:
     long_description = fh.read()
 
-base_packages = ["scipy>=1.5.2", "numpy>=1.19.5", "pandas>=1.1.5", "scikit-learn>=0.23.2", "dataclasses", "pyyaml"]
+base_packages = [
+    "scipy>=1.5.2",
+    "numpy>=1.19.5",
+    "pandas>=1.1.5",
+    "scikit-learn>=0.23.2",
+    "dataclasses",
+    "pyyaml",
+    "category_encoders>=2.2.2",
+]
 
 dashboard_dep = [
     "dash>=1.21.0",
@@ -11,7 +19,7 @@ dashboard_dep = [
     "dash_bootstrap_components>=0.13",
 ]
 
-reporting_dep = ["plotly>=4.5.1"]
+reporting_dep = ["plotly>=4.14.3"]
 
 dev_dep = [
     "flake8>=3.8.3",
@@ -33,11 +41,12 @@ docs_dep = [
 
 # Packages that are not a set together
 # We recommend users to just install that package when it is used
+# We use optbinning 0.8.0 or later, because later versions drop support for python 3.6
 utils_dep = ["optbinning>=0.8.0"]
 
 setup(
     name="skorecard",
-    version="0.7.1",
+    version="1.0.0",
     description="Tools for building scorecard models in python, with a sklearn-compatible API",
     long_description=long_description,
     long_description_content_type="text/markdown",

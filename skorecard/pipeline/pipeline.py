@@ -20,6 +20,11 @@ try:
 except ModuleNotFoundError:
     JupyterDash = NotInstalledError("jupyter-dash", "dashboard")
 
+try:
+    import dash_bootstrap_components as dbc
+except ModuleNotFoundError:
+    dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
+
 
 from skorecard.apps.app_layout import add_basic_layout
 from skorecard.apps.app_callbacks import add_bucketing_callbacks
@@ -321,21 +326,46 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
         assert isinstance(pipeline, Pipeline)
 
         bucketers_vars = []
-        for step in _get_all_steps(pipeline):
-            if hasattr(step, "variables"):
-                bucketers_vars += step.variables
+        bucketers_on_all = []
+        bucketers_with_vars = []
 
-        if any([x is None for x in bucketers_vars]):
-            if not all([x is None for x in bucketers_vars]):
-                raise BucketingPipelineError(
-                    "One of the bucketers applies to all variables, which means a feature will be bucketed twice."
-                )
+        for step in _get_all_steps(pipeline):
+            if is_fitted(step):
+                if hasattr(step, "variables_"):
+                    if len(step.variables_) == 0:
+                        bucketers_vars += ["**all**"]
+                        bucketers_on_all += [step]
+                    else:
+                        bucketers_vars += step.variables_
+                        bucketers_with_vars += [step]
+            else:
+                if hasattr(step, "variables"):
+                    if len(step.variables) == 0:
+                        bucketers_vars += ["**all**"]
+                        bucketers_on_all += [step]
+                    else:
+                        bucketers_vars += step.variables
+                        bucketers_with_vars += [step]
+
+        if len(list(set(bucketers_vars))) > 1 and "**all**" in list(set(bucketers_vars)):
+            msg = "A SkorecardPipeline should bucket each feature only once.\n"
+            msg += f"These bucketers bucket all features: {bucketers_on_all}\n"
+            msg += f"While these bucket specific ones: {bucketers_with_vars}\n"
+            msg += "This means some features would have been bucketed sequentially."
+            msg += "To solve this, either use a BucketingProcess, or remove the duplicates from one of the bucketers."
+            msg += "Remember that if you don't specify 'variables', a bucketer will bucket all columns."
+            raise BucketingPipelineError(msg)
 
         if len(set(bucketers_vars)) != len(bucketers_vars):
             values, counts = np.unique(bucketers_vars, return_counts=True)
-            duplicates = set(values[counts > 1])
+            duplicates = list(set(values[counts > 1]))
 
-            raise BucketingPipelineError(f"The features {duplicates} appear in multiple bucketers.")
+            msg = "A SkorecardPipeline should bucket each feature only once. "
+            msg += f"The features {duplicates} appear in multiple bucketers, "
+            msg += "meaning they would have been bucketed sequentially."
+            msg += "To solve this, either use a BucketingProcess, or remove the duplicates from one of the bucketers."
+            msg += "Remember that if you don't specify 'variables', a bucketer will bucket all columns."
+            raise BucketingPipelineError(msg)
 
     @staticmethod
     def _check_pipeline_all_bucketers(pipeline: Pipeline) -> None:
@@ -352,13 +382,6 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
                 msg = "All bucketing steps must be skorecard bucketers."
                 msg += f"Remove {step} from the pipeline."
                 raise NotBucketObjectError(msg)
-
-    @property
-    def variables(self):
-        """
-        Helper function to show which features are in scope of this pipeline.
-        """
-        return self.features_bucket_mapping_.columns
 
     def fit_interactive(self, X, y=None, mode="external"):
         """
@@ -377,8 +400,6 @@ class SkorecardPipeline(Pipeline, PlotBucketMethod, BucketTableMethod, SummaryMe
         # when re-running .fit_interactive()
         if not is_fitted(self):
             self.fit(X, y)
-
-        import dash_bootstrap_components as dbc
 
         self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         add_basic_layout(self)

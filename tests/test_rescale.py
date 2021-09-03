@@ -58,12 +58,12 @@ def test_scorecard_rescaling(df):
         skorecard_model=scorecard_model, pdo=25, ref_score=400, ref_odds=20
     ).get_scorecard_points()
 
-    # Contains all the features and the intercepct
+    # Contains all the features and the intercept
     assert len(scorecard.loc[:, "feature"].unique().tolist()) == len(features) + 1
 
     # The intercept must have 0 points
     assert scorecard.loc[scorecard["feature"] == "Intercept", "Points"].values[0] == 0
 
-    # MAke sure transform works
+    # Make sure transform works
     sc = ScoreCardPoints(skorecard_model=scorecard_model, pdo=25, ref_score=400, ref_odds=20)
     assert isinstance(sc.transform(X), pd.DataFrame)

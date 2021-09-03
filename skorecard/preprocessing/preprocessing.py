@@ -1,4 +1,5 @@
-import pandas as pd
+from typing import List
+from skorecard.utils.validation import ensure_dataframe
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -20,7 +21,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
     ```
     """
 
-    def __init__(self, variables=None):
+    def __init__(self, variables: List = []):
         """Transformer constructor.
 
         Args:
@@ -35,7 +36,10 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
 
         Here to be compliant with the sklearn API, does not fit anything.
         """
-        assert isinstance(X, pd.DataFrame), "X must be pd.DataFrame"
+        # scikit-learn requires checking that X has same shape on transform
+        # this is because scikit-learn is still positional based (no column names used)
+        self.n_train_features_ = X.shape[1]
+
         return self
 
     def transform(self, X):
@@ -45,9 +49,22 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
         Args:
             X (pd.DataFrame): Dataset
         """
-        assert isinstance(X, pd.DataFrame), "X must be pd.DataFrame"
+        X = ensure_dataframe(X)
+        if hasattr(self, "n_train_features_"):
+            if X.shape[1] != self.n_train_features_:
+                msg = f"Number of features in X ({X.shape[1]}) is different "
+                msg += f"from the number of features in X during fit ({self.n_train_features_})"
+                raise ValueError(msg)
 
-        if self.variables is not None:
+        if len(self.variables) > 0:
             return X[self.variables]
         else:
             return X
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"requires_fit": False}

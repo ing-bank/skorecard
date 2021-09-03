@@ -36,7 +36,7 @@ def test_keep_pandas(df, caplog):
         EqualWidthBucketer(n_bins=5, variables=["LIMIT_BAL", "BILL_AMT1"]),
     )
     # Doesn't work, input should be a pandas dataframe.
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         bucket_pipeline.fit(X, y)
 
     bucket_pipeline = make_pipeline(
@@ -160,7 +160,7 @@ def test_pipeline_errors(df):
     bu = EqualWidthBucketer(n_bins=4, variables=["LIMIT_BAL", "BILL_AMT1"])
     with pytest.raises(NotFittedError):
         bu.transform(X)  # not fitted yet
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         bu.fit_transform(np.array([1, 2, 3]), y)
 
 
@@ -176,9 +176,9 @@ def test_pipeline_has_no_duplicated_features(df):
         OrdinalCategoricalBucketer(variables=features_2, tol=0.05),
     )
 
-    # before fit
+    # during fit
     with pytest.raises(BucketingPipelineError):
-        to_skorecard_pipeline(bucketer)
+        to_skorecard_pipeline(bucketer).fit(X, y)
 
     # after fit
     bucketer.fit(X, y)
@@ -191,7 +191,19 @@ def test_pipeline_has_no_duplicated_features(df):
                 ("dtb", DecisionTreeBucketer(variables=features_1, max_n_bins=5)),
                 ("ocb", OrdinalCategoricalBucketer(variables=features_2, tol=0.05)),
             ]
-        )
+        ).fit(X, y)
+
+    # What if one of the pipelines applies to all
+    # And the other to some?
+    # That should also be a conflict
+    bucketer = make_pipeline(
+        DecisionTreeBucketer(max_n_bins=5),
+        OrdinalCategoricalBucketer(variables=features_2, tol=0.05),
+    )
+    with pytest.raises(BucketingPipelineError):
+        p = to_skorecard_pipeline(bucketer)
+        feat = ["LIMIT_BAL", "BILL_AMT1", "EDUCATION", "MARRIAGE"]
+        p.fit(X[feat], y)
 
 
 def test_skorecard_pipeline(df):

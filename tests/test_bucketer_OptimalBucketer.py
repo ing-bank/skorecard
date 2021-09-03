@@ -1,6 +1,5 @@
 import pytest
 import numpy as np
-import pandas as pd
 from optbinning import OptimalBinning
 from sklearn.pipeline import make_pipeline
 
@@ -83,18 +82,6 @@ def test_optimal_binning_numerical(df):
     obt.fit(X_prebucketed, y)
     X_trans = obt.transform(X_prebucketed)
     assert len(X_trans["LIMIT_BAL"].unique()) == 9
-
-    # Test the transforms work well
-    optb = OptimalBinning(name="LIMIT_BAL", dtype="numerical", solver="cp", max_n_prebins=100, max_n_bins=10)
-    optb.fit(X_prebucketed["LIMIT_BAL"], y)
-    ref = optb.transform(X_prebucketed["LIMIT_BAL"], metric="indices")
-    skore = X_trans["LIMIT_BAL"]
-    assert len(np.unique(ref)) == len(np.unique(skore))
-
-    # Multiple columns in a df, should keep transformation equal
-    df1 = obt.transform(pd.DataFrame([0, 30_000], columns=["LIMIT_BAL"]))
-    df2 = obt.transform(pd.DataFrame([[0, 0], [30_000, 30_000]], columns=["LIMIT_BAL", "BILL_AMT1"]))
-    assert df1["LIMIT_BAL"].equals(df2["LIMIT_BAL"])
 
     # Note our bins were 1-indexed in the past
     # This unit test is there to make sure our bins are zero-indexed

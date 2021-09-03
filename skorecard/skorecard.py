@@ -4,14 +4,13 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.utils.validation import check_is_fitted
+from category_encoders.woe import WOEEncoder
 
 from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
-from skorecard.utils.validation import is_fitted
+from skorecard.utils.validation import ensure_dataframe, is_fitted
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
-from skorecard.preprocessing import WoeEncoder
 from skorecard.bucketers import (
-    OrdinalCategoricalBucketer,
     DecisionTreeBucketer,
     OptimalBucketer,
 )
@@ -19,22 +18,32 @@ from skorecard.preprocessing import ColumnSelector
 
 from typing import List
 
+ignores = [
+    (
+        "category_encoders",
+        FutureWarning,
+        "is_categorical is deprecated and will be removed in a future version.  Use is_categorical_dtype instead",
+    )
+    # add addition warnings you want to ignore
+]
+
+for module, category, message in ignores:
+    warnings.filterwarnings("ignore", module=module, category=category, message=message)
+
 
 class Skorecard(BaseEstimator, ClassifierMixin):
     """Scikit-learn-like estimator that builds a scorecard model.
 
     Usage Examples:
+
     usage of Skorecard() without bucketing
 
     ```python
     from skorecard import Skorecard
     from skorecard.datasets import load_uci_credit_card
+
     X,y = load_uci_credit_card(return_X_y=True)
-
-    num_cols = ["LIMIT_BAL", "BILL_AMT1"]
-    cat_cols = ["EDUCATION", "MARRIAGE"]
-    model = Skorecard(cat_features = cat_cols, selected_features = num_cols+cat_cols)
-
+    model = Skorecard(variables = ["LIMIT_BAL", "BILL_AMT1","EDUCATION", "MARRIAGE"])
     model.fit(X, y)
     ```
 
@@ -56,14 +65,12 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         OrdinalCategoricalBucketer(variables=cat_cols, tol=0.01)
     )
     bucketing_pipeline = make_pipeline(
-        OptimalBucketer(variables=features, max_n_bins=5, min_bin_size=0.08),
+        OptimalBucketer(variables=num_cols, max_n_bins=5, min_bin_size=0.08),
         OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=5, min_bin_size=0.08)
     )
 
     bucketer = BucketingProcess(prebucketing_pipeline = prebucketing_pipeline, bucketing_pipeline = bucketing_pipeline)
-
-    skorecard_model = Skorecard(bucketing=bucketer, selected_features=num_cols+cat_cols)
-
+    skorecard_model = Skorecard(bucketing=bucketer, variables=num_cols+cat_cols)
     skorecard_model.fit(X, y)
 
     # Details
@@ -73,7 +80,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
     skorecard_model.plot_prebucket("LIMIT_BAL")
     ```
 
-    Using it with bucketers
+    Using it with bucketers:
+
      ```python
     from skorecard import Skorecard
     from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
@@ -89,8 +97,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         OrdinalCategoricalBucketer(variables=cat_cols, tol=0.05)
     )
 
-    skorecard_model = Skorecard(bucketing=bucket_pipe, selected_features=num_cols+cat_cols)
-
+    skorecard_model = Skorecard(bucketing=bucket_pipe, variables=num_cols+cat_cols)
     skorecard_model.fit(X, y)
 
     # Details
@@ -106,17 +113,18 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         *,
         specials: dict = {},
         encoder: str = "woe",
-        selected_features: List = None,
-        cat_features: List = None,
+        variables: List = [],
         verbose: int = 0,
-        lr_kwargs: dict = None,
+        lr_kwargs: dict = {"solver": "lbfgs"},
+        calculate_stats: bool = False,
     ):
         """
         Init the class.
 
         Args:
-            bucketing: bucketing step, can be a bucketer, a pipeline of bucketers or BucketingProcess.
-                    Default value is None. In that case it will generate a predefined BucketingProcess.
+            bucketing: bucketing step, can be a bucketer, a pipeline of bucketers or a BucketingProcess.
+                    Default value is None. In that case it will generate a predefined BucketingProcess where
+                    numerical and categorical columns will attempt to be auto-detected and bucketed accordingly.
             specials: (nested) dictionary of special values that require their own binning.
                     Used only if bucketing=None.
                     The dictionary has the following format:
@@ -126,23 +134,20 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                     in that bucket.
                     When special values are defined, they are not considered in the fitting procedure.
             encoder (string): indicating the type of encoder. Currently only 'woe' (weight-of-evidence) is supported.
-            selected_features (list): list of features to fit the model on. Defaults to None (all features selected).
-            cat_features (list): list of  categorical features. Used only if bucketing=None.
+            variables (list): list of features after bucketing to fit the LogisticRegression model on. Defaults to None (all features selected).
             verbose (int): verbosity, set to 0 to avoid warning methods.
-            lr_kwargs (dict): Settings passed to sklearn.linear_model.LogisticRegression.
+            lr_kwargs (dict): Settings passed to skorecard.linear_model.LogisticRegression.
                 By default no settings are passed.
-        """
-        if isinstance(bucketing, Pipeline):
-            bucketing = to_skorecard_pipeline(bucketing)
+            calculate_stats (bool): Passed to skorecard.linear_model.LogisticRegression.
+                Will calculate statistic like standard error at the cost of fit() time. Defaults to False.
+        """  # noqa
         self.bucketing = bucketing
         self.specials = specials
         self.encoder = encoder
-        self.selected_features = selected_features
-        self.cat_features = cat_features
-        self._use_default_bucketing = False
+        self.variables = variables
         self.verbose = verbose
         self.lr_kwargs = lr_kwargs
-        self.repr_msg = ""
+        self.calculate_stats = calculate_stats
 
     def __repr__(self):
         """Pretty print self.
@@ -156,102 +161,72 @@ class Skorecard(BaseEstimator, ClassifierMixin):
                 v = str(v.__class__.__name__)  # get only the class name of the bucketer
             vars += f"{k}={v}, "
 
-        self.repr_msg = f"{self.__class__.__name__}({vars})"
-        return self.repr_msg
+        return f"{self.__class__.__name__}({vars})"
 
-    def _build_default_bucketing_process(self):
-        """Make the default bucketing step of Skorecard as a BucketingProcess."""
-        prebucketing_pipe = [DecisionTreeBucketer(variables=self.num_features, max_n_bins=50, min_bin_size=0.02)]
+    def _build_default_bucketing_process(self, X):
+        """
+        A default BucketingProcess to use if not specified by user.
+        """
+        # Auto-detect cat and numerical columns
+        num_features = list(X._get_numeric_data().columns)
+        cat_features = [f for f in X.columns if f not in num_features]
 
-        bucketing_pipe = [OptimalBucketer(variables=self.num_features, max_n_bins=6, min_bin_size=0.05)]
+        # Features with less than 10 unique values should be treated at categoricals
+        # Because there is probably no point in binning them further.
+        for col in num_features:
+            if X[col].nunique() < 10:
+                cat_features.append(col)
+                num_features.remove(col)
 
-        # Add this part only if cat_features are defined
-        if self.cat_features:
-            prebucketing_pipe.append(OrdinalCategoricalBucketer(variables=self.cat_features, tol=0.02))
+        prebucketing_pipe = []
+        bucketing_pipe = []
+
+        if len(num_features) > 0:
+            prebucketing_pipe.append(DecisionTreeBucketer(variables=num_features, max_n_bins=100, min_bin_size=0.03))
+            bucketing_pipe.append(OptimalBucketer(variables=num_features, max_n_bins=10, min_bin_size=0.05))
+        if len(cat_features) > 0:
             bucketing_pipe.append(
                 OptimalBucketer(
-                    variables=self.cat_features,
+                    variables=cat_features,
                     variables_type="categorical",
-                    max_n_bins=6,
-                    min_bin_size=0.05,
+                    max_n_bins=10,
                 )
             )
+        if len(num_features) == 0 and len(cat_features) == 0:
+            raise AssertionError("No numeric or categorical columns detected in X.")
 
-        prebucketing_pipeline = make_pipeline(*prebucketing_pipe)
-        bucketing_pipeline = make_pipeline(*bucketing_pipe)
-        bucketing = BucketingProcess(
+        prebucketing_pipeline = to_skorecard_pipeline(make_pipeline(*prebucketing_pipe))
+        bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))
+
+        return BucketingProcess(
             specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline
         )
 
-        return bucketing
-
-    def _build_pipeline(self):
+    def _build_pipeline(self, X):
         """Build the default pipeline."""
         if self.encoder == "woe":
-            encoder = WoeEncoder()
+            # encoder = WoeEncoder()
+            encoder = WOEEncoder(cols=list(X.columns))
         else:
-            raise NotImplementedError(f"Encoder {self.encoder} not supported. Please use woe")
+            raise NotImplementedError(f"Encoder {self.encoder} not supported. Please use 'woe'")
 
-        if self.lr_kwargs:
-            lr_model = LogisticRegression(**self.lr_kwargs)
+        # If a pipeline is specified, convert to SkorecardPipeline
+        if self.bucketing is None:
+            self.bucketing_ = self._build_default_bucketing_process(X)
+        elif isinstance(self.bucketing, Pipeline):
+            self.bucketing_ = to_skorecard_pipeline(self.bucketing)
         else:
-            lr_model = LogisticRegression()
+            self.bucketing_ = self.bucketing
 
-        self.pipeline = Pipeline(
+        # Note ColumnSelector will not select any columns if passed an empty list.
+        self.pipeline_ = Pipeline(
             [
-                ("bucketer", self.bucketing),
+                ("bucketer", self.bucketing_),
                 ("encoder", encoder),
-                ("column_selector", ColumnSelector(self.selected_features)),
-                ("model", lr_model),
+                ("column_selector", ColumnSelector(self.variables)),
+                ("model", LogisticRegression(calculate_stats=self.calculate_stats, **self.lr_kwargs)),
             ]
         )
-
-    def _setup(self, X):
-        """Setup the bucketing with a default Bucketing process if no bucketing is passed to the model.
-
-        This is called within the fit method, as the dataset X is needed to extract other default attributes.
-        """
-        if self.bucketing is None:
-            self._use_default_bucketing = True
-            setup_msg = "\nNo bucketing passed. Using predefined bucketer."
-
-            if self.cat_features is None:
-                setup_msg += (
-                    "\nNo categorical columns (cat_features) specified. Setting all the numerical features with less"
-                    " than 10 unique values as categorical."
-                )
-
-                self.cat_features = []
-
-                # find all numerical features with less than 10 unique values
-                low_uniques = X.nunique()[X.nunique() < 10]
-                if low_uniques.shape[0] > 0:
-                    self.cat_features += low_uniques.index.tolist()
-
-                # add all non numerical features as categorical
-                non_nums = X.dtypes[X.dtypes == "object"]
-                if non_nums.shape[0] > 0:
-                    self.cat_features += non_nums.index.tolist()
-
-                # ensure eventual duplicates are dropped
-                self.cat_features = list(set(self.cat_features))
-
-                setup_msg += (
-                    f"\nTotal categorical features {len(self.cat_features)}\n"
-                    f"Categorical featueres = {self.cat_features}."
-                )
-
-            # Find all the numerical features
-            self.num_features = [feat for feat in X.columns if feat not in self.cat_features]
-
-            setup_msg += f"\nTotal numerical features {len(self.num_features)}."
-
-            self.bucketing = self._build_default_bucketing_process()
-
-            if self.verbose > 0:
-                warnings.warn(setup_msg)
-
-        self._build_pipeline()
 
     def fit(self, X, y=None):
         """Fit the skorecard pipeline with X, y.
@@ -260,10 +235,16 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             X (pd.DataFrame): features
             y (pd.Series, optional): target. Defaults to None.
         """
-        self._setup(X)
-        try:
-            self.pipeline.fit(X, y)
+        # input validation
+        assert isinstance(self.variables, list)
+        # data validation
+        X = ensure_dataframe(X)
+        self.classes_, y = np.unique(y, return_inverse=True)
 
+        self._build_pipeline(X)
+
+        try:
+            self.pipeline_.fit(X, y)
         except np.linalg.LinAlgError as e:
             # update the LinAlgError message with a more helpful message.
             error_msg = (
@@ -276,7 +257,10 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             )
             raise type(e)(f"{e.args[0]}\n{error_msg}")
 
-        self.is_fitted_ = True  # sklearn convention to signal model has been fitted.
+        # Save some stuff for scikitlearn
+        self.coef_ = self.pipeline_[-1].coef_
+        self.n_features_in_ = len(X.columns)
+
         return self
 
     def fit_interactive(self, X, y=None, mode="external", **server_kwargs):
@@ -296,36 +280,48 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         # when re-running .fit_interactive()
         if not is_fitted(self):
             self.fit(X, y)
-        self.bucketing.fit_interactive(X=X, y=y, mode=mode, **server_kwargs)
+        self.bucketing_.fit_interactive(X=X, y=y, mode=mode, **server_kwargs)
 
     def bucket_transform(self, X):
-        """Transform X through the bucketing pipelines."""
-        # Rerun the buckets
-        return self.pipeline[0].transform(X)
+        """
+        Transform X through the bucketing pipelines.
+        """
+        check_is_fitted(self)
+        return self.pipeline_[0].transform(X)
 
     def woe_transform(self, X):
         """Transform X through the bucketing + WoE pipelines."""
-        return self.pipeline[:2].transform(X)
+        check_is_fitted(self)
+        return self.pipeline_[:2].transform(X)
 
     def predict_proba(self, X):
         """Predicted probabilities."""
-        return self.pipeline.predict_proba(X)
+        check_is_fitted(self)
+        return self.pipeline_.predict_proba(X)
 
     def predict(self, X):
         """Predict the class."""
-        return self.pipeline.predict(X)
+        check_is_fitted(self)
+        return self.pipeline_.predict(X)
+
+    def decision_function(self, *args, **kwargs):
+        """Decision function."""
+        check_is_fitted(self)
+        return self.pipeline_.decision_function(*args, **kwargs)
 
     def get_stats(self):
         """Get the stats of the fitted model."""
+        check_is_fitted(self)
         # Get the pipeline model
-        model = self.pipeline[-1]
+        model = self.pipeline_[-1]
         check_is_fitted(model)
         return model.get_stats()
 
     def summary(self):
-        """Get the summary of all the buceketers."""
+        """Get the summary of all the bucketers."""
         raise NotImplementedError("Not implemented yet")
-        return self.bucketing.summary()
+        check_is_fitted(self)
+        return self.bucketing_.summary()
 
     def prebucket_table(self, column):
         """Get the prebucket_table.
@@ -337,12 +333,13 @@ class Skorecard(BaseEstimator, ClassifierMixin):
 
         Returns: pd.DataFrame, pre-bucketing summary for columns
         """
-        if isinstance(self.bucketing, BucketingProcess):
-            return self.bucketing.prebucket_table(column)
+        check_is_fitted(self)
+        if isinstance(self.bucketing_, BucketingProcess):
+            return self.bucketing_.prebucket_table(column)
         else:
             error_msg = (
                 f"prebucket_table is supported only if the attirbuite bucketing is of type BucketingProcess, "
-                f"got {self.bucketing.__class__}"
+                f"got {self.bucketing_.__class__}"
             )
             raise BucketerTypeError(error_msg)
 
@@ -354,7 +351,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
 
         Returns: pd.DataFrame, -bucketing summary for columns
         """
-        return self.bucketing.bucket_table(column)
+        check_is_fitted(self)
+        return self.bucketing_.bucket_table(column)
 
     def plot_prebucket(self, column):
         """Plot the prebucket_table. It's supported only if the bucketing object is BucketingProcess.
@@ -362,12 +360,12 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         Args:
             column: (str). column name
         """
-        if isinstance(self.bucketing, BucketingProcess):
-            return self.bucketing.plot_prebucket(column)
+        if isinstance(self.bucketing_, BucketingProcess):
+            return self.bucketing_.plot_prebucket(column)
         else:
             error_msg = (
                 f"plot_prebucket  is supported only if the attirbuite bucketing is of type BucketingProcess, "
-                f"got {type(self.bucketing.__class__)}"
+                f"got {type(self.bucketing_.__class__)}"
             )
             raise BucketerTypeError(error_msg)
 
@@ -377,4 +375,13 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         Args:
             column: (str). column name
         """
-        return self.bucketing.plot_bucket(column)
+        check_is_fitted(self)
+        return self.bucketing_.plot_bucket(column)
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True, "allow_nan": True}

@@ -8,9 +8,9 @@ from skorecard.bucketers import OrdinalCategoricalBucketer
 def test_threshold_min(df) -> None:
     """Test that threshold_min < 1 raises an error."""
     with pytest.raises(ValueError):
-        OrdinalCategoricalBucketer(tol=-0.1, variables=["EDUCATION"])
+        OrdinalCategoricalBucketer(tol=-0.1, variables=["EDUCATION"]).fit(X=None, y=None)
     with pytest.raises(ValueError):
-        OrdinalCategoricalBucketer(tol=1.001, variables=["EDUCATION"])
+        OrdinalCategoricalBucketer(tol=1.001, variables=["EDUCATION"]).fit(X=None, y=None)
 
 
 def test_correct_output(df):
@@ -117,18 +117,19 @@ def test_missing_manual(df_with_missings) -> None:
     assert len(X["EDUCATION_trans"].unique()) == 2
     assert X[X["EDUCATION"].isnull()]["EDUCATION_trans"].sum() == 0
 
-def test_missing_special_bucket(df_with_missings) -> None:
 
+def test_missing_special_bucket(df_with_missings) -> None:
+    """
+    Test missing treatment works with missings present.
+    """
     X = df_with_missings
     y = df_with_missings["default"].values
 
-    BUCK_risk = OrdinalCategoricalBucketer(
-                            variables=["MARRIAGE", "EDUCATION"],
-                            missing_treatment="most_risky")
+    BUCK_risk = OrdinalCategoricalBucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="most_risky")
     BUCK_risk.fit(X, y)
-    table = BUCK_risk.bucket_table('MARRIAGE')
+    table = BUCK_risk.bucket_table("MARRIAGE")
 
-    assert table[table['bucket'] == -2]['label'].values[0] == 'Other | Missing'
+    assert table[table["bucket"] == -2]["label"].values[0] == "Other | Missing"
 
 
 def test_missings():

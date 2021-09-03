@@ -1,3 +1,7 @@
+import pandas as pd
+from sklearn.utils import check_array
+
+
 def is_fitted(estimator) -> bool:
     """
     Checks if an estimator is fitted.
@@ -12,3 +16,30 @@ def is_fitted(estimator) -> bool:
     attrs = [v for v in vars(estimator) if v.endswith("_") and not v.startswith("__")]
 
     return len(attrs) > 0
+
+
+def ensure_dataframe(X: pd.DataFrame) -> pd.DataFrame:
+    """
+    Make sure X is a pandas DataFrame.
+    """
+    # checks if the input is a dataframe.
+    if not isinstance(X, pd.DataFrame):
+        # Convert X to pd.DataFrame. Not recommended,
+        # as you'll lose column name info.
+        # but bucketer will still work on numpy matrix
+        # also required for full scikitlearn compatibility
+        X = X.copy()
+        X = check_array(X, force_all_finite=False, accept_sparse=False, dtype=None)
+        X = pd.DataFrame(X)
+        X.columns = list(X.columns)  # sometimes columns can be a RangeIndex..
+    else:
+        # Create a copy
+        # important not to transform the original dataset.
+        X = X.copy()
+
+    if X.shape[0] == 0:
+        raise ValueError("Dataset has no rows!")
+    if X.shape[1] == 0:
+        raise ValueError(f"0 feature(s) (shape=({X.shape[0]}, 0)) while a minimum of 1 is required.")
+
+    return X

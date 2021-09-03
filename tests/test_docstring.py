@@ -11,52 +11,9 @@ pytest tests/test_docstring.py --verbose
 ```
 """
 
-# from skorecard.pipeline import bucketing_process
 import pytest
-import skorecard.linear_model
-import skorecard.bucketers
-import skorecard.pipeline
-import skorecard.preprocessing
-import skorecard.metrics
-import skorecard.bucket_mapping
-import skorecard.utils
-import skorecard.rescale
-import skorecard.datasets
 
-# List of all classes and functions we want tested
-CLASSES_TO_TEST = [
-    skorecard.bucketers.OptimalBucketer,
-    skorecard.bucketers.EqualWidthBucketer,
-    skorecard.bucketers.AgglomerativeClusteringBucketer,
-    skorecard.bucketers.EqualFrequencyBucketer,
-    skorecard.bucketers.DecisionTreeBucketer,
-    skorecard.bucketers.OrdinalCategoricalBucketer,
-    skorecard.bucketers.UserInputBucketer,
-    skorecard.bucketers.AsIsCategoricalBucketer,
-    skorecard.bucketers.AsIsNumericalBucketer,
-    skorecard.bucketers.UserInputBucketer,
-    skorecard.pipeline.KeepPandas,
-    skorecard.pipeline.BucketingProcess,
-    skorecard.pipeline.SkorecardPipeline,
-    skorecard.preprocessing.ColumnSelector,
-    skorecard.preprocessing.WoeEncoder,
-    skorecard.linear_model.LogisticRegression,
-    skorecard.rescale.ScoreCardPoints,
-    skorecard.features_bucket_mapping.FeaturesBucketMapping,
-    skorecard.bucket_mapping.BucketMapping,
-    skorecard.utils.DimensionalityError,
-    skorecard.Skorecard,
-    skorecard.pipeline.SkorecardPipeline,
-]
-FUNCTIONS_TO_TEST = [
-    skorecard.utils.reshape_1d_to_2d,
-    skorecard.pipeline.get_features_bucket_mapping,
-    skorecard.reporting.build_bucket_table,
-    skorecard.reporting.iv,
-    skorecard.reporting.psi,
-    skorecard.pipeline.to_skorecard_pipeline,
-    skorecard.datasets.load_uci_credit_card,
-]
+from tests.conftest import CLASSES_TO_TEST, FUNCTIONS_TO_TEST
 
 
 def get_public_methods(cls_ref):

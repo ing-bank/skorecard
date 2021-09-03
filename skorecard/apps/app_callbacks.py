@@ -99,6 +99,7 @@ def add_bucketing_callbacks(self, X, y):
                 # note using ast.literal_eval is not safe
                 # for use when you don't trust the user input
                 # in this case, it's a local user using his/her own kernel
+                # note: we're using literal_eval because JSON enforces quoted keys
                 input_map = ast.literal_eval(input_map)
                 # re-sort on value, key
                 input_map = dict(sorted(input_map.items(), key=lambda x: (x[1], x[0])))
@@ -124,7 +125,9 @@ def add_bucketing_callbacks(self, X, y):
 
         # Retrieve the new bucket tables and plots
         table = self.bucket_table(col)
-        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        # unsupervised bucketers don't have an event rate.
+        if "Event Rate" in table.columns:
+            table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         fig = self.plot_bucket(col)
         # remove title from plot
         fig.update_layout(title="")
@@ -157,8 +160,8 @@ def add_bucketing_process_callbacks(self, X, y):
     )
     def update_input_map(col):
         """Update bucketer map."""
-        input_map = self.pre_pipeline.features_bucket_mapping_.get(col).map
-        col_type = self.pre_pipeline.features_bucket_mapping_.get(col).type
+        input_map = self.pre_pipeline_.features_bucket_mapping_.get(col).map
+        col_type = self.pre_pipeline_.features_bucket_mapping_.get(col).type
 
         if col_type == "categorical":
             # We also allow for treating numerical as categoricals
@@ -179,8 +182,8 @@ def add_bucketing_process_callbacks(self, X, y):
         ],
     )
     def update_input_map_feedback(col):
-        col_type = self.pre_pipeline.features_bucket_mapping_.get(col).type
-        right = self.pre_pipeline.features_bucket_mapping_.get(col).right
+        col_type = self.pre_pipeline_.features_bucket_mapping_.get(col).type
+        right = self.pre_pipeline_.features_bucket_mapping_.get(col).right
         if col_type == "categorical":
             msg = "Edit the prebucket mapping dictionary, e.g. {'value' : 'pre-bucket'}"
         if col_type == "numerical" and right:
@@ -202,7 +205,7 @@ def add_bucketing_process_callbacks(self, X, y):
     )
     def get_prebucket_table(input_map, col):
         """Loads the table and the figure, when the input_map changes."""
-        col_type = self.pre_pipeline.features_bucket_mapping_.get(col).type
+        col_type = self.pre_pipeline_.features_bucket_mapping_.get(col).type
 
         # Load the object from text input into python object
         if col_type == "numerical":
@@ -237,7 +240,7 @@ def add_bucketing_process_callbacks(self, X, y):
         # Update the fit for this specific column
         # Note we passed X, y to add_bucketing_process_callbacks() so they are available here.
         # make sure to re-generate the summary table
-        for step in self.pre_pipeline.steps:
+        for step in self.pre_pipeline_.steps:
             if col in step[1].variables:
                 step[1]._update_column_fit(
                     X=X,
@@ -245,19 +248,21 @@ def add_bucketing_process_callbacks(self, X, y):
                     feature=col,
                     special=self._prebucketing_specials.get(col, {}),
                     splits=input_map,
-                    right=self.pre_pipeline.features_bucket_mapping_.get(col).right,
+                    right=self.pre_pipeline_.features_bucket_mapping_.get(col).right,
                     generate_summary=True,
                 )
 
         self.prebucket_tables_[col] = build_bucket_table(
-            X, y, column=col, bucket_mapping=self.pre_pipeline.features_bucket_mapping_.get(col)
+            X, y, column=col, bucket_mapping=self.pre_pipeline_.features_bucket_mapping_.get(col)
         )
         # Re-calculate the BucketingProcess summary
         self._generate_summary(X, y)
 
         # Retrieve the new bucket tables and plots
         table = self.prebucket_table(col)
-        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        # unsupervised bucketers don't have an event rate.
+        if "Event Rate" in table.columns:
+            table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         return table.to_dict("records"), False, no_update
 
     @app.callback(
@@ -279,7 +284,7 @@ def add_bucketing_process_callbacks(self, X, y):
         new_buckets["buckets"] = input_buckets
 
         # Input validation
-        bucket_mapping = self.pipeline.features_bucket_mapping_.get(col)
+        bucket_mapping = self.pipeline_.features_bucket_mapping_.get(col)
         if not is_sequential(sorted(input_buckets)):
             msg = "Buckets must start at 0 and increase by 1"
             return no_update, no_update, no_update, [msg], {"display": "block"}
@@ -290,7 +295,7 @@ def add_bucketing_process_callbacks(self, X, y):
         # Update the fit for this specific column
         # Note we passed X, y to add_bucketing_process_callbacks() so they are available here.
         # make sure to re-generate the summary table
-        for step in self.pipeline.steps:
+        for step in self.pipeline_.steps:
             if col in step[1].variables:
                 step[1]._update_column_fit(
                     X=X,
@@ -303,12 +308,12 @@ def add_bucketing_process_callbacks(self, X, y):
                 )
 
         # update the BucketingProcess bucket tables.
-        X_prebucketed = self.pre_pipeline.transform(X)
+        X_prebucketed = self.pre_pipeline_.transform(X)
         self.bucket_tables_[col] = build_bucket_table(
             X_prebucketed,
             y,
             column=col,
-            bucket_mapping=self.pipeline.features_bucket_mapping_.get(col),
+            bucket_mapping=self.pipeline_.features_bucket_mapping_.get(col),
         )
 
         # Re-calculate the BucketingProcess summary
@@ -316,7 +321,9 @@ def add_bucketing_process_callbacks(self, X, y):
 
         # Get the updated tables and figures
         table = self.bucket_table(col)
-        table["Event Rate"] = round(table["Event Rate"] * 100, 2)
+        # unsupervised bucketers don't have an event rate.
+        if "Event Rate" in table.columns:
+            table["Event Rate"] = round(table["Event Rate"] * 100, 2)
         prebucket_fig = self.plot_prebucket(col)
         prebucket_fig.update_layout(title="")
         fig = self.plot_bucket(col)

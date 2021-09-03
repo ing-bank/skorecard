@@ -41,7 +41,7 @@ def add_basic_layout(self):
     """
     Adds a basic layout to self.app.
     """
-    column_options = [{"label": o, "value": o} for o in self.variables]
+    column_options = [{"label": o, "value": o} for o in self.features_bucket_mapping_.columns]
 
     sidebar = get_sidebar(self, column_options)
 

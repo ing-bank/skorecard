@@ -12,17 +12,6 @@ def df():
     return datasets.load_uci_credit_card(as_frame=True)
 
 
-def test_kwargs_are_saved():
-    """Test that the kwargs fed to the TreeBucketTransformer are saved."""
-    tbt = DecisionTreeBucketer(
-        variables=["LIMIT_BAL"],
-        criterion="entropy",
-        min_impurity_decrease=0.001,
-    )
-    assert tbt.kwargs["criterion"] == "entropy"
-    assert tbt.kwargs["min_impurity_decrease"] == 0.001
-
-
 def test_transform(df):
     """Test that the correct shape is returned."""
     X = df[["LIMIT_BAL", "BILL_AMT1"]]
@@ -30,8 +19,7 @@ def test_transform(df):
 
     tbt = DecisionTreeBucketer(
         variables=["LIMIT_BAL", "BILL_AMT1"],
-        criterion="entropy",
-        min_impurity_decrease=0.001,
+        dt_kwargs={"criterion": "entropy", "min_impurity_decrease": 0.001},
     )
     tbt.fit(X, y)
 
@@ -110,7 +98,7 @@ def test_missing_default(df_with_missings) -> None:
 
     BUCK = DecisionTreeBucketer(variables=["LIMIT_BAL"], random_state=1)
     BUCK.fit(X, y)
-    X["LIMIT_BAL_trans"] = BUCK.transform(X[["LIMIT_BAL"]])
+    X["LIMIT_BAL_trans"] = BUCK.transform(X)["LIMIT_BAL"]
 
     missing_bucket = [f for f in BUCK.features_bucket_mapping_.get("LIMIT_BAL").labels.keys()][-1]
     assert BUCK.features_bucket_mapping_.get("LIMIT_BAL").labels[missing_bucket] == "Missing"
@@ -124,6 +112,6 @@ def test_missing_manual(df_with_missings) -> None:
 
     bucketer = DecisionTreeBucketer(variables=["LIMIT_BAL"], random_state=1, missing_treatment={"LIMIT_BAL": 0})
     bucketer.fit(X, y)
-    X["LIMIT_BAL_trans"] = bucketer.transform(X[["LIMIT_BAL"]])
+    X["LIMIT_BAL_trans"] = bucketer.transform(X)["LIMIT_BAL"]
 
     assert X[np.isnan(X["LIMIT_BAL_trans"])]["LIMIT_BAL"].sum() == 0

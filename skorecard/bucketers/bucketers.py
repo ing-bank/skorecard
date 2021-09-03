@@ -2,17 +2,19 @@ import warnings
 import yaml
 import numpy as np
 import pandas as pd
+from typing import List
 
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import _tree
+from sklearn.utils.multiclass import unique_labels
 
-from typing import List
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.features_bucket_mapping import FeaturesBucketMapping
+from skorecard.reporting import build_bucket_table
 from skorecard.utils import NotInstalledError, NotPreBucketedError
 from skorecard.utils.exceptions import ApproximationWarning
-from skorecard.reporting import build_bucket_table
+from skorecard.utils.validation import ensure_dataframe
 
 try:
     from optbinning import OptimalBinning
@@ -54,7 +56,10 @@ class OptimalBucketer(BaseBucketer):
         cat_cutoff=None,
         time_limit=25,
         remainder="passthrough",
-        **kwargs,
+        solver="cp",
+        monotonic_trend="auto_asc_desc",
+        gamma=0,
+        ob_kwargs={},
     ) -> None:
         """Initialize Optimal Bucketer.
 
@@ -67,7 +72,8 @@ class OptimalBucketer(BaseBucketer):
                 This dictionary contains a name of a bucket (key) and an array of unique values that should be put
                 in that bucket.
                 When special values are passed, they are not considered in the fitting procedure.
-            variables_type: Type of the variables
+            variables_type: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Type of the variables. Must be either 'categorical' or 'numerical'.
             missing_treatment: Defines how we treat the missing values present in the data.
                 If a string, it must be in ['separate', 'most_risky', 'most_frequent']
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
@@ -79,20 +85,35 @@ class OptimalBucketer(BaseBucketer):
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
-            min_bin_size: Minimum fraction of observations in a bucket. Passed to optbinning.OptimalBinning.
-            max_n_bins: Maximum numbers of bins to return. Passed to optbinning.OptimalBinning.
-            cat_cutoff: Threshold ratio (None, or >0 and <=1) below which categories are grouped
-                together in a bucket 'other'. Passed to optbinning.OptimalBinning.
-            time_limit: Time limit in seconds to find an optimal solution. Passed to optbinning.OptimalBinning.
+            min_bin_size: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Minimum fraction of observations in a bucket.
+            max_n_bins: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Maximum numbers of bins to return.
+            cat_cutoff: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Threshold ratio (None, or >0 and <=1) below which categories are grouped
+                together in a bucket 'other'.
+            time_limit (float): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Time limit in seconds to find an optimal solution.
             remainder: How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-            kwargs: Other parameters passed to optbinning.OptimalBinning. Passed to optbinning.OptimalBinning.
+            solver (str): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html): The optimizer to solve the optimal binning problem.
+                Supported solvers are “mip” to choose a mixed-integer programming solver, “cp” (default) to choose a constrained programming solver or “ls” to choose LocalSolver.
+            monotonic_trend (str): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                The event rate monotonic trend. Supported trends are “auto”, “auto_heuristic” and “auto_asc_desc”
+                to automatically determine the trend maximizing IV using a machine learning classifier,
+                “ascending”, “descending”, “concave”, “convex”, “peak” and “peak_heuristic” to allow a peak change point,
+                and “valley” and “valley_heuristic” to allow a valley change point.
+                Trends “auto_heuristic”, “peak_heuristic” and “valley_heuristic” use a heuristic to determine the change point,
+                and are significantly faster for large size instances (max_n_prebins > 20).
+                Trend “auto_asc_desc” is used to automatically select the best monotonic trend
+                between “ascending” and “descending”. If None, then the monotonic constraint is disabled.
+            gamma (float): Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
+                Regularization strength to reduce the number of dominating bins.
+                Larger values specify stronger regularization. Default is 0.
+                Option supported by solvers “cp” and “mip”.
+            ob_kwargs (dict): Other parameters passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html).
         """  # noqa
-        self._is_allowed_missing_treatment(missing_treatment)
-        assert variables_type in ["numerical", "categorical"]
-        assert remainder in ["passthrough", "drop"]
-
         self.variables = variables
         self.specials = specials
         self.variables_type = variables_type
@@ -102,8 +123,10 @@ class OptimalBucketer(BaseBucketer):
         self.cat_cutoff = cat_cutoff
         self.time_limit = time_limit
         self.remainder = remainder
-
-        self.kwargs = kwargs
+        self.solver = solver
+        self.monotonic_trend = monotonic_trend
+        self.gamma = gamma
+        self.ob_kwargs = ob_kwargs
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -140,10 +163,12 @@ class OptimalBucketer(BaseBucketer):
 
         # Fit estimator
         binner = OptimalBinning(
-            name=feature,
+            name=str(feature),
             dtype=self.variables_type,
-            solver="cp",
-            monotonic_trend="auto_asc_desc",
+            solver=self.solver,
+            monotonic_trend=self.monotonic_trend,
+            gamma=self.gamma,
+            # On user_splits:
             # We want skorecard users to explicitly define pre-binning for numerical features
             # Setting the user_splits prevents OptimalBinning from doing pre-binning again.
             user_splits=user_splits,
@@ -151,7 +176,7 @@ class OptimalBucketer(BaseBucketer):
             max_n_bins=self.max_n_bins,
             cat_cutoff=self.cat_cutoff,
             time_limit=self.time_limit,
-            **self.kwargs,
+            **self.ob_kwargs,
         )
         binner.fit(X.values, y)
 
@@ -226,19 +251,18 @@ class EqualWidthBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert isinstance(n_bins, int)
-        assert n_bins >= 1
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.missing_treatment = missing_treatment
         self.variables = variables
         self.n_bins = n_bins
         self.specials = specials
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -327,12 +351,6 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 drop: all remaining columns that were not specified in "variables" will be dropped.
             kwargs: Other parameters passed to AgglomerativeBucketer
         """  # noqa
-        assert isinstance(variables, list)
-        assert isinstance(n_bins, int)
-        assert n_bins >= 1
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.n_bins = n_bins
         self.specials = specials
@@ -340,7 +358,12 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
         self.remainder = remainder
         self.kwargs = kwargs
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -432,19 +455,18 @@ class EqualFrequencyBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert isinstance(n_bins, int)
-        assert n_bins >= 1
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.n_bins = n_bins
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -526,7 +548,7 @@ class DecisionTreeBucketer(BaseBucketer):
         min_bin_size=0.05,
         random_state=42,
         remainder="passthrough",
-        **kwargs,
+        dt_kwargs={},
     ) -> None:
         """Init the class.
 
@@ -561,22 +583,23 @@ class DecisionTreeBucketer(BaseBucketer):
             remainder (str): How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
-            kwargs: Other parameters passed to DecisionTreeClassifier
+            dt_kwargs: Other parameters passed to DecisionTreeClassifier
         """  # noqa
-        assert isinstance(variables, list)
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.specials = specials
-        self.kwargs = kwargs
+        self.dt_kwargs = dt_kwargs
         self.max_n_bins = max_n_bins
         self.missing_treatment = missing_treatment
         self.min_bin_size = min_bin_size
         self.random_state = random_state
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -619,7 +642,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 max_leaf_nodes=(self.max_n_bins - n_special_bins),
                 min_samples_leaf=min_bin_size,
                 random_state=self.random_state,
-                **self.kwargs,
+                **self.dt_kwargs,
             )
             binner.fit(X.values.reshape(-1, 1), y)
 
@@ -713,18 +736,6 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert encoding_method in ["frequency", "ordered"]
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
-        if tol < 0 or tol > 1:
-            raise ValueError("tol takes values between 0 and 1")
-
-        if max_n_categories is not None:
-            if max_n_categories < 0 or not isinstance(max_n_categories, int):
-                raise ValueError("max_n_categories takes only positive integer numbers")
-
         self.tol = tol
         self.max_n_categories = max_n_categories
         self.variables = variables
@@ -733,7 +744,12 @@ class OrdinalCategoricalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "categorical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "categorical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -843,16 +859,17 @@ class AsIsCategoricalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.variables = variables
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "categorical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "categorical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -935,17 +952,18 @@ class AsIsNumericalBucketer(BaseBucketer):
                 passthrough (Default): all columns that were not specified in "variables" will be passed through.
                 drop: all remaining columns that were not specified in "variables" will be dropped.
         """  # noqa
-        assert isinstance(variables, list)
-        assert remainder in ["passthrough", "drop"]
-        self._is_allowed_missing_treatment(missing_treatment)
-
         self.right = right
         self.variables = variables
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
 
-        self.variables_type = "numerical"
+    @property
+    def variables_type(self):
+        """
+        Signals variables type supported by this bucketer.
+        """
+        return "numerical"
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -1021,7 +1039,7 @@ class UserInputBucketer(BaseBucketer):
 
     def __init__(
         self,
-        features_bucket_mapping,
+        features_bucket_mapping=None,
         variables: List = [],
         remainder="passthrough",
     ) -> None:
@@ -1032,7 +1050,7 @@ class UserInputBucketer(BaseBucketer):
         - features_bucket_mapping is stored without the trailing underscore (_) because it is not fitted.
 
         Args:
-            features_bucket_mapping (Dict, FeaturesBucketMapping, str or Path): Contains the feature name and boundaries
+            features_bucket_mapping (None, Dict, FeaturesBucketMapping, str or Path): Contains the feature name and boundaries
                 defined for this feature.
                 If a dict, it will be converted to an internal FeaturesBucketMapping object.
                 If a string or path, which will attempt to load the file as a yaml and convert to FeaturesBucketMapping object.
@@ -1045,10 +1063,12 @@ class UserInputBucketer(BaseBucketer):
         # sklearn.base.BaseEstimator. See the notes in
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
-        assert remainder in ["passthrough", "drop"]
         self.remainder = remainder
+        self.variables = variables
 
-        if isinstance(features_bucket_mapping, str):
+        if features_bucket_mapping is None:
+            self.features_bucket_mapping_ = FeaturesBucketMapping()
+        elif isinstance(features_bucket_mapping, str):
             buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
             self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
         elif isinstance(features_bucket_mapping, dict):
@@ -1061,21 +1081,31 @@ class UserInputBucketer(BaseBucketer):
                 self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
             except Exception:
                 raise TypeError(
-                    "'features_bucket_mapping' must be a dict, str, path, or FeaturesBucketMapping instance"
+                    "'features_bucket_mapping' must be a None, dict, str, path, or FeaturesBucketMapping instance"
                 )
-
-        # If user did not specify any variables,
-        # use all the variables defined in the features_bucket_mapping
-        self.variables = variables
-        if variables == []:
-            self.variables = list(self.features_bucket_mapping_.maps.keys())
 
     def fit(self, X, y=None):
         """Init the class."""
+        X = ensure_dataframe(X)
+        if y is not None:
+            assert len(y) == X.shape[0], "y and X not same length"
+            # Store the classes seen during fit
+            self.classes_ = unique_labels(y)
+
+        # scikit-learn requires checking that X has same shape on transform
+        # this is because scikit-learn is still positional based (no column names used)
+        self.n_train_features_ = X.shape[1]
+
         # bucket tables can only be computed on fit().
         # so a user will have to .fit() if she/he wants .plot_buckets() and .bucket_table()
         self.bucket_tables_ = {}
-        for feature in self.variables:
+
+        # and if user did not specify any variables
+        # use all the variables defined in the features_bucket_mapping
+        if self.variables == []:
+            self.variables_ = list(self.features_bucket_mapping_.maps.keys())
+
+        for feature in self.variables_:
             # Calculate the bucket table
             self.bucket_tables_[feature] = build_bucket_table(
                 X,
@@ -1087,3 +1117,11 @@ class UserInputBucketer(BaseBucketer):
         self._generate_summary(X, y)
 
         return self
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True, "allow_nan": True, "requires_fit": False}

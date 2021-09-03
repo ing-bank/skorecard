@@ -23,7 +23,7 @@ def test_column_selector(df):
     # test that it raises an exception if X is not a pd DataFrame
     npX = X.values
     cs = ColumnSelector(variables=features)
-    with pytest.raises(AssertionError):
+    with pytest.raises(KeyError):
         cs.fit_transform(npX)
 
 
@@ -38,7 +38,7 @@ def test_column_selector_in_pipeline(df):
         OrdinalCategoricalBucketer(variables=["MARRIAGE"], tol=0.05),
         WoeEncoder(),
         ColumnSelector(variables=features),
-        LogisticRegression(),
+        LogisticRegression(calculate_stats=True),
     ).fit(X, y)
 
     # test that the model pipe has as many coefficients as there are features.

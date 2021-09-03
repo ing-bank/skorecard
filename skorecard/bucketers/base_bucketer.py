@@ -5,7 +5,8 @@ import itertools
 import pathlib
 
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_array
+from sklearn.utils.multiclass import unique_labels
 
 from skorecard.reporting.plotting import PlotBucketMethod
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
@@ -21,9 +22,15 @@ try:
 except ModuleNotFoundError:
     JupyterDash = NotInstalledError("jupyter-dash", "dashboard")
 
+try:
+    import dash_bootstrap_components as dbc
+except ModuleNotFoundError:
+    dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
+
 
 from skorecard.apps.app_layout import add_basic_layout
 from skorecard.apps.app_callbacks import add_bucketing_callbacks
+from skorecard.utils.validation import ensure_dataframe
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
@@ -32,41 +39,30 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
     """Base class for bucket transformers."""
 
     @staticmethod
-    def _is_dataframe(X: pd.DataFrame):
-        # checks if the input is a dataframe. Also creates a copy,
-        # important not to transform the original dataset.
-        if not isinstance(X, pd.DataFrame):
-            raise TypeError("The data set should be a pandas dataframe")
-        return X.copy()
-
-    @staticmethod
     def _check_y(y):
         # checks that y is an appropriate type and shape
         if y is None:
             return y
-        y = y.copy()
+
         if isinstance(y, pd.DataFrame):
             if y.shape[1] != 1:
                 raise AttributeError("If passing y as a DataFrame, it must be 1 column.")
-            y = y.values.reshape(
-                -1,
-            )
+            y = y.values.reshape(-1)
 
-        elif isinstance(y, pd.core.series.Series):
+        if isinstance(y, pd.core.series.Series):
             y = y.values
 
-        elif isinstance(y, np.ndarray):
+        if isinstance(y, np.ndarray):
             if y.ndim > 2:
                 raise AttributeError("If passing y as a Numpy array, y must be a 1-dimensional")
             elif y.ndim == 2:
                 if y.shape[1] != 1:
                     raise AttributeError("If passing y as a Numpy array, y must be a 1-dimensional")
                 else:
-                    y = y.reshape(
-                        -1,
-                    )
-        else:
-            raise TypeError("y must be either a Pandas column or a Numpy array")
+                    y = y.reshape(-1, 1)
+
+        y = check_array(y, ensure_2d=False)
+
         return y
 
     @staticmethod
@@ -189,8 +185,13 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         We need to filter out the missing values from a vector.
 
         Because we don't want to use those values to determine bin boundaries.
+
+        Note pd.DataFrame.isna and pd.DataFrame.isnull are identical
         """
-        flt = pd.isnull(X).values
+        # let's also treat infinite values as NA
+        # scikit-learn's check_estimator might throw those at us
+        with pd.option_context("mode.use_inf_as_na", True):
+            flt = pd.isna(X).values
         X_out = X[~flt]
         if y is not None and len(y) > 0:
             y_out = y[~flt]
@@ -209,18 +210,42 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     def fit(self, X, y=None):
         """Fit X, y."""
-        X = self._is_dataframe(X)
+        # Do __init__ validation.
+        # See https://scikit-learn.org/stable/developers/develop.html#parameters-and-init
+        assert self.remainder in ["passthrough", "drop"]
+        if hasattr(self, "missing_treatment"):
+            self._is_allowed_missing_treatment(self.missing_treatment)
+        if hasattr(self, "n_bins"):
+            assert isinstance(self.n_bins, int)
+            assert self.n_bins >= 1
+        if hasattr(self, "encoding_method"):
+            assert self.encoding_method in ["frequency", "ordered"]
+        if hasattr(self, "tol"):
+            if self.tol < 0 or self.tol > 1:
+                raise ValueError("tol takes values between 0 and 1")
+        if hasattr(self, "max_n_categories"):
+            if self.max_n_categories is not None:
+                if self.max_n_categories < 0 or not isinstance(self.max_n_categories, int):
+                    raise ValueError("max_n_categories takes only positive integer numbers")
+
+        # Do data validation
+        X = ensure_dataframe(X)
         y = self._check_y(y)
-        self.variables = self._check_variables(X, self.variables)
+        if y is not None:
+            assert len(y) == X.shape[0], "y and X not same length"
+            # Store the classes seen during fit
+            self.classes_ = unique_labels(y)
+
+        # scikit-learn requires checking that X has same shape on transform
+        # this is because scikit-learn is still positional based (no column names used)
+        self.n_train_features_ = X.shape[1]
+
+        self.variables_ = self._check_variables(X, self.variables)
         self._verify_specials_variables(self.specials, X.columns)
-
-        if isinstance(y, pd.Series):
-            y = y.values
-
         self.features_bucket_mapping_ = FeaturesBucketMapping()
         self.bucket_tables_ = {}
 
-        for feature in self.variables:
+        for feature in self.variables_:
 
             # filter specials for the fit
             if feature in self.specials.keys():
@@ -327,8 +352,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         if not is_fitted(self):
             self.fit(X, y)
 
-        import dash_bootstrap_components as dbc
-
         self.app = JupyterDash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
         add_basic_layout(self)
         add_bucketing_callbacks(self, X, y)
@@ -345,15 +368,30 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             df (pd.DataFrame): dataset with transformed features
         """
         check_is_fitted(self)
-        X = self._is_dataframe(X)
+        X = ensure_dataframe(X)
         y = self._check_y(y)
+        if y is not None:
+            assert len(y) == X.shape[0], "y and X not same length"
+        # If bucketer was fitted, make sure X has same columns as train
+        if hasattr(self, "n_train_features_"):
+            if X.shape[1] != self.n_train_features_:
+                raise ValueError("number of features in transform is different from the number of features in fit")
 
-        for feature in self.variables:
+        # Some bucketers do not have a .fit() method
+        # and if user did not specify any variables
+        # use all the variables defined in the features_bucket_mapping
+        if not hasattr(self, "variables_"):
+            if self.variables == []:
+                self.variables_ = list(self.features_bucket_mapping_.maps.keys())
+            else:
+                self.variables_ = self.variables
+
+        for feature in self.variables_:
             bucket_mapping = self.features_bucket_mapping_.get(feature)
             X[feature] = bucket_mapping.transform(X[feature])
 
         if self.remainder == "drop":
-            return X[self.variables]
+            return X[self.variables_]
         else:
             return X
 
@@ -391,3 +429,11 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             FeaturesBucketMapping(self.features_bucket_mapping_).save_yml(fout)
         else:
             self.features_bucket_mapping_.save_yml(fout)
+
+    def _more_tags(self):
+        """
+        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.
+
+        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags
+        """  # noqa
+        return {"binary_only": True, "allow_nan": True}
