@@ -1,5 +1,7 @@
 import pandas as pd
 from sklearn.utils import check_array
+from typing import Dict
+import warnings
 
 
 def is_fitted(estimator) -> bool:
@@ -43,3 +45,16 @@ def ensure_dataframe(X: pd.DataFrame) -> pd.DataFrame:
         raise ValueError(f"0 feature(s) (shape=({X.shape[0]}, 0)) while a minimum of 1 is required.")
 
     return X
+
+
+def check_args(args: Dict, obj):
+    """
+    Checks if keys from args dictionary are valid args to an object.
+
+    Note: this assumes 'obj' is scikit-learn compatible and thus has .get_params() implemented.
+    """
+    valid_args = obj().get_params()
+    for arg in args.keys():
+        if arg not in valid_args:
+            msg = f"Argument '{arg}' is not a valid argument for object '{obj}'"
+            warnings.warn(msg)

@@ -14,7 +14,7 @@ from skorecard.features_bucket_mapping import FeaturesBucketMapping
 from skorecard.reporting import build_bucket_table
 from skorecard.utils import NotInstalledError, NotPreBucketedError
 from skorecard.utils.exceptions import ApproximationWarning
-from skorecard.utils.validation import ensure_dataframe
+from skorecard.utils.validation import check_args, ensure_dataframe
 
 try:
     from optbinning import OptimalBinning
@@ -127,6 +127,8 @@ class OptimalBucketer(BaseBucketer):
         self.monotonic_trend = monotonic_trend
         self.gamma = gamma
         self.ob_kwargs = ob_kwargs
+
+        check_args(ob_kwargs, OptimalBinning)
 
     def _get_feature_splits(self, feature, X, y, X_unfiltered=None):
         """
@@ -593,6 +595,8 @@ class DecisionTreeBucketer(BaseBucketer):
         self.min_bin_size = min_bin_size
         self.random_state = random_state
         self.remainder = remainder
+
+        check_args(dt_kwargs, DecisionTreeClassifier)
 
     @property
     def variables_type(self):
