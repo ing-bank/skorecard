@@ -66,8 +66,8 @@ class BucketMapping:
         assert self.type in ["numerical", "categorical"]
         assert len(self.map) is not None, "Please set a 'map' first"
         assert isinstance(self.specials, dict) or isinstance(self.specials, list)
-        if self.missing_bucket is not None:
-            assert isinstance(self.missing_bucket, int)
+        # if self.missing_bucket is not None:
+        #     assert isinstance(self.missing_bucket, int)
 
         # Check specials
         assert all(
@@ -93,13 +93,14 @@ class BucketMapping:
             max_bucket = len(self.map)
 
             if self.missing_bucket is not None:
-                assert (
-                    self.missing_bucket <= max_bucket
-                ), "map '%s' corresponds buckets 0-%s but missing_bucket is set to %s" % (
-                    self.map,
-                    max_bucket,
-                    self.missing_bucket,
-                )
+                if not np.isnan(self.missing_bucket):
+                    assert (
+                        self.missing_bucket <= max_bucket
+                    ), "map '%s' corresponds buckets 0-%s but missing_bucket is set to %s" % (
+                        self.map,
+                        max_bucket,
+                        self.missing_bucket,
+                    )
                 self._missing_bucket = self.missing_bucket
             else:
                 self._missing_bucket = -1
@@ -151,10 +152,11 @@ class BucketMapping:
             # Set 'missing' bucket
             if self.missing_bucket is not None:
                 # Allow -2, -1 Some missing_treatments (e.g. most_risky) add it here
-                if self.missing_bucket not in [-2, -1]:
+                if self.missing_bucket not in [-2, -1, np.nan]:
                     assert (
                         self.missing_bucket in self.map.values()
                     ), "missing_bucket '%s' does not exist in map values: %s" % (self.missing_bucket, self.map)
+
                 self._missing_bucket = self.missing_bucket
             else:
                 self._missing_bucket = -1
@@ -218,7 +220,8 @@ class BucketMapping:
         buckets = np.where(x.isnull(), self._missing_bucket, buckets)
 
         # Ensure dtype is integer buckets
-        buckets = buckets.astype(int)
+        if not np.isnan(self._missing_bucket):
+            buckets = buckets.astype(int)
 
         # Deal with special values
         # Both categorical & numerical
