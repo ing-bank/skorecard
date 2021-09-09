@@ -395,6 +395,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         for feature in self.variables_:
             bucket_mapping = self.features_bucket_mapping_.get(feature)
             X[feature] = bucket_mapping.transform(X[feature])
+            #X[feature] = X[feature].astype(pd.Int32Dtype())
 
         if self.remainder == "drop":
             return X[self.variables_]

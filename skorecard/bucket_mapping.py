@@ -66,8 +66,6 @@ class BucketMapping:
         assert self.type in ["numerical", "categorical"]
         assert len(self.map) is not None, "Please set a 'map' first"
         assert isinstance(self.specials, dict) or isinstance(self.specials, list)
-        # if self.missing_bucket is not None:
-        #     assert isinstance(self.missing_bucket, int)
 
         # Check specials
         assert all(
@@ -208,6 +206,13 @@ class BucketMapping:
         if isinstance(x, list):
             x = pd.Series(x)
         assert isinstance(x, pd.core.series.Series)
+        
+        # Workaround for missings
+        def to_int(x):
+            if not np.isnan(x):
+                return int(x)
+            else:
+                return x
 
         # Transform using self.map
         if self.type == "numerical":
@@ -220,8 +225,7 @@ class BucketMapping:
         buckets = np.where(x.isnull(), self._missing_bucket, buckets)
 
         # Ensure dtype is integer buckets
-        if not np.isnan(self._missing_bucket):
-            buckets = buckets.astype(int)
+        buckets = [to_int(x) for x in buckets]
 
         # Deal with special values
         # Both categorical & numerical
@@ -229,7 +233,7 @@ class BucketMapping:
         for k, v in self.specials.items():
             buckets = np.where(x.isin(v), special_counter, buckets)
             special_counter -= 1
-
+        buckets = [to_int(x) for x in buckets]
         return buckets
 
     def _apply_cat_mapping(self, x):
