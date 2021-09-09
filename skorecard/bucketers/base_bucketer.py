@@ -182,6 +182,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         elif self.missing_treatment in ["passthrough"]:
             missing_bucket = np.nan
 
+        else:
+            raise AssertionError(f"Invalid missing treatment '{self.missing_treatment}' specified")
+
+
         return missing_bucket
 
     def _filter_na_for_fit(self, X: pd.DataFrame, y):
@@ -395,7 +399,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         for feature in self.variables_:
             bucket_mapping = self.features_bucket_mapping_.get(feature)
             X[feature] = bucket_mapping.transform(X[feature])
-            #X[feature] = X[feature].astype(pd.Int32Dtype())
 
         if self.remainder == "drop":
             return X[self.variables_]
