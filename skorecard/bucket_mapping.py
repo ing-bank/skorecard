@@ -233,7 +233,6 @@ class BucketMapping:
         for k, v in self.specials.items():
             buckets = np.where(x.isin(v), special_counter, buckets)
             special_counter -= 1
-        buckets = [to_int(x) for x in buckets]
         return buckets
 
     def _apply_cat_mapping(self, x):
