@@ -183,6 +183,21 @@ def test_missings_set(bucketer, df_with_missings) -> None:
                 BUCK_similar.bucket_table(feature)["bucket"] == closest_bucket
             ].reset_index()["label"][0]
         )
+    
+    BUCK_passthrough = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="passthrough")
+    BUCK_passthrough.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the bucket id with 'Missing' label
+        table = BUCK_passthrough.bucket_table(feature)
+        impute_missing = "Soup37120"
+        table = table.fillna(impute_missing)
+        missing_bucket = table[table["label"] == "Missing"]["bucket"].values[0]
+        assert missing_bucket == impute_missing
+        X_trans = BUCK_passthrough.transform(X)[[feature]]
+        original_index_missings = X[X[feature].isnull()][feature].index
+        trans_index_missings = X_trans[X_trans[feature].isnull()][feature].index
+        assert all(original_index_missings[i] == trans_index_missings[i] for i in range(len(original_index_missings)))
 
 
 @pytest.mark.parametrize("bucketer", BUCKETERS_WITHOUT_SET_BINS)
@@ -267,6 +282,22 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
                 BUCK_similar.bucket_table(feature)["bucket"] == closest_bucket
             ].reset_index()["label"][0]
         )
+
+    BUCK_passthrough = bucketer(variables=["MARRIAGE", "EDUCATION"], missing_treatment="passthrough")
+    BUCK_passthrough.fit(X, y)
+
+    for feature in ["MARRIAGE", "EDUCATION"]:
+        # look at the bucket id with 'Missing' label
+        table = BUCK_passthrough.bucket_table(feature)
+        impute_missing = "Soup37120"
+        table = table.fillna(impute_missing)
+        missing_bucket = table[table["label"] == "Missing"]["bucket"].values[0]
+        assert missing_bucket == impute_missing
+        X_trans = BUCK_passthrough.transform(X)[[feature]]
+        original_index_missings = X[X[feature].isnull()][feature].index
+        trans_index_missings = X_trans[X_trans[feature].isnull()][feature].index
+        assert all(original_index_missings[i] == trans_index_missings[i] for i in range(len(original_index_missings)))
+
 
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)

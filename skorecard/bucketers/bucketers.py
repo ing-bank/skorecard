@@ -82,6 +82,7 @@ class OptimalBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -246,6 +247,7 @@ class EqualWidthBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -345,6 +347,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -450,6 +453,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values..
@@ -578,6 +582,7 @@ class DecisionTreeBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -733,6 +738,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -856,6 +862,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values.
@@ -949,6 +956,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                     most_frequent: Missing values are put into the most common bucket.
                     neutral: Missing values are put into the bucket with WoE closest to 0.
                     similar: Missing values are put into the bucket with WoE closest to the bucket with only missing values.
+                    passthrough: Leaves missing values untouched.
                 If a dict, it must be of the following format:
                     {"<column name>": <bucket_number>}
                     This bucket number is where we will put the missing values..

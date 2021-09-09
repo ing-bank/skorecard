@@ -75,6 +75,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             "least_risky",
             "neutral",
             "similar",
+            "passthrough",
         ]
 
         if type(missing_treatment) == str:
@@ -177,6 +178,13 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             missing_bucket = int(
                 table[table["label"] != "Missing"].sort_values("New_WoE").reset_index(drop=True).iloc[0]["bucket_id"]
             )
+
+        elif self.missing_treatment in ["passthrough"]:
+            missing_bucket = np.nan
+
+        else:
+            raise AssertionError(f"Invalid missing treatment '{self.missing_treatment}' specified")
+
 
         return missing_bucket
 
@@ -283,6 +291,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             "least_risky",
             "neutral",
             "similar",
+            "passthrough",
         ]:
             missing_bucket = None
         if isinstance(self.missing_treatment, dict):
@@ -311,6 +320,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             "least_risky",
             "neutral",
             "similar",
+            "passthrough",
         ]:
             missing_bucket = self._find_missing_bucket(feature=feature)
             # Repeat above procedure now we know the bucket distribution

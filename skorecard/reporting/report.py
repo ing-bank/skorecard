@@ -82,10 +82,14 @@ def build_bucket_table(
         col_bucket_mapping = bucket_dict.get(column)
 
     X_transform = pd.DataFrame(data={"bucket_id": col_bucket_mapping.transform(X[column])}, index=X.index)
+    
     if y is not None:
         X_transform["Event"] = y
     else:
         X_transform["Event"] = np.nan
+    
+    # If missing_treatment == passthrough, we reformat the bucket_id and un-do this later
+    X_transform["bucket_id"].fillna(31415926535, inplace=True)
 
     stats = X_transform.groupby("bucket_id", as_index=False).agg(
         def_rate=pd.NamedAgg(column="Event", aggfunc="mean"),
@@ -94,7 +98,6 @@ def build_bucket_table(
     )
 
     stats["label"] = stats["bucket_id"].map(col_bucket_mapping.labels)
-
     # Make sure missing is present even when not present
     if display_missing:
         ref = pd.DataFrame.from_dict(col_bucket_mapping.labels, orient="index", columns=["label"])
@@ -141,6 +144,11 @@ def build_bucket_table(
         "WoE",
         "IV",
     ]
+
+    # A little reformatting for if missing_treatment is passthrough
+    if 31415926535 in stats["bucket_id"].values:
+        stats["label"] = np.where(stats["bucket_id"] == 31415926535, "Missing", stats["label"])
+        stats = stats.drop_duplicates(subset=["label"], keep="last").reset_index(drop=True).replace([31415926535], np.nan)
     return stats.sort_values(by="bucket_id")[columns]
 
 
