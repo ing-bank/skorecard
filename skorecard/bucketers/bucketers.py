@@ -75,7 +75,7 @@ class OptimalBucketer(BaseBucketer):
             variables_type: Passed to [optbinning.OptimalBinning](http://gnpalencia.org/optbinning/binning_binary.html):
                 Type of the variables. Must be either 'categorical' or 'numerical'.
             missing_treatment: Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -240,7 +240,7 @@ class EqualWidthBucketer(BaseBucketer):
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
             missing_treatment: Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -340,7 +340,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
             missing_treatment: Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -446,7 +446,7 @@ class EqualFrequencyBucketer(BaseBucketer):
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
             missing_treatment: Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -575,7 +575,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 therefore, max_n_bins  must always be >= (number of special bins + 2) if specials are defined,
                 otherwise must be >=2.
             missing_treatment (str or dict): Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -731,7 +731,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
                 - "ordered": orders the buckets based on the average class 1 rate in the bucket.
                     The lower the number of the bucket the lower the fraction of class 1 in that bucket.
             missing_treatment (str or dict): Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -855,7 +855,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
             missing_treatment: Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
@@ -949,7 +949,7 @@ class AsIsNumericalBucketer(BaseBucketer):
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
             missing_treatment (str or dict): Defines how we treat the missing values present in the data.
-                If a string, it must be in ['separate', 'most_risky', 'most_frequent']
+                If a string, it must be one of the following options:
                     separate: Missing values get put in a separate 'Other' bucket: `-1`
                     most_risky: Missing values are put into the bucket containing the largest percentage of Class 1.
                     least_risky: Missing values are put into the bucket containing the largest percentage of Class 0.
