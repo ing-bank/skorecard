@@ -18,9 +18,9 @@ except ModuleNotFoundError:
     Image = NotInstalledError("psutil")
 
 
-def make_plot_figure(bucket_table: pd.DataFrame):
+def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
     """
-    Make a plotly object out of a table.
+    Make a plotly object out of a table. The line defines what is plotted on the y-axis.
     """
     # To support both pre-buckets and buckets
     if "pre-bucket" in bucket_table.columns:
@@ -37,19 +37,27 @@ def make_plot_figure(bucket_table: pd.DataFrame):
         }
     )
 
+    if line == "event_rate":
+        column_to_plot = "Event Rate"
+    elif line == "woe":
+        column_to_plot = "WoE"
+    else:
+        raise AttributeError(f"line {line} must be event_rate or woe")
+
     # If the bucket_table is built without any 'y' information
     # we won't know any event rate rates either
     # and thus we need to output a simpler plot
-    if "Event Rate" in bucket_table.columns:
-        plotdf["Event Rate"] = [event for event in bucket_table["Event Rate"].values]
+    if column_to_plot in bucket_table.columns:
+        plotdf[column_to_plot] = [event for event in bucket_table[column_to_plot].values]
         fig = make_subplots(specs=[[{"secondary_y": True}]])
 
         # Add trace with event rate
         fig.add_trace(
-            go.Scatter(x=plotdf["label"], y=plotdf["Event Rate"], name="Event Rate", line=dict(color="#454c57")),
+            go.Scatter(x=plotdf["label"], y=plotdf[column_to_plot], name=column_to_plot, line=dict(color="#454c57")),
             secondary_y=True,
         )
-        fig.update_yaxes(title_text="bucket event rate", secondary_y=True, tickformat=",.0%")
+        fig.update_yaxes(title_text=f"Bucket {column_to_plot}", secondary_y=True, tickformat=",.0%")
+
     else:
         fig = make_subplots(specs=[[{"secondary_y": False}]])
 
@@ -78,15 +86,14 @@ def make_plot_figure(bucket_table: pd.DataFrame):
     return fig
 
 
-def plot_prebucket_table(prebucket_table, column="", format=None, scale=None, width=None, height=None):
+def plot_prebucket_table(prebucket_table, column="", line="", format=None, scale=None, width=None, height=None):
     """
     Given the prebucketed data, plot the pre-buckets.
 
     Args:
         prebucket_table (pd.DataFrame): the table of the prebucketed data
-        X (pd.DataFrame): [description]
-        y ([type], optional): [description]. Defaults to None.
         column (str): The column to plot
+        line (str): The line to plot on the secondary axis
         format (str): The format of the image, e.g. 'png'. The default returns a plotly fig
         scale: If format is specified, the scale of the image
         width: If format is specified, the width of the image
@@ -95,7 +102,7 @@ def plot_prebucket_table(prebucket_table, column="", format=None, scale=None, wi
     Returns:
         fig of desired format
     """
-    fig = make_plot_figure(prebucket_table)
+    fig = make_plot_figure(prebucket_table, line)
 
     fig.update_layout(title=f"pre-buckets: {column}".strip())
     fig.update_layout(xaxis_title=f"{column} pre-buckets".strip())
@@ -106,13 +113,14 @@ def plot_prebucket_table(prebucket_table, column="", format=None, scale=None, wi
     return fig
 
 
-def plot_bucket_table(bucket_table, column="", format=None, scale=None, width=None, height=None):
+def plot_bucket_table(bucket_table, column="", line="", format=None, scale=None, width=None, height=None):
     """
     Given the bucketed data, plot the buckets with Event Rate.
 
     Args:
         bucket_table (pd.DataFrame): the table of the bucketed data
         format (str): The format of the image, e.g. 'png'. The default returns a plotly fig
+        line (str): The line to plot on the secondary axis
         scale: If format is specified, the scale of the image
         width: If format is specified, the width of the image
         height: If format is specified, the image of the image
@@ -120,7 +128,7 @@ def plot_bucket_table(bucket_table, column="", format=None, scale=None, width=No
     Returns:
         plotly fig
     """
-    fig = make_plot_figure(bucket_table)
+    fig = make_plot_figure(bucket_table, line)
 
     fig.update_layout(title=f"buckets: {column}".strip())
     fig.update_layout(xaxis_title=f"{column} buckets".strip())
@@ -179,12 +187,13 @@ class PlotPreBucketMethod:
     To be used with skorecard.pipeline.BucketingProcess and skorecard.bucketers.BaseBucketer
     """
 
-    def plot_prebucket(self, column, format=None, scale=None, width=None, height=None):
+    def plot_prebucket(self, column, line="event_rate", format=None, scale=None, width=None, height=None):
         """
         Generates the prebucket table and produces a corresponding plotly plot.
 
         Args:
             column: The column we want to visualise
+            line: The line to plot on the secondary axis. Default is Event Rate.
             format: The format of the image, such as 'png'. The default None returns a plotly image.
             scale: If format is specified, the scale of the image
             width: If format is specified, the width of the image
@@ -193,12 +202,14 @@ class PlotPreBucketMethod:
         Returns:
             plot: plotly fig
         """
+        assert line in ["event_rate", "woe"], "line must be event_rate or woe"
         if isinstance(self, Pipeline):
             check_is_fitted(self.steps[0][1])
         else:
             check_is_fitted(self)
         return plot_prebucket_table(
             prebucket_table=self.prebucket_table(column),
+            line=line,
             column=column,
             format=format,
             scale=scale,
@@ -214,12 +225,13 @@ class PlotBucketMethod:
     To be used with skorecard.pipeline.BucketingProcess and skorecard.bucketers.BaseBucketer
     """
 
-    def plot_bucket(self, column, format=None, scale=None, width=None, height=None):
+    def plot_bucket(self, column, line="event_rate", format=None, scale=None, width=None, height=None):
         """
         Plot the buckets.
 
         Args:
             column: The column we want to visualise
+            line: The line to plot on the secondary axis. Default is Event Rate.
             format: The format of the image, such as 'png'. The default None returns a plotly image.
             scale: If format is specified, the scale of the image
             width: If format is specified, the width of the image
@@ -228,6 +240,7 @@ class PlotBucketMethod:
         Returns:
             plot: plotly fig
         """
+        assert line in ["event_rate", "woe"], "line must be event_rate or woe"
         if isinstance(self, Pipeline):
             check_is_fitted(self.steps[0][1])
         else:
@@ -235,6 +248,7 @@ class PlotBucketMethod:
 
         return plot_bucket_table(
             bucket_table=self.bucket_table(column=column),
+            line=line,
             column=column,
             format=format,
             scale=scale,
