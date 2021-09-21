@@ -153,7 +153,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         """Pretty print self.
 
         Returns:
-            str: reproducable object representation.
+            str: reproducible object representation.
         """
         vars = ""
         for k, v in self.__dict__.items():
@@ -338,7 +338,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             return self.bucketing_.prebucket_table(column)
         else:
             error_msg = (
-                f"prebucket_table is supported only if the attirbuite bucketing is of type BucketingProcess, "
+                f"prebucket_table is supported only if the attribute bucketing is of type BucketingProcess, "
                 f"got {self.bucketing_.__class__}"
             )
             raise BucketerTypeError(error_msg)
@@ -354,29 +354,31 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         check_is_fitted(self)
         return self.bucketing_.bucket_table(column)
 
-    def plot_prebucket(self, column):
+    def plot_prebucket(self, column, line="event_rate"):
         """Plot the prebucket_table. It's supported only if the bucketing object is BucketingProcess.
 
         Args:
             column: (str). column name
+            line (str): The line to plot on the y-axis. Can be event rate or weight of evidence
         """
         if isinstance(self.bucketing_, BucketingProcess):
-            return self.bucketing_.plot_prebucket(column)
+            return self.bucketing_.plot_prebucket(column, line=line)
         else:
             error_msg = (
-                f"plot_prebucket  is supported only if the attirbuite bucketing is of type BucketingProcess, "
+                f"plot_prebucket  is supported only if the attribute bucketing is of type BucketingProcess, "
                 f"got {type(self.bucketing_.__class__)}"
             )
             raise BucketerTypeError(error_msg)
 
-    def plot_bucket(self, column):
+    def plot_bucket(self, column, line="event_rate"):
         """Plot the buckets.
 
         Args:
-            column: (str). column name
+            column (str): column name
+            line (str): The line to plot on the y-axis. Can be event rate or weight of evidence
         """
         check_is_fitted(self)
-        return self.bucketing_.plot_bucket(column)
+        return self.bucketing_.plot_bucket(column, line=line)
 
     def _more_tags(self):
         """
