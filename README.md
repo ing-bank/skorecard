@@ -9,6 +9,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/skorecard)
 ![GitHub contributors](https://img.shields.io/github/contributors/ing-bank/skorecard)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/skorecard)](#)
+[![Downloads](https://pepy.tech/badge/skorecard)](https://pepy.tech/project/skorecard)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
