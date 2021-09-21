@@ -158,7 +158,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 raise AttributeError("bucketer must be fit with y to determine the risk rates")
 
             missing_bucket = int(
-                self.bucket_tables_[feature]
+                self.bucket_tables_[feature][self.bucket_tables_[feature]["bucket_id"] >=0]
                 .sort_values("Event Rate", ascending=ascending)
                 .reset_index(drop=True)
                 .iloc[0]["bucket_id"]
