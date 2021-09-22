@@ -567,7 +567,7 @@ class DecisionTreeBucketer(BaseBucketer):
                 This dictionary contains a name of a bucket (key) and an array of unique values that should be put
                 in that bucket.
                 When special values are defined, they are not considered in the fitting procedure.
-            min_bin_size (int): Minimum fraction of observations in a bucket. Passed directly to min_samples_leaf.
+            min_bin_size (float): Minimum fraction of observations in a bucket. Passed directly to min_samples_leaf.
             max_n_bins (int): Maximum numbers of after the bucketing. Passed directly to max_leaf_nodes of the
                 DecisionTreeClassifier.
                 If specials are defined, max_leaf_nodes will be redefined to max_n_bins - (number of special bins).
@@ -796,7 +796,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             cats = X_y.groupby([feature])["target"].mean().sort_values(ascending=True).index
             normalized_counts = normalized_counts[cats]
 
-        if self.encoding_method == "frequency":
+        elif self.encoding_method == "frequency":
             normalized_counts = X_y[feature].value_counts(normalize=True)
 
         # Limit number of categories if set.

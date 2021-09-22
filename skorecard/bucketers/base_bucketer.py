@@ -131,7 +131,8 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     def _find_missing_bucket(self, feature):
         """
-        Used for when missing_treatment is in ["most_frequent", "most_risky", "least_risky", "neutral", "similar"].
+        Used for when missing_treatment is in:
+        ["most_frequent", "most_risky", "least_risky", "neutral", "similar", "passthrough"]
 
         Calculates the new bucket for us to put the missing values in.
         """
@@ -284,26 +285,18 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         Useful when we want to interactively update the fit.
         """
         # Deal with missing values
-        if self.missing_treatment in [
-            "separate",
-            "most_frequent",
-            "most_risky",
-            "least_risky",
-            "neutral",
-            "similar",
-            "passthrough",
-        ]:
-            missing_bucket = None
+        missing_bucket = None
         if isinstance(self.missing_treatment, dict):
             missing_bucket = self.missing_treatment.get(feature)
 
         self.features_bucket_mapping_[feature] = BucketMapping(
             feature_name=feature,
             type=self.variables_type,
+            missing_bucket=missing_bucket,
             map=splits,
             right=right,
             specials=special,
-            missing_bucket=missing_bucket,
+
         )
 
         # Calculate the bucket table
@@ -327,10 +320,11 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             self.features_bucket_mapping_[feature] = BucketMapping(
                 feature_name=feature,
                 type=self.variables_type,
+                missing_bucket=missing_bucket,
                 map=splits,
                 right=right,
                 specials=special,
-                missing_bucket=missing_bucket,
+
             )
 
             # Recalculate the bucket table with the new bucket for missings
