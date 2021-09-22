@@ -194,7 +194,7 @@ class BucketingProcess(
                 step.variables = self.variables
 
         self._prebucketing_specials = self.specials
-        self._bucketing_specials: Dict = dict()  # will be determined later.
+        self._bucketing_specials = dict()  # will be determined later.
 
         # Fit the prebucketing pipeline
         X_prebucketed_ = self.pre_pipeline_.fit_transform(X, y)

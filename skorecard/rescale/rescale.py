@@ -25,10 +25,10 @@ def calibrate_to_master_scale(y_pred, *, pdo, ref_score, ref_odds, epsilon=1e-6)
         if the odds become 25:1, the score is 275.
 
     Args:
-        y_pred: prediced probabilities
+        y_pred: predicted probabilities
         pdo: number of points necessary to double the odds
         ref_score: reference score set for the reference odds
-        ref_odds: odds that correspont do the ref_score
+        ref_odds: odds that correspond to the ref_score
         epsilon: float (1e-6), correction to avoid infinite odds if y_pred = 0
 
     Returns:
@@ -42,7 +42,7 @@ def calibrate_to_master_scale(y_pred, *, pdo, ref_score, ref_odds, epsilon=1e-6)
     odds = y_pred.apply(odd_func)
 
     factor = pdo / np.log(2)
-    offset = ref_score - (factor) * np.log(ref_odds)
+    offset = ref_score - factor * np.log(ref_odds)
 
     master_scale = odds.apply(lambda x: _map_to_scale(x, factor, offset))
 
@@ -81,7 +81,13 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, skorecard_model, *, pdo=20, ref_score=100, ref_odds=1):
-        """Class constructor."""
+        """
+        Args:
+            skorecard_model: the fitted Skorecard class
+            pdo: number of points necessary to double the odds
+            ref_score: reference score set for the reference odds
+            ref_odds: odds that correspond to the ref_score
+        """
         assert isinstance(skorecard_model, Skorecard), (
             f"The skorecard_model must be an instance of "
             f"skorecard.Skorecard, got {skorecard_model.__class__.__name__} instead."
@@ -176,11 +182,19 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
 
 def _scale_scorecard(df, *, pdo, ref_score, ref_odds, features):
-    """Equations to scale the feature scorecards."""
+    """Equations to scale the feature scorecards.
+    Args:
+        df: Pandas DataFrame
+        pdo: number of points necessary to double the odds
+        ref_score: reference score set for the reference odds
+        ref_odds: odds that correspond to the ref_score
+        features (list): The list of features
+
+    """
     df = df[~df["woe"].isnull()]
 
     factor = pdo / np.log(2)
-    offset = ref_score - (factor) * np.log(ref_odds)
+    offset = ref_score - factor * np.log(ref_odds)
 
     intercept = df.loc[df["feature"] == "Intercept"]["coef"].values[0]
     n = len(features)
