@@ -255,3 +255,64 @@ class PlotBucketMethod:
             width=width,
             height=height,
         )
+
+
+def weight_plot(stats: pd.DataFrame):
+
+    """
+    Generates a weight plot(plotly chart) from `stats`
+    Example:
+
+    from skorecard.datasets import load_uci_credit_card
+    from skorecard.bucketers import EqualFrequencyBucketer
+    from skorecard.linear_model import LogisticRegression
+
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import OneHotEncoder
+    X, y = load_uci_credit_card(return_X_y=True)
+    pipeline = Pipeline([
+        ('bucketer', EqualFrequencyBucketer(n_bins=10)),
+        ('clf', LogisticRegression(calculate_stats=True))
+    ])
+    pipeline.fit(X, y)
+    assert pipeline.named_steps['clf'].p_val_coef_[0][0] > 0
+    stats = pipeline.named_steps['clf'].get_stats()
+
+    weight_plot(stats)
+    """
+    fig = go.Figure()
+
+    stats["[0.025"] = stats["Coef."] - 1.96 * stats["Std.Err"]
+    stats["0.975]"] = stats["Coef."] + 1.96 * stats["Std.Err"]
+
+    fig.add_trace(
+        go.Scatter(
+            x=stats['Coef.'],
+            y=stats['Coef.'].index,
+            line=dict(color='#42C4F7', width=2),
+            mode='markers',
+
+            error_x=dict(
+                type='data',
+                symmetric=False,
+                array=stats['0.975]'] - stats['Coef.'],
+                arrayminus=stats['Coef.'] - stats['[0.025'],
+                color='#68BBE3')
+        )
+    )
+
+    fig.add_shape(type="line",
+                  x0=0, y0=0, x1=0, y1=len(stats),
+                  line=dict(color="#3f3f3f", width=3, dash='dash')
+                  )
+
+    fig.update_layout(
+        title='Regression Meta Analysis - Weight Plot',
+        xaxis_title='Weight Estimates',
+        yaxis_title='Variable',
+        xaxis_showgrid=False,
+        yaxis_showgrid=False
+    )
+    fig.update_layout(template="simple_white")
+
+    return fig
