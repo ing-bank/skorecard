@@ -182,3 +182,77 @@ def test_default_skorecard_class(df):
     features = []
     expected_probas = np.array([[0.895, 0.105], [0.752, 0.248]])
     run_checks(X, y, bucketer, features, expected_probas)
+
+
+def test_random_state(df):
+    """Test that all of the random_state shenanigans work as expected."""
+    X = df.drop("default", axis=1)
+    y = df["default"]
+    num_cols = ["LIMIT_BAL", "BILL_AMT1"]
+    cat_cols = ["EDUCATION", "MARRIAGE"]
+
+    # Test assigning a random state
+    prebucketing_pipeline = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=100),
+        OrdinalCategoricalBucketer(variables=cat_cols, tol=0.01)
+    )
+    bucketing_pipeline = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=100),
+        OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=5, min_bin_size=0.08)
+    )
+
+    bucketer = BucketingProcess(prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline)
+    skorecard_model = Skorecard(bucketing=bucketer, variables=num_cols + cat_cols, random_state=411)
+    skorecard_model.fit(X, y)
+    assert bucketer.pre_pipeline_.named_steps['decisiontreebucketer'].random_state == 411
+    assert bucketer.pipeline_.named_steps['decisiontreebucketer'].random_state == 411
+    assert skorecard_model.pipeline_.named_steps['model'].random_state == 411
+
+    # Test overwriting a random state
+    prebucketing_pipeline = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=100, random_state=123),
+        OrdinalCategoricalBucketer(variables=cat_cols, tol=0.01)
+    )
+    bucketing_pipeline = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=100, random_state=123),
+        OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=5, min_bin_size=0.08)
+    )
+
+    bucketer = BucketingProcess(prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline)
+    skorecard_model = Skorecard(bucketing=bucketer, variables=num_cols + cat_cols, random_state=411)
+    skorecard_model.fit(X, y)
+    assert bucketer.pre_pipeline_.named_steps['decisiontreebucketer'].random_state == 411
+    assert bucketer.pipeline_.named_steps['decisiontreebucketer'].random_state == 411
+    assert skorecard_model.pipeline_.named_steps['model'].random_state == 411
+
+    # Test keeping a random state
+    prebucketing_pipeline = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=100, random_state=123),
+        OrdinalCategoricalBucketer(variables=cat_cols, tol=0.01)
+    )
+    bucketing_pipeline = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=100, random_state=123),
+        OptimalBucketer(variables=cat_cols, variables_type="categorical", max_n_bins=5, min_bin_size=0.08)
+    )
+
+    bucketer = BucketingProcess(prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline)
+    skorecard_model = Skorecard(bucketing=bucketer, variables=num_cols + cat_cols, lr_kwargs={"random_state": 411})
+    skorecard_model.fit(X, y)
+    assert bucketer.pre_pipeline_.named_steps['decisiontreebucketer'].random_state == 123
+    assert bucketer.pipeline_.named_steps['decisiontreebucketer'].random_state == 123
+    assert skorecard_model.pipeline_.named_steps['model'].random_state == 411
+
+    # Test with Pipeline
+
+    num_cols = ["LIMIT_BAL", "BILL_AMT1"]
+    cat_cols = ["EDUCATION", "MARRIAGE"]
+
+    bucket_pipe = make_pipeline(
+        DecisionTreeBucketer(variables=num_cols, max_n_bins=5),
+        OrdinalCategoricalBucketer(variables=cat_cols, tol=0.05)
+    )
+
+    skorecard_model = Skorecard(bucketing=bucket_pipe, variables=num_cols + cat_cols, random_state=411)
+    skorecard_model.fit(X, y)
+    assert skorecard_model.pipeline_.named_steps['bucketer']['decisiontreebucketer'].random_state == 411
+    assert skorecard_model.pipeline_.named_steps['model'].random_state == 411
