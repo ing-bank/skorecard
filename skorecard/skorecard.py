@@ -115,6 +115,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         encoder: str = "woe",
         variables: List = [],
         verbose: int = 0,
+        random_state: int = None,
         lr_kwargs: dict = {"solver": "lbfgs"},
         calculate_stats: bool = False,
     ):
@@ -136,6 +137,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             encoder (string): indicating the type of encoder. Currently only 'woe' (weight-of-evidence) is supported.
             variables (list): list of features after bucketing to fit the LogisticRegression model on. Defaults to None (all features selected).
             verbose (int): verbosity, set to 0 to avoid warning methods.
+            random_state (int): the random state that is passed to the LogisticRegression and all Bucketers that have this attribute
             lr_kwargs (dict): Settings passed to skorecard.linear_model.LogisticRegression.
                 By default no settings are passed.
             calculate_stats (bool): Passed to skorecard.linear_model.LogisticRegression.
@@ -146,8 +148,10 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.encoder = encoder
         self.variables = variables
         self.verbose = verbose
+        self.random_state = random_state
         self.lr_kwargs = lr_kwargs
         self.calculate_stats = calculate_stats
+        self.lr_kwargs.update({"random_state": self.random_state})
 
     def __repr__(self):
         """Pretty print self.
@@ -199,7 +203,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))
 
         return BucketingProcess(
-            specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline
+            specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline,
+            random_state=self.random_state
         )
 
     def _build_pipeline(self, X):
@@ -217,6 +222,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             self.bucketing_ = to_skorecard_pipeline(self.bucketing)
         else:
             self.bucketing_ = self.bucketing
+            if isinstance(self.bucketing_, BucketingProcess):
+                self.bucketing_.random_state = self.random_state
 
         # Note ColumnSelector will not select any columns if passed an empty list.
         self.pipeline_ = Pipeline(
