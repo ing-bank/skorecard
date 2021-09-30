@@ -10,6 +10,7 @@ from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
 from skorecard.utils.validation import ensure_dataframe, is_fitted
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
+from skorecard.pipeline.pipeline import _get_all_steps
 from skorecard.bucketers import (
     DecisionTreeBucketer,
     OptimalBucketer,
@@ -151,7 +152,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.random_state = random_state
         self.lr_kwargs = lr_kwargs
         self.calculate_stats = calculate_stats
-        self.lr_kwargs.update({"random_state": self.random_state})
+        if random_state is not None:
+            self.lr_kwargs.update({"random_state": self.random_state})
 
     def __repr__(self):
         """Pretty print self.
@@ -219,6 +221,12 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         if self.bucketing is None:
             self.bucketing_ = self._build_default_bucketing_process(X)
         elif isinstance(self.bucketing, Pipeline):
+            for step in _get_all_steps(self.bucketing):
+                if hasattr(step, "random_state") and self.random_state is not None:
+                    if step.random_state is not None:
+                        warnings.warn(f"Overwriting random_state of {step} with random_state of Skorecard", UserWarning)
+                    step.random_state = self.random_state
+
             self.bucketing_ = to_skorecard_pipeline(self.bucketing)
         else:
             self.bucketing_ = self.bucketing
