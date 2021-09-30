@@ -107,6 +107,7 @@ class BucketingProcess(
         bucketing_pipeline=make_pipeline(OptimalBucketer(max_n_bins=6, min_bin_size=0.05)),
         variables: List = [],
         specials: Dict = {},
+        random_state: int = None,
         remainder="passthrough",
     ):
         """
@@ -144,6 +145,7 @@ class BucketingProcess(
         self.remainder = remainder
         self.variables = variables
         self.specials = specials
+        self.random_state = random_state
 
     @property
     def name(self):
@@ -186,12 +188,23 @@ class BucketingProcess(
                     warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
                 step.variables = self.variables
 
+            # Overwrite random_state to bucketers
+            if hasattr(step, "random_state") and self.random_state is not None:
+                warnings.warn(f"Overwriting random_state of {step} with random_state of bucketingprocess", UserWarning)
+                step.random_state = self.random_state
+
         # Overwrite variables to all bucketers
         if len(self.variables) != 0:
             for step in _get_all_steps(self.pipeline_):
                 if len(step.variables) != 0:
                     warnings.warn(f"Overwriting variables of {step} with variables of bucketingprocess", UserWarning)
                 step.variables = self.variables
+        # Overwrite random_state to bucketers
+        for step in _get_all_steps(self.pipeline_):
+            if hasattr(step, "random_state") and self.random_state is not None:
+                warnings.warn(f"Overwriting random_state of {step} with random_state of bucketingprocess",
+                              UserWarning)
+                step.random_state = self.random_state
 
         self._prebucketing_specials = self.specials
         self._bucketing_specials = dict()  # will be determined later.
