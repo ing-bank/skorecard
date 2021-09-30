@@ -10,6 +10,7 @@ from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
 from skorecard.utils.validation import ensure_dataframe, is_fitted
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
+from skorecard.pipeline.pipeline import _get_all_steps
 from skorecard.bucketers import (
     DecisionTreeBucketer,
     OptimalBucketer,
@@ -115,6 +116,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         encoder: str = "woe",
         variables: List = [],
         verbose: int = 0,
+        random_state: int = None,
         lr_kwargs: dict = {"solver": "lbfgs"},
         calculate_stats: bool = False,
     ):
@@ -136,6 +138,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
             encoder (string): indicating the type of encoder. Currently only 'woe' (weight-of-evidence) is supported.
             variables (list): list of features after bucketing to fit the LogisticRegression model on. Defaults to None (all features selected).
             verbose (int): verbosity, set to 0 to avoid warning methods.
+            random_state (int): the random state that is passed to the LogisticRegression and all Bucketers that have this attribute
             lr_kwargs (dict): Settings passed to skorecard.linear_model.LogisticRegression.
                 By default no settings are passed.
             calculate_stats (bool): Passed to skorecard.linear_model.LogisticRegression.
@@ -146,8 +149,11 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         self.encoder = encoder
         self.variables = variables
         self.verbose = verbose
+        self.random_state = random_state
         self.lr_kwargs = lr_kwargs
         self.calculate_stats = calculate_stats
+        if random_state is not None:
+            self.lr_kwargs.update({"random_state": self.random_state})
 
     def __repr__(self):
         """Pretty print self.
@@ -199,7 +205,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))
 
         return BucketingProcess(
-            specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline
+            specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline,
+            random_state=self.random_state
         )
 
     def _build_pipeline(self, X):
@@ -214,9 +221,17 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         if self.bucketing is None:
             self.bucketing_ = self._build_default_bucketing_process(X)
         elif isinstance(self.bucketing, Pipeline):
+            for step in _get_all_steps(self.bucketing):
+                if hasattr(step, "random_state") and self.random_state is not None:
+                    if step.random_state is not None:
+                        warnings.warn(f"Overwriting random_state of {step} with random_state of Skorecard", UserWarning)
+                    step.random_state = self.random_state
+
             self.bucketing_ = to_skorecard_pipeline(self.bucketing)
         else:
             self.bucketing_ = self.bucketing
+            if isinstance(self.bucketing_, BucketingProcess):
+                self.bucketing_.random_state = self.random_state
 
         # Note ColumnSelector will not select any columns if passed an empty list.
         self.pipeline_ = Pipeline(

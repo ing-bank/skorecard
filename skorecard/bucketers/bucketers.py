@@ -552,7 +552,7 @@ class DecisionTreeBucketer(BaseBucketer):
         max_n_bins=100,
         missing_treatment="separate",
         min_bin_size=0.05,
-        random_state=42,
+        random_state=None,
         remainder="passthrough",
         dt_kwargs={},
     ) -> None:
@@ -600,6 +600,7 @@ class DecisionTreeBucketer(BaseBucketer):
         self.min_bin_size = min_bin_size
         self.random_state = random_state
         self.remainder = remainder
+        self.dt_kwargs.update({"random_state": self.random_state})
 
         check_args(dt_kwargs, DecisionTreeClassifier)
 
@@ -650,7 +651,6 @@ class DecisionTreeBucketer(BaseBucketer):
             binner = DecisionTreeClassifier(
                 max_leaf_nodes=(self.max_n_bins - n_special_bins),
                 min_samples_leaf=min_bin_size,
-                random_state=self.random_state,
                 **self.dt_kwargs,
             )
             binner.fit(X.values.reshape(-1, 1), y)

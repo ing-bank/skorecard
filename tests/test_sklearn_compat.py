@@ -58,8 +58,6 @@ nonmeta_checks = (
     estimator_checks.check_estimators_dtypes,
     estimator_checks.check_fit_score_takes_y,
     estimator_checks.check_dtype_object,
-    estimator_checks.check_sample_weights_pandas_series,
-    estimator_checks.check_sample_weights_list,
     estimator_checks.check_estimators_fit_returns_self,
     estimator_checks.check_complex_data,
     estimator_checks.check_estimators_empty_data_messages,
