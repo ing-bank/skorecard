@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from skorecard.utils import convert_sparse_matrix
 from sklearn.utils.validation import check_is_fitted
-
+from ..reporting import weight_plot
 
 class LogisticRegression(lm.LogisticRegression):
     """Extended Logistic Regression.
@@ -192,3 +192,29 @@ class LogisticRegression(lm.LogisticRegression):
         }
 
         return pd.DataFrame(data, index=self.names_)
+
+    def plot_weights(self):
+
+        """
+        Plots the relative importance of coefficients of the model.
+
+        Example:
+
+        ```from skorecard.datasets import load_uci_credit_card
+        from skorecard.bucketers import EqualFrequencyBucketer
+        from skorecard.linear_model import LogisticRegression
+        from reporting.plotting import weight_plot
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import OneHotEncoder
+        X, y = load_uci_credit_card(return_X_y=True)
+        pipeline = Pipeline([
+            ('bucketer', EqualFrequencyBucketer(n_bins=10)),
+            ('clf', LogisticRegression(calculate_stats=True))
+        ])
+        pipeline.fit(X, y)
+        assert pipeline.named_steps['clf'].p_val_coef_[0][0] > 0
+        stats = pipeline.named_steps['clf'].get_stats()
+        pipeline.named_steps['clf'].plot_weights()```
+        """
+        stats = self.get_stats()
+        weight_plot(stats)

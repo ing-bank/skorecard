@@ -266,7 +266,7 @@ def weight_plot(stats: pd.DataFrame):
     ```from skorecard.datasets import load_uci_credit_card
     from skorecard.bucketers import EqualFrequencyBucketer
     from skorecard.linear_model import LogisticRegression
-
+    from reporting.plotting import weight_plot
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import OneHotEncoder
     X, y = load_uci_credit_card(return_X_y=True)
@@ -282,8 +282,8 @@ def weight_plot(stats: pd.DataFrame):
     """
     fig = go.Figure()
 
-    stats["[0.025"] = stats["Coef."] - 1.96 * stats["Std.Err"]
-    stats["0.975]"] = stats["Coef."] + 1.96 * stats["Std.Err"]
+    stats["conf_interval_0.025"] = stats["Coef."] - 1.96 * stats["Std.Err"]
+    stats["conf_interval_0.975"] = stats["Coef."] + 1.96 * stats["Std.Err"]
 
     fig.add_trace(
         go.Scatter(
@@ -295,8 +295,8 @@ def weight_plot(stats: pd.DataFrame):
             error_x=dict(
                 type='data',
                 symmetric=False,
-                array=stats['0.975]'] - stats['Coef.'],
-                arrayminus=stats['Coef.'] - stats['[0.025'],
+                array=stats['conf_interval_0.975'] - stats['Coef.'],
+                arrayminus=stats['Coef.'] - stats['conf_interval_0.025'],
                 color='#68BBE3')
         )
     )
