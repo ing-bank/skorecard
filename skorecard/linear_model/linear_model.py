@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from skorecard.utils import convert_sparse_matrix
 from sklearn.utils.validation import check_is_fitted
-from ..reporting import weight_plot
+from skorecard.reporting import weight_plot
 
 class LogisticRegression(lm.LogisticRegression):
     """Extended Logistic Regression.
