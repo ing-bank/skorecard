@@ -203,7 +203,7 @@ class LogisticRegression(lm.LogisticRegression):
         ```from skorecard.datasets import load_uci_credit_card
         from skorecard.bucketers import EqualFrequencyBucketer
         from skorecard.linear_model import LogisticRegression
-        from reporting.plotting import weight_plot
+        from skorecard.reporting.plotting import weight_plot
         from sklearn.pipeline import Pipeline
         from sklearn.preprocessing import OneHotEncoder
         X, y = load_uci_credit_card(return_X_y=True)
@@ -217,4 +217,4 @@ class LogisticRegression(lm.LogisticRegression):
         pipeline.named_steps['clf'].plot_weights()```
         """
         stats = self.get_stats()
-        weight_plot(stats)
+        return weight_plot(stats)

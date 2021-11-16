@@ -70,7 +70,7 @@ def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
 
     # If we have bucket information, use that to colorize the bars
     # that means a prebucket table without information on the corresponding buckets
-    # wont have bars colorized.
+    # won't have bars colorized.
     if "bucket" in bucket_table.columns:
         bar_colors = [get_bucket_color(i) for i in bucket_table["bucket"].values]
         fig.update_traces(marker=dict(color=bar_colors), selector=dict(type="bar"))
@@ -107,7 +107,7 @@ def plot_prebucket_table(prebucket_table, column="", line="", format=None, scale
     fig.update_layout(title=f"pre-buckets: {column}".strip())
     fig.update_layout(xaxis_title=f"{column} pre-buckets".strip())
 
-    if format:
+    if format is not None:
         img_bytes = fig.to_image(format=format, scale=scale, width=width, height=height)
         fig = Image(img_bytes)
     return fig
@@ -266,7 +266,7 @@ def weight_plot(stats: pd.DataFrame):
     ```from skorecard.datasets import load_uci_credit_card
     from skorecard.bucketers import EqualFrequencyBucketer
     from skorecard.linear_model import LogisticRegression
-    from reporting.plotting import weight_plot
+    from skorecard.reporting.plotting import weight_plot
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import OneHotEncoder
     X, y = load_uci_credit_card(return_X_y=True)

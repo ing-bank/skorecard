@@ -5,4 +5,4 @@ from .plotting import (
     weight_plot
 )
 
-__all__ = ["build_bucket_table", "plot_bucket_table", "psi", "iv","weight_plot"]
+__all__ = ["build_bucket_table", "plot_bucket_table", "psi", "iv", "weight_plot"]
