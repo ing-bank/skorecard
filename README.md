@@ -54,7 +54,7 @@ ewb.fit_interactive(df)
 #> Dash app running on http://127.0.0.1:8050/
 ```
 
-![dash app example](docs/assets/img/dash_app_unsupervised_bucketer.png)
+![dash app example](./assets/img/dash_app_unsupervised_bucketer.png)
 
 ## Installation
 
