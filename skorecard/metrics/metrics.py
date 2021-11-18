@@ -19,7 +19,7 @@ def woe_1d(X, y, epsilon=0.00001):
         - counts_0: count of entries per bin where y==0
         - counts_1: count of entries per bin where y==1
     """
-    X = X.copy()
+    X = X.copy().reset_index(drop=True)
     if not isinstance(y, pd.Series):
         if y.shape[0] == X.shape[0]:
             y = pd.Series(y).reset_index(drop=True)
@@ -56,6 +56,7 @@ def woe_1d(X, y, epsilon=0.00001):
         msg = "Woe Calculation produced NaNs! "
         msg += "Perhaps check your target distribution contains more than 1 class."
         raise ValueError(msg)
+
     return t
 
 
