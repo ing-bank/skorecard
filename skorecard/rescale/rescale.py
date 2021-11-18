@@ -21,7 +21,7 @@ def calibrate_to_master_scale(y_pred, *, pdo, ref_score, ref_odds, epsilon=1e-6)
     Example:
         ref_score = 300 for ref_odds 50:1, and pdo = 25
         if the odds become 100:1, the score is 325.
-        if the odds become 200:1, the score is 355.
+        if the odds become 200:1, the score is 350.
         if the odds become 25:1, the score is 275.
 
     Args:
