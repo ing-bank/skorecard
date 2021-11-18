@@ -317,7 +317,7 @@ def psi(X1: pd.DataFrame, X2: pd.DataFrame, epsilon=0.0001, digits=None) -> Dict
     y2 = pd.Series(1, index=X2.index)
 
     X = pd.concat([X1, X2], axis=0)
-    y = pd.concat([y1, y2], axis=0)
+    y = pd.concat([y1, y2], axis=0).reset_index(drop=True)
 
     psis = {col: _IV_score(y, X[col], epsilon=epsilon, digits=digits) for col in X1.columns}
 
