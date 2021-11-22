@@ -266,16 +266,14 @@ def weight_plot(stats: pd.DataFrame):
     ```from skorecard.datasets import load_uci_credit_card
     from skorecard.bucketers import EqualFrequencyBucketer
     from skorecard.linear_model import LogisticRegression
-    from skorecard.reporting.plotting import weight_plot
+    from skorecard.reporting import weight_plot
     from sklearn.pipeline import Pipeline
-    from sklearn.preprocessing import OneHotEncoder
     X, y = load_uci_credit_card(return_X_y=True)
     pipeline = Pipeline([
         ('bucketer', EqualFrequencyBucketer(n_bins=10)),
         ('clf', LogisticRegression(calculate_stats=True))
     ])
     pipeline.fit(X, y)
-    assert pipeline.named_steps['clf'].p_val_coef_[0][0] > 0
     stats = pipeline.named_steps['clf'].get_stats()
 
     weight_plot(stats)```
