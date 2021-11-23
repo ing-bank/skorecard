@@ -277,6 +277,13 @@ def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height
     stats = pipeline.named_steps['clf'].get_stats()
 
     weight_plot(stats)```
+
+    Args:
+        stats: The statistics to display
+        format: The format of the image, such as 'png'. The default None returns a plotly image.
+        scale: If format is specified, the scale of the image
+        width: If format is specified, the width of the image
+        height: If format is specified, the image of the image
     """
     fig = go.Figure()
 
