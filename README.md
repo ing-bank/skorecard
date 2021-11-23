@@ -53,8 +53,7 @@ That also support a dash app to explore and update bucket boundaries:
 ewb.fit_interactive(df)
 #> Dash app running on http://127.0.0.1:8050/
 ```
-
-![dash app example](./docs/assets/img/dash_app_unsupervised_bucketer.png)
+<img src="https://github.com/ing-bank/skorecard/blob/main/docs/assets/img/dash_app_unsupervised_bucketer.png" width="120">
 
 ## Installation
 
