@@ -257,7 +257,7 @@ class PlotBucketMethod:
         )
 
 
-def weight_plot(stats: pd.DataFrame):
+def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height=None):
 
     """
     Generates a weight plot(plotly chart) from `stats`
@@ -312,5 +312,10 @@ def weight_plot(stats: pd.DataFrame):
         yaxis_showgrid=False
     )
     fig.update_layout(template="simple_white")
+
+    if format is not None:
+        img_bytes = fig.to_image(format=format, scale=scale, width=width, height=height)
+        fig = Image(img_bytes)
+    return fig
 
     return fig
