@@ -114,6 +114,7 @@ nav:
             - api/datasets/load_uci_credit_card.md
     - Discussion:
         - Benchmarks: discussion/benchmarks.ipynb
+        - Benchmarks with Explainable Boosting Classifier: discussion/benchmark_with_EBM.ipynb
 
 markdown_extensions:
     - codehilite:
