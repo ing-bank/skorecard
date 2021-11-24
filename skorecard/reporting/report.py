@@ -126,6 +126,10 @@ def build_bucket_table(
     stats["WoE"] = ((stats["% Non-event"] + epsilon) / (stats["% Event"] + epsilon)).apply(lambda x: np.log(x))
     stats["IV"] = (stats["% Non-event"] - stats["% Event"]) * stats["WoE"]
 
+    stats["% Event"] = np.round(100 * stats["% Event"], 2)
+    stats["% Non-event"] = np.round(100 * stats["% Non-event"], 2)
+    stats["Event Rate"] = np.round(stats["Event Rate"], 3)
+
     stats["WoE"] = np.round(stats["WoE"], 3)
     stats["IV"] = np.round(stats["IV"], 3)
 
@@ -140,6 +144,8 @@ def build_bucket_table(
         "Count (%)",
         "Non-event",
         "Event",
+        "% Event",
+        "% Non-event",
         "Event Rate",
         "WoE",
         "IV",
@@ -167,10 +173,10 @@ class BucketTableMethod:
         the BucketingProcess ends up with the final buckets.
         An example:
 
-        bucket     | label              | Count | Count (%) | Non-event | Event | Event Rate | WoE  |  IV
-        -----------|--------------------|-------|-----------|-----------|-------|------------|------|-----
-        0          | (-inf, 25000.0)    | 479.0 | 7.98      | 300.0     | 179.0 | 37.37      | 0.73 | 0.05
-        1          | [25000.0, 45000.0) | 370.0 | 6.17      | 233.0     | 137.0 | 37.03      | 0.71 | 0.04
+        bucket | label        | Count | Count (%) | Non-event | Event | % Event | % Non-event | Event Rate | WoE  | IV
+        -------|--------------|-------|-----------|-----------|-------|---------|-------------|------------|------|-----
+        0      | (-inf, 25.0) | 61.0  |	1.36      |	57.0	  | 4.0	  |  0.41	| 1.62        |	0.066      |1.380 |0.017
+        1      | [25.0, 45.0) | 2024.0|	44.98	  | 1536.0	  | 488.0 |	49.64	|43.67        |	0.241	   |-0.128|0.008
 
         Args:
             column: The column we wish to analyse

@@ -14,7 +14,7 @@ def test_report_decision_tree(df):
     tbt.transform(X)
 
     df_out = build_bucket_table(X, y, column="LIMIT_BAL", bucketer=tbt)
-    assert df_out.shape == (5, 9)
+    assert df_out.shape == (5, 11)
     # Make sure bucket table equals feature bucket mapping dict
     assert (
         dict(zip(df_out["bucket_id"].values, df_out["label"].values))
@@ -36,9 +36,9 @@ def test_report_decision_tree(df):
                 "Count (%)",
                 "Non-event",
                 "Event",
+                "% Event",
+                "% Non-event",
                 "Event Rate",
-                # "% Event",
-                # "% Non Event",
                 "WoE",
                 "IV",
             ]
