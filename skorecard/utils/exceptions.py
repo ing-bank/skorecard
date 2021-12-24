@@ -111,7 +111,6 @@ class NotInstalledError:
         else:
             msg += f"pip install skorecard[{self.dep}]\n\n"
 
-        msg += "See skorecard installation guide here: <TODO, link to our hosted docs>"
         self.msg = msg
 
     def __getattr__(self, *args, **kwargs):
