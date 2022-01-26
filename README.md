@@ -17,6 +17,8 @@
 
 Scorecards are ‘traditional’ models used by banks in the credit decision process. Internally, scorecards are Logistic Regression models that make use of features that are binned into different groups. The process of binning is usually done manually by experts, and `skorecard` provides tools to makes this process easier. `skorecard` is built on top of [scikit-learn](https://pypi.org/project/scikit-learn/) as well as other excellent open source projects like [optbinning](https://pypi.org/project/optbinning/), [dash](https://pypi.org/project/dash/) and [plotly](https://pypi.org/project/plotly/).
 
+:point_right: Read the [blogpost introducing skorecard](https://timvink.nl/introducing-skorecard/)
+
 ## Features ⭐
 
 - Automate bucketing of features inside scikit-learn pipelines.
