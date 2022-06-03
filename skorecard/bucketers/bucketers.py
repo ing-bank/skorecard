@@ -3,6 +3,7 @@ import yaml
 import numpy as np
 import pandas as pd
 from typing import List
+from joblib import Parallel, delayed
 
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.tree import DecisionTreeClassifier
@@ -56,6 +57,7 @@ class OptimalBucketer(BaseBucketer):
         cat_cutoff=None,
         time_limit=25,
         remainder="passthrough",
+        get_statistics=True,
         solver="cp",
         monotonic_trend="auto_asc_desc",
         gamma=0,
@@ -124,6 +126,7 @@ class OptimalBucketer(BaseBucketer):
         self.cat_cutoff = cat_cutoff
         self.time_limit = time_limit
         self.remainder = remainder
+        self.get_statistics = get_statistics
         self.solver = solver
         self.monotonic_trend = monotonic_trend
         self.gamma = gamma
@@ -225,7 +228,8 @@ class EqualWidthBucketer(BaseBucketer):
         variables=[],
         specials={},
         missing_treatment="separate",
-        remainder="passthrough",
+        remainder="passthrough", 
+        get_statistics=True
     ):
         """Init the class.
 
@@ -260,6 +264,7 @@ class EqualWidthBucketer(BaseBucketer):
         self.n_bins = n_bins
         self.specials = specials
         self.remainder = remainder
+        self.get_statistics = get_statistics
 
     @property
     def variables_type(self):
@@ -325,6 +330,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
+        get_statistics=True,
         **kwargs,
     ):
         """Init the class.
@@ -361,6 +367,7 @@ class AgglomerativeClusteringBucketer(BaseBucketer):
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
+        self.get_statistics = get_statistics
         self.kwargs = kwargs
 
     @property
@@ -432,6 +439,7 @@ class EqualFrequencyBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
+        get_statistics=True
     ):
         """Init the class.
 
@@ -466,6 +474,8 @@ class EqualFrequencyBucketer(BaseBucketer):
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
+        self.get_statistics = get_statistics
+        
 
     @property
     def variables_type(self):
@@ -554,6 +564,7 @@ class DecisionTreeBucketer(BaseBucketer):
         min_bin_size=0.05,
         random_state=None,
         remainder="passthrough",
+        get_statistics=True,
         dt_kwargs={},
     ) -> None:
         """Init the class.
@@ -600,6 +611,7 @@ class DecisionTreeBucketer(BaseBucketer):
         self.min_bin_size = min_bin_size
         self.random_state = random_state
         self.remainder = remainder
+        self.get_statistics = get_statistics
         self.dt_kwargs.update({"random_state": self.random_state})
 
         check_args(dt_kwargs, DecisionTreeClassifier)
@@ -707,6 +719,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
         encoding_method="frequency",
         missing_treatment="separate",
         remainder="passthrough",
+        get_statistics=True
     ):
         """
         Init the class.
@@ -753,6 +766,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
         self.encoding_method = encoding_method
         self.missing_treatment = missing_treatment
         self.remainder = remainder
+        self.get_statistics = get_statistics
 
     @property
     def variables_type(self):
@@ -842,6 +856,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
+        get_statistics=True
     ):
         """Init the class.
 
@@ -874,6 +889,8 @@ class AsIsCategoricalBucketer(BaseBucketer):
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
+        self.get_statistics = get_statistics
+        
 
     @property
     def variables_type(self):
@@ -931,7 +948,8 @@ class AsIsNumericalBucketer(BaseBucketer):
         variables=[],
         specials={},
         missing_treatment="separate",
-        remainder="passthrough",
+        remainder="passthrough", 
+        get_statistics=True
     ):
         """
         Init the class.
@@ -969,6 +987,8 @@ class AsIsNumericalBucketer(BaseBucketer):
         self.specials = specials
         self.missing_treatment = missing_treatment
         self.remainder = remainder
+        self.get_statistics = get_statistics
+        
 
     @property
     def variables_type(self):
@@ -1053,7 +1073,8 @@ class UserInputBucketer(BaseBucketer):
         self,
         features_bucket_mapping=None,
         variables: List = [],
-        remainder="passthrough",
+        remainder="passthrough", 
+        get_statistics=True
     ) -> None:
         """
         Initialise the user-defined boundaries with a dictionary.
@@ -1076,6 +1097,8 @@ class UserInputBucketer(BaseBucketer):
         # https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator
         self.features_bucket_mapping = features_bucket_mapping
         self.remainder = remainder
+        self.get_statistics = get_statistics
+        
         self.variables = variables
 
         if features_bucket_mapping is None:
