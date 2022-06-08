@@ -46,7 +46,7 @@ utils_dep = ["optbinning>=0.8.0"]
 
 setup(
     name="skorecard",
-    version="1.6.3",
+    version="1.6.4",
     description="Tools for building scorecard models in python, with a sklearn-compatible API",
     long_description=long_description,
     long_description_content_type="text/markdown",
