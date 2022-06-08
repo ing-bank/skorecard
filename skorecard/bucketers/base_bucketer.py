@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import itertools
 import pathlib
+from joblib import Parallel, delayed
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, check_array
@@ -255,7 +256,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         self.bucket_tables_ = {}
 
         for feature in self.variables_:
-
             # filter specials for the fit
             if feature in self.specials.keys():
                 special = self.specials[feature]
@@ -274,7 +274,8 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
             self._update_column_fit(X, y, feature, special, splits, right)
 
-        self._generate_summary(X, y)
+        if self.get_statistics: 
+            self._generate_summary(X, y)
 
         return self
 
@@ -300,39 +301,40 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         )
 
         # Calculate the bucket table
-        self.bucket_tables_[feature] = build_bucket_table(
-            X,
-            y,
-            column=feature,
-            bucket_mapping=self.features_bucket_mapping_.get(feature),
-        )
-
-        if self.missing_treatment in [
-            "most_frequent",
-            "most_risky",
-            "least_risky",
-            "neutral",
-            "similar",
-            "passthrough",
-        ]:
-            missing_bucket = self._find_missing_bucket(feature=feature)
-            # Repeat above procedure now we know the bucket distribution
-            self.features_bucket_mapping_[feature] = BucketMapping(
-                feature_name=feature,
-                type=self.variables_type,
-                missing_bucket=missing_bucket,
-                map=splits,
-                right=right,
-                specials=special,
-
-            )
-
-            # Recalculate the bucket table with the new bucket for missings
+        if self.get_statistics: 
             self.bucket_tables_[feature] = build_bucket_table(
                 X,
                 y,
                 column=feature,
                 bucket_mapping=self.features_bucket_mapping_.get(feature),
+            )
+
+            if self.missing_treatment in [
+                "most_frequent",
+                "most_risky",
+                "least_risky",
+                "neutral",
+                "similar",
+                "passthrough",
+            ]:
+                missing_bucket = self._find_missing_bucket(feature=feature)
+                # Repeat above procedure now we know the bucket distribution
+                self.features_bucket_mapping_[feature] = BucketMapping(
+                    feature_name=feature,
+                    type=self.variables_type,
+                    missing_bucket=missing_bucket,
+                    map=splits,
+                    right=right,
+                    specials=special,
+
+                )
+
+                # Recalculate the bucket table with the new bucket for missings
+                self.bucket_tables_[feature] = build_bucket_table(
+                    X,
+                    y,
+                    column=feature,
+                    bucket_mapping=self.features_bucket_mapping_.get(feature),
             )
 
         if generate_summary:
