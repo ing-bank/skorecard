@@ -17,7 +17,7 @@ def build_bucket_table(
     column: str,
     bucketer=None,
     bucket_mapping: Optional[BucketMapping] = None,
-    epsilon=0.00001,
+    epsilon=1,
     display_missing=True,
     verbose=False,
 ) -> pd.DataFrame:
@@ -82,12 +82,12 @@ def build_bucket_table(
         col_bucket_mapping = bucket_dict.get(column)
 
     X_transform = pd.DataFrame(data={"bucket_id": col_bucket_mapping.transform(X[column])}, index=X.index)
-    
+
     if y is not None:
         X_transform["Event"] = y
     else:
         X_transform["Event"] = np.nan
-    
+
     # If missing_treatment == passthrough, we reformat the bucket_id and un-do this later
     X_transform["bucket_id"].fillna(31415926535, inplace=True)
 
@@ -123,7 +123,10 @@ def build_bucket_table(
     stats["% Event"] = stats["Event"] / stats["Event"].sum()
     stats["% Non-event"] = stats["Non-event"] / stats["Non-event"].sum()
 
-    stats["WoE"] = ((stats["% Non-event"] + epsilon) / (stats["% Event"] + epsilon)).apply(lambda x: np.log(x))
+    event_percentage = (stats["Event"] + epsilon) / (stats["Event"].sum() + 2 * epsilon)
+    non_event_percentage = (stats["Non-event"] + epsilon) / (stats["Non-event"].sum() + 2 * epsilon)
+    stats["WoE"] = (event_percentage / non_event_percentage).apply(lambda x: np.log(x))
+
     stats["IV"] = (stats["% Non-event"] - stats["% Event"]) * stats["WoE"]
 
     stats["% Event"] = np.round(100 * stats["% Event"], 2)
@@ -154,7 +157,9 @@ def build_bucket_table(
     # A little reformatting for if missing_treatment is passthrough
     if 31415926535 in stats["bucket_id"].values:
         stats["label"] = np.where(stats["bucket_id"] == 31415926535, "Missing", stats["label"])
-        stats = stats.drop_duplicates(subset=["label"], keep="last").reset_index(drop=True).replace([31415926535], np.nan)
+        stats = (
+            stats.drop_duplicates(subset=["label"], keep="last").reset_index(drop=True).replace([31415926535], np.nan)
+        )
     return stats.sort_values(by="bucket_id")[columns]
 
 
