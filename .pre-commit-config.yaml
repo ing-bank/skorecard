@@ -6,7 +6,7 @@ repos:
       entry: black
       language: python_venv
       types: [python]
-      language_version: python3.8
+      language_version: python3
       args: [--line-length=120]
   - repo: local
     hooks:
