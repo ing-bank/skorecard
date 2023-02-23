@@ -58,3 +58,15 @@ def check_args(args: Dict, obj):
         if arg not in valid_args:
             msg = f"Argument '{arg}' is not a valid argument for object '{obj}'"
             warnings.warn(msg)
+
+
+def check_suppressor_effect(coefs: list, feat_names: list):
+    """Checks if the coefficients all have the expected sign."""
+    suspect_feats = []
+    for i, c in enumerate(coefs):
+        if c < 0:
+            suspect_feats.append(feat_names[i])
+    if len(suspect_feats) != 0:
+        msg = f"Features found with coefficient-sign that is contrary to what is expected based on weight-of-evidence. \
+                This is likely caused by multi-collinearity. The features are: {suspect_feats}"
+        warnings.warn(msg)

@@ -8,7 +8,7 @@ from category_encoders.woe import WOEEncoder
 
 from skorecard.linear_model import LogisticRegression
 from skorecard.utils import BucketerTypeError
-from skorecard.utils.validation import ensure_dataframe, is_fitted
+from skorecard.utils.validation import ensure_dataframe, is_fitted, check_suppressor_effect
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 from skorecard.pipeline.pipeline import _get_all_steps
 from skorecard.bucketers import (
@@ -205,8 +205,10 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         bucketing_pipeline = to_skorecard_pipeline(make_pipeline(*bucketing_pipe))
 
         return BucketingProcess(
-            specials=self.specials, prebucketing_pipeline=prebucketing_pipeline, bucketing_pipeline=bucketing_pipeline,
-            random_state=self.random_state
+            specials=self.specials,
+            prebucketing_pipeline=prebucketing_pipeline,
+            bucketing_pipeline=bucketing_pipeline,
+            random_state=self.random_state,
         )
 
     def _build_pipeline(self, X):
@@ -275,6 +277,8 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         # Save some stuff for scikitlearn
         self.coef_ = self.pipeline_[-1].coef_
         self.n_features_in_ = len(X.columns)
+
+        check_suppressor_effect(self.coef_[0], X.columns)
 
         return self
 
