@@ -1,5 +1,6 @@
 import warnings
 import numpy as np
+import pandas as pd
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
@@ -338,9 +339,22 @@ class Skorecard(BaseEstimator, ClassifierMixin):
 
     def summary(self):
         """Get the summary of all the bucketers."""
-        raise NotImplementedError("Not implemented yet")
+        # raise NotImplementedError("Not implemented yet")
         check_is_fitted(self)
         return self.bucketing_.summary()
+
+    def get_correlation(self, X, method="pearson"):
+        """Get correlation matrix and VIF-values for transformed features."""
+        X_transform = self.woe_transform(X)
+        correlation = X_transform.corr(method)
+
+        vif = pd.DataFrame(index=X_transform.columns)
+        corr_inv = np.linalg.inv(correlation.to_numpy())
+        vif["VIF"] = np.diagonal(corr_inv)
+
+        self.correlation_dict_ = {"correlation": correlation, "vif": vif}
+
+        return self.correlation_dict_
 
     def prebucket_table(self, column):
         """Get the prebucket_table.
