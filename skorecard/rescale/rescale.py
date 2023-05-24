@@ -142,10 +142,13 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
         # Reduce the list of tables, to build the final scorecard feature points
         scorecard = reduce(lambda x, y: pd.concat([x, y]), list_dfs)
-        scorecard = scorecard.append(
-            {"feature": "Intercept", "coef": self.model.intercept_[0], "bin_index": 0, "map": 0, "woe": 0},
-            ignore_index=True,
-        )
+        scorecard = pd.concat([
+            scorecard,
+            pd.DataFrame.from_records([
+                {"feature": "Intercept", "coef": self.model.intercept_[0], "bin_index": 0, "map": 0, "woe": 0}
+            ])
+        ], ignore_index=True)
+
         #     return buckets, woes
         scorecard["contribution"] = scorecard["woe"] * scorecard["coef"]
 
