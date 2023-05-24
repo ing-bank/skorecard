@@ -128,7 +128,7 @@ def build_bucket_table(
     stats["WoE"] = (event_percentage / non_event_percentage).apply(lambda x: np.log(x))
     stats.loc[stats["Count"] == 0, "WoE"] = np.nan
 
-    stats["IV"] = (stats["% Non-event"] - stats["% Event"]) * stats["WoE"]
+    stats["IV"] = abs((stats["% Non-event"] - stats["% Event"]) * stats["WoE"])
 
     stats["% Event"] = np.round(100 * stats["% Event"], 2)
     stats["% Non-event"] = np.round(100 * stats["% Non-event"], 2)
