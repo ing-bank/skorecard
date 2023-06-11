@@ -51,14 +51,15 @@ all = [
     "pre-commit>=2.5.0",
     "pytest>=6.0.0",
     "pytest-cov>=2.10.0",
+    "pyflakes>=3.0.1",
     "isort>=5.12.0",
     "codespell>=2.2.4",
     "ruff>=0.0.272",
     "mypy>=0.770",
     # Mypy type stubs
     "types-PyYAML>=6.0.12.10",
-    "types-six",
-    "types-decorator",
+    "types-six>=1.16.21.8",
+    "types-decorator>=5.1.8.3",
     # Doc dependencies
     "mkdocs>=1.1.2",
     "mkdocs-material>=7.1",
