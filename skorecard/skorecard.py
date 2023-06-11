@@ -17,7 +17,7 @@ from skorecard.bucketers import (
 )
 from skorecard.preprocessing import ColumnSelector
 
-from typing import List
+from typing import Optional, List
 
 ignores = [
     (
@@ -116,7 +116,7 @@ class Skorecard(BaseEstimator, ClassifierMixin):
         encoder: str = "woe",
         variables: List = [],
         verbose: int = 0,
-        random_state: int = None,
+        random_state: Optional[int] = None,
         lr_kwargs: dict = {"solver": "lbfgs"},
         calculate_stats: bool = False,
     ):

@@ -17,7 +17,6 @@ repos:
       name: 'ruff nb: Check for errors, styling issues and complexity'
     - id: nbqa-mypy
       name: 'mypy nb: Static type checking'
-      # args: ["--exclude 'skorecard'"]
     # - id: nbqa-isort
     #   name: 'isort nb: Sort file imports'
     # - id: nbqa-pyupgrade

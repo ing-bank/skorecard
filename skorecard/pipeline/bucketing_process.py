@@ -20,7 +20,7 @@ from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_featu
 from skorecard.utils.validation import is_fitted, ensure_dataframe
 from skorecard.utils.exceptions import NotInstalledError
 
-from typing import Dict, TypeVar, List
+from typing import Optional, Dict, TypeVar, List
 
 
 # JupyterDash
@@ -107,7 +107,7 @@ class BucketingProcess(
         bucketing_pipeline=make_pipeline(OptimalBucketer(max_n_bins=6, min_bin_size=0.05)),
         variables: List = [],
         specials: Dict = {},
-        random_state: int = None,
+        random_state: Optional[int] = None,
         remainder="passthrough",
     ):
         """
