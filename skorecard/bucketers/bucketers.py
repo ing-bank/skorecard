@@ -227,7 +227,7 @@ class EqualWidthBucketer(BaseBucketer):
         variables=[],
         specials={},
         missing_treatment="separate",
-        remainder="passthrough", 
+        remainder="passthrough",
         get_statistics=True
     ):
         """Init the class.
@@ -474,7 +474,7 @@ class EqualFrequencyBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
+
 
     @property
     def variables_type(self):
@@ -889,7 +889,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
+
 
     @property
     def variables_type(self):
@@ -947,7 +947,7 @@ class AsIsNumericalBucketer(BaseBucketer):
         variables=[],
         specials={},
         missing_treatment="separate",
-        remainder="passthrough", 
+        remainder="passthrough",
         get_statistics=True
     ):
         """
@@ -987,7 +987,7 @@ class AsIsNumericalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
+
 
     @property
     def variables_type(self):
@@ -1072,7 +1072,7 @@ class UserInputBucketer(BaseBucketer):
         self,
         features_bucket_mapping=None,
         variables: List = [],
-        remainder="passthrough", 
+        remainder="passthrough",
         get_statistics=True
     ) -> None:
         """
@@ -1097,7 +1097,7 @@ class UserInputBucketer(BaseBucketer):
         self.features_bucket_mapping = features_bucket_mapping
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
+
         self.variables = variables
 
         if features_bucket_mapping is None:

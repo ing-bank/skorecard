@@ -206,7 +206,7 @@ class BucketMapping:
         if isinstance(x, list):
             x = pd.Series(x)
         assert isinstance(x, pd.core.series.Series)
-        
+
         # Workaround for missings
         def to_int(x):
             if not np.isnan(x):

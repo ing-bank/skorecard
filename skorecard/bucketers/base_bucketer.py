@@ -273,7 +273,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
             self._update_column_fit(X, y, feature, special, splits, right)
 
-        if self.get_statistics: 
+        if self.get_statistics:
             self._generate_summary(X, y)
 
         return self
@@ -300,7 +300,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
         )
 
         # Calculate the bucket table
-        if self.get_statistics: 
+        if self.get_statistics:
             self.bucket_tables_[feature] = build_bucket_table(
                 X,
                 y,

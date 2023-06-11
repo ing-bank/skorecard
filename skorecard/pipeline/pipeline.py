@@ -127,7 +127,7 @@ def find_bucketing_step(pipeline: Pipeline, identifier: str = "bucketingprocess"
         If you do not need prebucketing simply leave it empty.
 
         Example:
-        
+
         ```python
         from sklearn.pipeline import make_pipeline
         from skorecard.pipeline import make_bucketing_pipeline, make_prebucketing_pipeline
@@ -147,9 +147,9 @@ def find_bucketing_step(pipeline: Pipeline, identifier: str = "bucketingprocess"
         msg = """
         You need to identity only the bucketing step,
         using skorecard.pipeline.make_bucketing_pipeline and skorecard.pipeline.make_prebucketing_pipeline only once.
-        
+
         Example:
-        
+
         ```python
         from skorecard.pipeline import make_bucketing_pipeline
         bucket_pipeline = make_bucketing_pipeline(

@@ -183,7 +183,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
                 BUCK_similar.bucket_table(feature)["bucket"] == closest_bucket
             ].reset_index()["label"][0]
         )
-    
+
     BUCK_passthrough = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="passthrough")
     BUCK_passthrough.fit(X, y)
 
