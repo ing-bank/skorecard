@@ -22,6 +22,14 @@ We use [pre-commit](https://pre-commit.com/) hooks to ensure code styling. Insta
 pre-commit install
 ```
 
+Now if you install it (which you are encouraged to do), you are encouraged to do the following command before committing your work:
+
+```shell
+pre-commit run --all-files
+```
+
+This will allow you to quickly see if the work you made contains some adaptions that you still might need to make before a pull request is accepted.
+
 ## Documentation
 
 We use [mkdocs](https://www.mkdocs.org) with [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme. The docs are structured using the [divio documentation system](https://documentation.divio.com/). To view the docs locally:
