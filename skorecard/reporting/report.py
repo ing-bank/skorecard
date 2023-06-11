@@ -289,7 +289,7 @@ def psi(X1: pd.DataFrame, X2: pd.DataFrame, epsilon=0.0001, digits=None) -> Dict
     `X1` and `X2` should be bucketed (outputs of fitted bucketers).
 
     $$
-    PSI = \sum((\%{ Good } - \%{ Bad }) \times \ln \frac{\%{ Good }}{\%{ Bad }})
+    PSI = \\sum((\\%{ Good } - \\%{ Bad }) \times \\ln \frac{\\%{ Good }}{\\%{ Bad }})
     $$
 
     Args:
@@ -337,7 +337,7 @@ def psi(X1: pd.DataFrame, X2: pd.DataFrame, epsilon=0.0001, digits=None) -> Dict
 
 
 def iv(X: pd.DataFrame, y: pd.Series, epsilon: float = 0.0001, digits: Optional[int] = None) -> Dict:
-    """
+    r"""
     Calculate the Information Value (IV) of the features in `X`.
 
     `X` must be the output of fitted bucketers.

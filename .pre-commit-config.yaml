@@ -52,12 +52,12 @@ repos:
       language: system
       types: [python]
       args: ['-L missings,bu'] # Skip the word "missings" and "bu"
-  # - repo: https://github.com/asottile/pyupgrade
-  #   rev: v3.4.0
-  #   hooks:
-  #   - id: pyupgrade
-  #     name: 'pyupgrade: Updates code to Python 3.8+ code convention'
-  #     args: [*py_version]
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.4.0
+    hooks:
+    - id: pyupgrade
+      name: 'pyupgrade: Updates code to Python 3.8+ code convention'
+      args: [*py_version]
   # - repo: local
   #   hooks:
   #   - id: black

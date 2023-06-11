@@ -290,7 +290,7 @@ def test_bucketing_process_summary(df):
 
     bucketing_process.fit(X, y)
     table = bucketing_process.summary()
-    assert set(table.columns) == set(["column", "num_prebuckets", "num_buckets", "IV_score", "dtype"])
+    assert set(table.columns) == {"column", "num_prebuckets", "num_buckets", "IV_score", "dtype"}
     assert table[table["column"] == "pet_ownership"]["num_prebuckets"].values[0] == "not_prebucketed"
     assert table[table["column"] == "pet_ownership"]["num_buckets"].values[0] == "not_bucketed"
     assert len(table["dtype"].unique()) == 3

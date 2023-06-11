@@ -1090,7 +1090,7 @@ class UserInputBucketer(BaseBucketer):
         if features_bucket_mapping is None:
             self.features_bucket_mapping_ = FeaturesBucketMapping()
         elif isinstance(features_bucket_mapping, str):
-            buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
+            buckets_yaml = yaml.safe_load(open(features_bucket_mapping))
             self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
         elif isinstance(features_bucket_mapping, dict):
             self.features_bucket_mapping_ = FeaturesBucketMapping(features_bucket_mapping)

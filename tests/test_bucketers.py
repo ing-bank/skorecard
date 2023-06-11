@@ -384,4 +384,4 @@ def test_summary_no_bins(bucketer, df):
     BUCK.fit(X, y)
     summary_table = BUCK.summary()
     assert summary_table.shape[0] == 6
-    assert set(summary_table.columns) == set(["column", "num_prebuckets", "num_buckets", "IV_score", "dtype"])
+    assert set(summary_table.columns) == {"column", "num_prebuckets", "num_buckets", "IV_score", "dtype"}

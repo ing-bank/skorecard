@@ -78,7 +78,7 @@ class LogisticRegression(lm.LogisticRegression):
         Args:
             calculate_stats (bool): If true, calculate statistics like standard error during fit, accessible with .get_stats()
         """  # noqa
-        super(LogisticRegression, self).__init__(
+        super().__init__(
             penalty=penalty,
             dual=dual,
             tol=tol,

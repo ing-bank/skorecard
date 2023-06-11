@@ -93,7 +93,7 @@ class BucketMapping:
                 if not np.isnan(self.missing_bucket):
                     assert (
                         self.missing_bucket <= max_bucket
-                    ), "map '%s' corresponds buckets 0-%s but missing_bucket is set to %s" % (
+                    ), "map '{}' corresponds buckets 0-{} but missing_bucket is set to {}".format(
                         self.map,
                         max_bucket,
                         self.missing_bucket,
@@ -137,7 +137,9 @@ class BucketMapping:
 
             # Set 'other' bucket
             if self.other_bucket is not None:
-                assert self.other_bucket in self.map.values(), "other_bucket '%s' does not exist in map values: %s" % (
+                assert (
+                    self.other_bucket in self.map.values()
+                ), "other_bucket '{}' does not exist in map values: {}".format(
                     self.other_bucket,
                     self.map,
                 )
@@ -151,7 +153,7 @@ class BucketMapping:
                 if self.missing_bucket not in [-2, -1, np.nan]:
                     assert (
                         self.missing_bucket in self.map.values()
-                    ), "missing_bucket '%s' does not exist in map values: %s" % (self.missing_bucket, self.map)
+                    ), f"missing_bucket '{self.missing_bucket}' does not exist in map values: {self.map}"
 
                 self._missing_bucket = self.missing_bucket
             else:
