@@ -22,8 +22,8 @@ repos:
     - id: nbqa-pyupgrade
       name: 'pyupgrade nb: Updates code to Python 3.8+ code convention'
       args: [&py_version --py37-plus]
-    # - id: nbqa-black
-    #   name: 'black nb: PEP8 compliant code formatter'
+    - id: nbqa-black
+      name: 'black nb: PEP8 compliant code formatter'
   # - repo: local
   #   hooks:
   #   - id: mypy
