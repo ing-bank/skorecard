@@ -147,7 +147,6 @@ class LogisticRegression(lm.LogisticRegression):
         # Index 0 corresponds to the intercept, from index 1 onwards it relates to the coefficients
         # If fit intercept is False, then all the values are related to the coefficients
         if lr.fit_intercept:
-
             self.std_err_intercept_ = std_err[:, 0]
             self.std_err_coef_ = std_err[:, 1:][0]
 
@@ -196,7 +195,6 @@ class LogisticRegression(lm.LogisticRegression):
         return pd.DataFrame(data, index=self.names_)
 
     def plot_weights(self):
-
         """
         Plots the relative importance of coefficients of the model.
 

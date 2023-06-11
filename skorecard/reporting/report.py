@@ -76,7 +76,6 @@ def build_bucket_table(
         col_bucket_mapping = bucket_mapping
 
     if not bucket_mapping and bucketer:
-
         bucket_dict = bucketer.features_bucket_mapping_
 
         col_bucket_mapping = bucket_dict.get(column)

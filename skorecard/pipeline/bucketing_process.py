@@ -187,8 +187,9 @@ class BucketingProcess(
             # Overwrite random_state to bucketers
             if hasattr(step, "random_state") and self.random_state is not None:
                 if step.random_state is not None:
-                    warnings.warn(f"Overwriting random_state of {step} with random_state of bucketingprocess",
-                                  UserWarning)
+                    warnings.warn(
+                        f"Overwriting random_state of {step} with random_state of bucketingprocess", UserWarning
+                    )
                 step.random_state = self.random_state
 
         # Overwrite variables to all bucketers
@@ -202,8 +203,9 @@ class BucketingProcess(
         for step in _get_all_steps(self.pipeline_):
             if hasattr(step, "random_state") and self.random_state is not None:
                 if step.random_state is not None:
-                    warnings.warn(f"Overwriting random_state of {step} with random_state of bucketingprocess",
-                                  UserWarning)
+                    warnings.warn(
+                        f"Overwriting random_state of {step} with random_state of bucketingprocess", UserWarning
+                    )
                 step.random_state = self.random_state
 
         self._prebucketing_specials = self.specials

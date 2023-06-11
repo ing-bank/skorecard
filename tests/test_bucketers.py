@@ -124,7 +124,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the riskiest bucket when missings are in a separate bucket
         riskiest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=False)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -141,7 +141,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the safest bucket when missings are in a separate bucket
         safest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=True)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -223,7 +223,7 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the riskiest bucket when missings are in a separate bucket
         riskiest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=False)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -240,7 +240,7 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the safest bucket when missings are in a separate bucket
         safest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=True)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -296,7 +296,6 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
         original_index_missings = X[X[feature].isnull()][feature].index
         trans_index_missings = X_trans[X_trans[feature].isnull()][feature].index
         assert all(original_index_missings[i] == trans_index_missings[i] for i in range(len(original_index_missings)))
-
 
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)

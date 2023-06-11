@@ -102,7 +102,6 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         self._calculate_scorecard_points()
 
     def _get_pipeline_elements(self):
-
         bucketers = self.skorecard_model.pipeline_.named_steps["bucketer"]
         woe_enc = self.skorecard_model.pipeline_.named_steps["encoder"]
         self.features = self.skorecard_model.variables
@@ -125,7 +124,6 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         self.woes = {k: woe_dict[k] for k in woe_dict.keys() if k in self.features}
 
     def _calculate_scorecard_points(self):
-
         # Put together the features in a list of table, containing all the buckets.
         list_dfs = list()
         for ix, col in enumerate(self.features):

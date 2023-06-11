@@ -58,11 +58,11 @@ repos:
     - id: pyupgrade
       name: 'pyupgrade: Updates code to Python 3.8+ code convention'
       args: [*py_version]
-  # - repo: local
-  #   hooks:
-  #   - id: black
-  #     name: 'black: PEP8 compliant code formatter'
-  #     entry: black
-  #     language: python
-  #     types: [python]
-  #     language_version: python3
+  - repo: local
+    hooks:
+    - id: black
+      name: 'black: PEP8 compliant code formatter'
+      entry: black
+      language: python
+      types: [python]
+      language_version: python3
