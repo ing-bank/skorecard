@@ -1,9 +1,9 @@
+import numpy as np
+import pandas as pd
+import pytest
+
 from skorecard import datasets
 from skorecard.bucketers import DecisionTreeBucketer
-import pandas as pd
-import numpy as np
-
-import pytest
 
 
 @pytest.fixture()

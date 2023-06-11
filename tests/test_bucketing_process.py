@@ -1,14 +1,13 @@
+import pytest
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.bucketers.bucketers import AsIsCategoricalBucketer, UserInputBucketer
-from skorecard.bucketers import OptimalBucketer, DecisionTreeBucketer
-from skorecard.preprocessing import WoeEncoder
 from skorecard.pipeline import BucketingProcess
 from skorecard.pipeline.bucketing_process import _find_remapped_specials
-from skorecard.utils import NotPreBucketedError, NotBucketObjectError, NotBucketedError
-
-from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import LogisticRegression
-
-import pytest
+from skorecard.preprocessing import WoeEncoder
+from skorecard.utils import NotBucketedError, NotBucketObjectError, NotPreBucketedError
 
 
 def test_bucketing_process_order(df):

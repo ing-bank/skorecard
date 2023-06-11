@@ -1,6 +1,8 @@
 from typing import List
-from skorecard.utils.validation import ensure_dataframe
+
 from sklearn.base import BaseEstimator, TransformerMixin
+
+from skorecard.utils.validation import ensure_dataframe
 
 
 class ColumnSelector(BaseEstimator, TransformerMixin):

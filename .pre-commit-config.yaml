@@ -24,26 +24,26 @@ repos:
       args: [&py_version --py37-plus]
     - id: nbqa-black
       name: 'black nb: PEP8 compliant code formatter'
-  # - repo: local
-  #   hooks:
-  #   - id: mypy
-  #     name: 'mypy: Static type checking'
-  #     entry: mypy
-  #     language: system
-  #     types: [python]
-  # - repo: local
-  #   hooks:
-  #   - id: ruff
-  #     name: 'ruff: Check for errors, styling issues and complexity'
-  #     entry: ruff
-  #     language: system
-  # - repo: local
-  #   hooks:
-  #   - id: isort
-  #     name: 'isort: Sort file imports'
-  #     entry: isort
-  #     language: system
-  #     types: [python]
+  - repo: local
+    hooks:
+    - id: ruff
+      name: 'ruff: Check for errors, styling issues and complexity'
+      entry: ruff
+      language: system
+  - repo: local
+    hooks:
+    - id: mypy
+      name: 'mypy: Static type checking'
+      entry: mypy
+      language: system
+      types: [python]
+  - repo: local
+    hooks:
+    - id: isort
+      name: 'isort: Sort file imports'
+      entry: isort
+      language: system
+      types: [python]
   # - repo: local
   #   hooks:
   #   - id: codespell

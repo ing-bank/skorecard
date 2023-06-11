@@ -51,6 +51,7 @@ all = [
     "black>=19.10b0",
     "pre-commit>=2.5.0",
     "mypy>=0.770",
+    "types-PyYAML>=6.0.12.10",
     "pytest>=6.0.0",
     "pytest-cov>=2.10.0",
     "isort>=5.12.0",
@@ -77,12 +78,6 @@ mypy = ["--install-types", "--non-interactive", "--ignore-missing-imports"]
 isort = ["--profile=black"]
 black = ["--line-length=120"]
 
-[tool.mypy]
-python_version = "3.8"
-ignore_missing_imports = true
-namespace_packages = true
-pretty = true
-
 [tool.ruff]
 line-length = 120
 # D100 requires all Python files (modules) to have a "public" docstring even if all functions within have a docstring.
@@ -97,11 +92,17 @@ line-length = 120
 # D417 Missing argument descriptions in the docstring # Only ignored because of false positve when using multiline args.
 # E731 do not assign a lambda expression, use a def
 ignore = ["D100", "D104", "D202", "D212", "D200", "E203", "E731", "W293", "D412", "D417", "D411", "RUF100"]
-extend-exclude = ["docs", "mkdocs.yml", ".github", "*md", "LICENSE", ".pre-commit-config.yaml", ".gitignore"]
+extend-exclude = ["docs", "mkdocs.yml", ".github", "*md", "LICENSE", ".pre-commit-config.yaml", ".gitignore", "data", "*.css", "*.zip", "MANIFEST.in"]
 force-exclude = true
 
 [tool.ruff.pydocstyle]
 convention = "google"
+
+[tool.mypy]
+python_version = "3.8"
+ignore_missing_imports = true
+namespace_packages = true
+pretty = true
 
 [tool.isort]
 line_length = "120"

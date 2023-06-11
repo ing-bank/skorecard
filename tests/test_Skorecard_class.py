@@ -1,12 +1,13 @@
-from skorecard.features_bucket_mapping import FeaturesBucketMapping
+import numpy as np
+import pytest
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.utils.validation import check_is_fitted
+
 from skorecard import Skorecard
 from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer, OrdinalCategoricalBucketer
+from skorecard.features_bucket_mapping import FeaturesBucketMapping
 from skorecard.pipeline import BucketingProcess
 from skorecard.utils import BucketerTypeError
-import numpy as np
-from sklearn.pipeline import make_pipeline, Pipeline
-from sklearn.utils.validation import check_is_fitted
-import pytest
 
 
 def run_checks(X, y, bucketer, features, expected_probas):

@@ -1,23 +1,22 @@
-import pytest
 import os
-import yaml
-
-from skorecard.bucketers import (
-    DecisionTreeBucketer,
-    UserInputBucketer,
-    EqualWidthBucketer,
-    AgglomerativeClusteringBucketer,
-    EqualFrequencyBucketer,
-    OptimalBucketer,
-    OrdinalCategoricalBucketer,
-    AsIsNumericalBucketer,
-    AsIsCategoricalBucketer,
-)
-from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
-
-from sklearn.pipeline import make_pipeline
 from contextlib import contextmanager
 
+import pytest
+import yaml
+from sklearn.pipeline import make_pipeline
+
+from skorecard.bucketers import (
+    AgglomerativeClusteringBucketer,
+    AsIsCategoricalBucketer,
+    AsIsNumericalBucketer,
+    DecisionTreeBucketer,
+    EqualFrequencyBucketer,
+    EqualWidthBucketer,
+    OptimalBucketer,
+    OrdinalCategoricalBucketer,
+    UserInputBucketer,
+)
+from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 
 BUCKETERS_WITH_SET_BINS = [EqualWidthBucketer, AgglomerativeClusteringBucketer, EqualFrequencyBucketer]
 

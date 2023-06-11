@@ -1,22 +1,21 @@
-import pytest
 import numpy as np
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.utils.validation import check_is_fitted
+import pytest
 from sklearn.exceptions import NotFittedError
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.utils.validation import check_is_fitted
 
-from skorecard.bucketers.bucketers import UserInputBucketer
 from skorecard.bucketers import (
-    EqualWidthBucketer,
     AgglomerativeClusteringBucketer,
-    EqualFrequencyBucketer,
-    OptimalBucketer,
-    OrdinalCategoricalBucketer,
     AsIsCategoricalBucketer,
     AsIsNumericalBucketer,
     DecisionTreeBucketer,
+    EqualFrequencyBucketer,
+    EqualWidthBucketer,
+    OptimalBucketer,
+    OrdinalCategoricalBucketer,
 )
+from skorecard.bucketers.bucketers import UserInputBucketer
 from skorecard.pipeline import BucketingProcess
 
 BUCKETERS_WITH_SET_BINS = [

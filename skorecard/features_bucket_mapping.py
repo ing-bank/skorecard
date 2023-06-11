@@ -1,5 +1,6 @@
-import yaml
 import dataclasses
+
+import yaml
 
 from skorecard.bucket_mapping import BucketMapping, merge_bucket_mapping
 

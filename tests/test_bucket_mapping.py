@@ -1,9 +1,10 @@
-from sklearn.pipeline import make_pipeline
-from skorecard.bucketers.bucketers import DecisionTreeBucketer, EqualWidthBucketer
 import numpy as np
 import pandas as pd
 import pytest
-from skorecard.bucket_mapping import BucketMapping, merge_bucket_mapping, MissingDict
+from sklearn.pipeline import make_pipeline
+
+from skorecard.bucket_mapping import BucketMapping, MissingDict, merge_bucket_mapping
+from skorecard.bucketers.bucketers import DecisionTreeBucketer, EqualWidthBucketer
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 
 

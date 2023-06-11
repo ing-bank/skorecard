@@ -1,8 +1,8 @@
+import numpy as np
+import pytest
+
 from skorecard import datasets
 from skorecard.bucketers import DecisionTreeBucketer, EqualFrequencyBucketer, EqualWidthBucketer, OptimalBucketer
-import numpy as np
-
-import pytest
 
 
 @pytest.fixture()

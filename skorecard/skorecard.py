@@ -1,23 +1,19 @@
 import warnings
-import numpy as np
+from typing import List, Optional
 
+import numpy as np
+from category_encoders.woe import WOEEncoder
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.utils.validation import check_is_fitted
-from category_encoders.woe import WOEEncoder
 
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.linear_model import LogisticRegression
-from skorecard.utils import BucketerTypeError
-from skorecard.utils.validation import ensure_dataframe, is_fitted, check_suppressor_effect
 from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 from skorecard.pipeline.pipeline import _get_all_steps
-from skorecard.bucketers import (
-    DecisionTreeBucketer,
-    OptimalBucketer,
-)
 from skorecard.preprocessing import ColumnSelector
-
-from typing import Optional, List
+from skorecard.utils import BucketerTypeError
+from skorecard.utils.validation import check_suppressor_effect, ensure_dataframe, is_fitted
 
 ignores = [
     (

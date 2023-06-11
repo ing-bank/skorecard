@@ -3,8 +3,8 @@ import pandas as pd
 import pytest
 
 import skorecard.reporting.report
-from skorecard.metrics import metrics
 from skorecard.bucketers import DecisionTreeBucketer
+from skorecard.metrics import metrics
 
 
 @pytest.fixture()

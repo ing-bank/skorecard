@@ -1,14 +1,12 @@
 import numpy as np
-import pytest
+import numpy.testing as npt
 import pandas as pd
-
-from skorecard.preprocessing import WoeEncoder
-from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer, AsIsCategoricalBucketer
-from skorecard.pipeline import BucketingProcess
-
+import pytest
 from sklearn.pipeline import make_pipeline
 
-import numpy.testing as npt
+from skorecard.bucketers import AsIsCategoricalBucketer, DecisionTreeBucketer, OptimalBucketer
+from skorecard.pipeline import BucketingProcess
+from skorecard.preprocessing import WoeEncoder
 
 # TODO: WoE should treat missing values as a separate bin and thus handled seamlessly.
 

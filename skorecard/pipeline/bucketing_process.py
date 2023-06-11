@@ -1,27 +1,24 @@
 import pathlib
-import pandas as pd
-import numpy as np
 import warnings
-
 from copy import deepcopy
+from typing import Dict, List, Optional, TypeVar
 
+import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
 from sklearn.pipeline import make_pipeline
+from sklearn.utils.validation import check_is_fitted
 
-from skorecard.utils import NotPreBucketedError, NotBucketedError
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
+from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 from skorecard.pipeline import to_skorecard_pipeline
 from skorecard.pipeline.pipeline import _get_all_steps
-from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.reporting import build_bucket_table
-from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
-from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
-from skorecard.utils.validation import is_fitted, ensure_dataframe
+from skorecard.reporting.report import BucketTableMethod, SummaryMethod
+from skorecard.utils import NotBucketedError, NotPreBucketedError
 from skorecard.utils.exceptions import NotInstalledError
-
-from typing import Optional, Dict, TypeVar, List
-
+from skorecard.utils.validation import ensure_dataframe, is_fitted
 
 # JupyterDash
 try:
@@ -35,9 +32,8 @@ except ModuleNotFoundError:
     dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
 
 
-from skorecard.apps.app_layout import add_bucketing_process_layout
 from skorecard.apps.app_callbacks import add_bucketing_process_callbacks
-
+from skorecard.apps.app_layout import add_bucketing_process_layout
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 

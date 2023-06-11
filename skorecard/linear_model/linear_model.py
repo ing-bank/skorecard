@@ -1,10 +1,12 @@
-from sklearn import linear_model as lm
-import scipy
 import numpy as np
 import pandas as pd
-from skorecard.utils import convert_sparse_matrix
+import scipy
+from sklearn import linear_model as lm
 from sklearn.utils.validation import check_is_fitted
+
 from skorecard.reporting import weight_plot
+from skorecard.utils import convert_sparse_matrix
+
 
 class LogisticRegression(lm.LogisticRegression):
     """Extended Logistic Regression.

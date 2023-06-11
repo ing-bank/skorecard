@@ -1,12 +1,12 @@
-from skorecard.rescale import calibrate_to_master_scale
-from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
-from sklearn.pipeline import make_pipeline
-from skorecard import Skorecard
-from skorecard.rescale import ScoreCardPoints
-from sklearn.exceptions import NotFittedError
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
+from sklearn.exceptions import NotFittedError
+from sklearn.pipeline import make_pipeline
+
+from skorecard import Skorecard
+from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
+from skorecard.rescale import ScoreCardPoints, calibrate_to_master_scale
 
 
 @pytest.fixture()

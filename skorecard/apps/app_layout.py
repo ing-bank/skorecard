@@ -1,5 +1,5 @@
+from skorecard.apps.app_utils import colorize_cell, perc_data_bars
 from skorecard.utils.exceptions import NotInstalledError
-from skorecard.apps.app_utils import perc_data_bars, colorize_cell
 
 # Dash + dependencies
 try:

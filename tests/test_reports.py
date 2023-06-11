@@ -1,8 +1,9 @@
-from skorecard.bucketers import DecisionTreeBucketer
-from skorecard.reporting import build_bucket_table
-from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
+from skorecard.bucketers import DecisionTreeBucketer
+from skorecard.reporting import build_bucket_table
 
 
 def test_report_decision_tree(df):

@@ -1,10 +1,10 @@
-import pandas as pd
+from typing import Dict, List, Union
+
 import numpy as np
+import pandas as pd
 
 from skorecard.bucket_mapping import BucketMapping
 from skorecard.reporting.plotting import get_bucket_color
-
-from typing import Union, List, Dict
 
 
 def determine_boundaries(df: pd.DataFrame, bucket_mapping: BucketMapping) -> Union[List, Dict]:

@@ -1,10 +1,10 @@
-import pytest
 import numpy as np
+import pytest
 from optbinning import OptimalBinning
 from sklearn.pipeline import make_pipeline
 
-from skorecard.bucketers import OptimalBucketer, DecisionTreeBucketer
 from skorecard.bucket_mapping import BucketMapping
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.utils import NotPreBucketedError
 
 

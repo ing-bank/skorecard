@@ -2,12 +2,11 @@
 Classes to store features mapping for bucketing.
 """
 import dataclasses
-
 from dataclasses import dataclass, field
-from typing import List, Union, Dict, Optional
+from typing import Dict, List, Optional, Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 @dataclass

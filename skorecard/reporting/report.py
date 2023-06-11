@@ -1,11 +1,11 @@
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict
 import warnings
+from typing import Dict, Optional
 
-from sklearn.utils.validation import check_is_fitted
+import numpy as np
+import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
+from sklearn.utils.validation import check_is_fitted
 
 from skorecard.bucket_mapping import BucketMapping
 from skorecard.metrics.metrics import _IV_score

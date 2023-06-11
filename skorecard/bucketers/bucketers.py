@@ -1,12 +1,11 @@
 import warnings
-import yaml
-import numpy as np
-import pandas as pd
 from typing import List
 
+import numpy as np
+import pandas as pd
+import yaml
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import _tree
+from sklearn.tree import DecisionTreeClassifier, _tree
 from sklearn.utils.multiclass import unique_labels
 
 from skorecard.bucketers.base_bucketer import BaseBucketer

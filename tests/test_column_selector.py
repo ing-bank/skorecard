@@ -1,11 +1,10 @@
-import pytest
-from skorecard.preprocessing import ColumnSelector
 import pandas as pd
+import pytest
+from sklearn.pipeline import make_pipeline
 
 from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
-from skorecard.preprocessing import WoeEncoder
 from skorecard.linear_model import LogisticRegression
-from sklearn.pipeline import make_pipeline
+from skorecard.preprocessing import ColumnSelector, WoeEncoder
 
 
 def test_column_selector(df):
