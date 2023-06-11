@@ -40,7 +40,7 @@ jobs:
         pre-commit install
         pre-commit run --all-files
 
-    - name: Run (unit) tests and generate coverage report
+    - name: Run (unit) tests
       run: |
-        pytest --cov=src --cov-report=xml -vvv
+        pytest
         pyflakes skorecard
