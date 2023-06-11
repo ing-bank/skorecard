@@ -44,14 +44,14 @@ repos:
       entry: isort
       language: system
       types: [python]
-  # - repo: local
-  #   hooks:
-  #   - id: codespell
-  #     name: 'codespell: Check for grammar'
-  #     entry: codespell
-  #     language: system
-  #     types: [python]
-  #     args: [-L mot] # Skip the word "mot"
+  - repo: local
+    hooks:
+    - id: codespell
+      name: 'codespell: Check for grammar'
+      entry: codespell
+      language: system
+      types: [python]
+      args: ['-L missings,bu'] # Skip the word "missings" and "bu"
   # - repo: https://github.com/asottile/pyupgrade
   #   rev: v3.4.0
   #   hooks:

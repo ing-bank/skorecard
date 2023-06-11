@@ -62,7 +62,7 @@ class FeaturesBucketMapping:
         """Pretty print self.
 
         Returns:
-            str: reproducable object representation.
+            str: reproducible object representation.
         """
         class_name = self.__class__.__name__
         maps = list(self.maps.values())

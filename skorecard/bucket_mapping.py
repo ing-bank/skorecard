@@ -69,11 +69,11 @@ class BucketMapping:
         # Check specials
         assert all(
             [isinstance(k, str) for k in self.specials.keys()]
-        ), f"The keys of the special dicionary must be \
+        ), f"The keys of the special dictionary must be \
         strings, got {self.specials.keys()} instead."
         assert all(
             [isinstance(k, list) for k in self.specials.values()]
-        ), f"The values of the special dicionary must be a list of elements, got {self.specials}instead."
+        ), f"The values of the special dictionary must be a list of elements, got {self.specials}instead."
         # TODO: assert that special values are not present in multiple special buckets.
 
         # Make sure map is in correct format
@@ -102,7 +102,7 @@ class BucketMapping:
             else:
                 self._missing_bucket = -1
 
-            # We leave -2 for 'other', whcih only applies to categoricals
+            # We leave -2 for 'other', which only applies to categoricals
             # There for consistency
             self._start_special_bucket = -3
 
@@ -117,7 +117,6 @@ class BucketMapping:
 
         # Determine the bucket numbers for reserved categories: 'other' and 'missing'.
         if self.type == "categorical":
-
             assert isinstance(self.map, dict), "Map must be dict"
 
             # Assure the conversion from numpy.int to int
@@ -235,7 +234,6 @@ class BucketMapping:
         return np.array(buckets)
 
     def _apply_cat_mapping(self, x):
-
         mapping = MissingDict(self.map)
         mapping.set_missing_value(self._other_bucket)  # This was 'other' but you cannot mix integers and strings
 
@@ -399,7 +397,6 @@ def merge_bucket_mapping(a, b):
     assert a.type == b.type, msg
 
     if a.type == "categorical":
-
         if b.other_bucket:
             assert (
                 b.other_bucket in a.labels.keys()
@@ -440,7 +437,6 @@ def merge_bucket_mapping(a, b):
         )
 
     if a.type == "numerical":
-
         # This should hold for numerical maps
         assert len(a.map) >= len(b.map)
 

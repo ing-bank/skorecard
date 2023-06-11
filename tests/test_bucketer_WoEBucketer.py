@@ -65,7 +65,7 @@ def test_missing_bucket(X_y_2):
     assert len(new_X["col1"].unique()) == len(X["col1"].unique())
     assert len(new_X["col2"].unique()) == len(X["col2"].unique())
 
-    # because class 1 will have zero counts, the WOE transformer will divide by the value of epsilon, avoinding infinite
+    # because class 1 will have zero counts, the WOE transformer will divide by the value of epsilon, avoiding infinite
     # numbers
     assert not any(new_X["col1"] == np.inf)
     assert not any(new_X["col2"] == np.inf)

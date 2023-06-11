@@ -9,7 +9,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
     """
     Transformer that performs selection of variables from a pandas dataframe.
 
-    Useful in pipelines, where we require a step that selects feautures.
+    Useful in pipelines, where we require a step that selects features.
 
     Example:
 

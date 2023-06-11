@@ -94,7 +94,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     @staticmethod
     def _check_contains_na(X, variables: Optional[List]):
-
         has_missings = X[variables].isnull().any()
         vars_missing = has_missings[has_missings].index.tolist()
 
@@ -159,7 +158,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 raise AttributeError("bucketer must be fit with y to determine the risk rates")
 
             missing_bucket = int(
-                self.bucket_tables_[feature][self.bucket_tables_[feature]["bucket_id"] >=0]
+                self.bucket_tables_[feature][self.bucket_tables_[feature]["bucket_id"] >= 0]
                 .sort_values("Event Rate", ascending=ascending)
                 .reset_index(drop=True)
                 .iloc[0]["bucket_id"]
@@ -185,7 +184,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
         else:
             raise AssertionError(f"Invalid missing treatment '{self.missing_treatment}' specified")
-
 
         return missing_bucket
 
@@ -296,7 +294,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             map=splits,
             right=right,
             specials=special,
-
         )
 
         # Calculate the bucket table
@@ -325,7 +322,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                     map=splits,
                     right=right,
                     specials=special,
-
                 )
 
                 # Recalculate the bucket table with the new bucket for missings
@@ -334,7 +330,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                     y,
                     column=feature,
                     bucket_mapping=self.features_bucket_mapping_.get(feature),
-            )
+                )
 
         if generate_summary:
             self._generate_summary(X, y)
@@ -352,7 +348,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
         """
         # We need to make sure we only fit if not already fitted
-        # This prevents a user loosing manually defined boundaries
+        # This prevents a user losing manually defined boundaries
         # when re-running .fit_interactive()
         if not is_fitted(self):
             self.fit(X, y)

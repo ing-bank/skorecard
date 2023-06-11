@@ -148,7 +148,7 @@ class OptimalBucketer(BaseBucketer):
             splits, right (tuple): The splits (dict or array), and whether right=True or False.
         """
         # Normally Optbinning uses a DecisionTreeBucketer to do automatic prebinning
-        # We require the user to pre-bucket explictly before using this.
+        # We require the user to pre-bucket explicitly before using this.
         if self.variables_type == "numerical":
             uniq_values = np.sort(np.unique(X.values))
             if len(uniq_values) > 100:
@@ -227,7 +227,7 @@ class EqualWidthBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
-        get_statistics=True
+        get_statistics=True,
     ):
         """Init the class.
 
@@ -437,7 +437,7 @@ class EqualFrequencyBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
-        get_statistics=True
+        get_statistics=True,
     ):
         """Init the class.
 
@@ -473,7 +473,6 @@ class EqualFrequencyBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-
 
     @property
     def variables_type(self):
@@ -717,7 +716,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
         encoding_method="frequency",
         missing_treatment="separate",
         remainder="passthrough",
-        get_statistics=True
+        get_statistics=True,
     ):
         """
         Init the class.
@@ -849,12 +848,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
     """  # noqa
 
     def __init__(
-        self,
-        variables=[],
-        specials={},
-        missing_treatment="separate",
-        remainder="passthrough",
-        get_statistics=True
+        self, variables=[], specials={}, missing_treatment="separate", remainder="passthrough", get_statistics=True
     ):
         """Init the class.
 
@@ -888,7 +882,6 @@ class AsIsCategoricalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-
 
     @property
     def variables_type(self):
@@ -947,7 +940,7 @@ class AsIsNumericalBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
-        get_statistics=True
+        get_statistics=True,
     ):
         """
         Init the class.
@@ -986,7 +979,6 @@ class AsIsNumericalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-
 
     @property
     def variables_type(self):
@@ -1068,11 +1060,7 @@ class UserInputBucketer(BaseBucketer):
     """  # noqa
 
     def __init__(
-        self,
-        features_bucket_mapping=None,
-        variables: List = [],
-        remainder="passthrough",
-        get_statistics=True
+        self, features_bucket_mapping=None, variables: List = [], remainder="passthrough", get_statistics=True
     ) -> None:
         """
         Initialise the user-defined boundaries with a dictionary.

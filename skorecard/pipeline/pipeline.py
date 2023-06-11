@@ -104,7 +104,7 @@ def find_bucketing_step(pipeline: Pipeline, identifier: str = "bucketingprocess"
     """
     Finds a specific step in a sklearn Pipeline that has a 'name' attribute equalling 'identifier'.
 
-    This is usefull to extract certain steps from a pipeline, f.e. a BucketingProcess.
+    This is useful to extract certain steps from a pipeline, f.e. a BucketingProcess.
 
     Args:
         pipeline (sklearn.pipeline.Pipeline): sklearn pipeline

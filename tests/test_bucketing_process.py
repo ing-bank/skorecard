@@ -108,7 +108,7 @@ def test_bucketing_optimization(df):
 
 
 def test_bucketing_with_specials(df):
-    """Test that specials propogate."""
+    """Test that specials propagate."""
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
 
@@ -147,7 +147,7 @@ def test_bucketing_with_specials(df):
 
 
 def test_bucketing_process_in_pipeline(df):
-    """Test that it works fine withing a sklearn pipeline."""
+    """Test that it works fine within a sklearn pipeline."""
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
 
@@ -317,10 +317,10 @@ def test_bucketing_process_remainder(df):
         remainder="passthrough",
         specials={"EDUCATION": {"=0": [0]}},
         prebucketing_pipeline=make_pipeline(
-            DecisionTreeBucketer(max_n_bins=100, min_bin_size=0.05),  # note we didnt specify variables here!
+            DecisionTreeBucketer(max_n_bins=100, min_bin_size=0.05),  # note we didn't specify variables here!
         ),
         bucketing_pipeline=make_pipeline(
-            OptimalBucketer(max_n_bins=10, min_bin_size=0.05),  # note we didnt specify variables here!
+            OptimalBucketer(max_n_bins=10, min_bin_size=0.05),  # note we didn't specify variables here!
         ),
     )
     new_X = bucketing_process.fit_transform(X, y)
