@@ -30,6 +30,7 @@ dependencies = [
     "scikit-learn>=0.23.2",
     "pyyaml",
     "category_encoders>=2.2.2",
+    "optbinning>=0.8.0",
 ]
 
 [project.urls]
@@ -67,8 +68,6 @@ all = [
     "mknotebooks>=0.7.0",
     "mkdocs-git-revision-date-localized-plugin>=0.7.2",
     "mkdocstrings-python>=1.1.2",
-    # Utils dependencies
-    "optbinning>=0.8.0",
 ]
 
 [tool.setuptools.packages.find]
