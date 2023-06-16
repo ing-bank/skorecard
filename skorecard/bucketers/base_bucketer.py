@@ -1,18 +1,18 @@
-from typing import Optional, Dict, List, TypeVar
-import pandas as pd
-import numpy as np
 import itertools
 import pathlib
+from typing import Dict, List, Optional, TypeVar
 
+import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted, check_array
 from sklearn.utils.multiclass import unique_labels
+from sklearn.utils.validation import check_array, check_is_fitted
 
+from skorecard.bucket_mapping import BucketMapping
+from skorecard.features_bucket_mapping import FeaturesBucketMapping
+from skorecard.reporting import build_bucket_table
 from skorecard.reporting.plotting import PlotBucketMethod
 from skorecard.reporting.report import BucketTableMethod, SummaryMethod
-from skorecard.features_bucket_mapping import FeaturesBucketMapping
-from skorecard.bucket_mapping import BucketMapping
-from skorecard.reporting import build_bucket_table
 from skorecard.utils.exceptions import NotInstalledError
 from skorecard.utils.validation import is_fitted
 
@@ -28,8 +28,8 @@ except ModuleNotFoundError:
     dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
 
 
-from skorecard.apps.app_layout import add_basic_layout
 from skorecard.apps.app_callbacks import add_bucketing_callbacks
+from skorecard.apps.app_layout import add_basic_layout
 from skorecard.utils.validation import ensure_dataframe
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
@@ -94,7 +94,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
     @staticmethod
     def _check_contains_na(X, variables: Optional[List]):
-
         has_missings = X[variables].isnull().any()
         vars_missing = has_missings[has_missings].index.tolist()
 
@@ -159,7 +158,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                 raise AttributeError("bucketer must be fit with y to determine the risk rates")
 
             missing_bucket = int(
-                self.bucket_tables_[feature][self.bucket_tables_[feature]["bucket_id"] >=0]
+                self.bucket_tables_[feature][self.bucket_tables_[feature]["bucket_id"] >= 0]
                 .sort_values("Event Rate", ascending=ascending)
                 .reset_index(drop=True)
                 .iloc[0]["bucket_id"]
@@ -185,7 +184,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
         else:
             raise AssertionError(f"Invalid missing treatment '{self.missing_treatment}' specified")
-
 
         return missing_bucket
 
@@ -273,7 +271,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
             self._update_column_fit(X, y, feature, special, splits, right)
 
-        if self.get_statistics: 
+        if self.get_statistics:
             self._generate_summary(X, y)
 
         return self
@@ -296,11 +294,10 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             map=splits,
             right=right,
             specials=special,
-
         )
 
         # Calculate the bucket table
-        if self.get_statistics: 
+        if self.get_statistics:
             self.bucket_tables_[feature] = build_bucket_table(
                 X,
                 y,
@@ -325,7 +322,6 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                     map=splits,
                     right=right,
                     specials=special,
-
                 )
 
                 # Recalculate the bucket table with the new bucket for missings
@@ -334,7 +330,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
                     y,
                     column=feature,
                     bucket_mapping=self.features_bucket_mapping_.get(feature),
-            )
+                )
 
         if generate_summary:
             self._generate_summary(X, y)
@@ -352,7 +348,7 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
 
         """
         # We need to make sure we only fit if not already fitted
-        # This prevents a user loosing manually defined boundaries
+        # This prevents a user losing manually defined boundaries
         # when re-running .fit_interactive()
         if not is_fitted(self):
             self.fit(X, y)

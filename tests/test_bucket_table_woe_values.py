@@ -1,8 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from skorecard.datasets import load_uci_credit_card
 from skorecard import Skorecard
+from skorecard.datasets import load_uci_credit_card
 
 
 def test_bucket_table_woe_values():

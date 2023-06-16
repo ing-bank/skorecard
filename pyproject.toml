@@ -1,0 +1,119 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skorecard"
+version = "1.6.6"
+requires-python= ">=3.8"
+description = "Tools for building scorecard models in python, with a sklearn-compatible API"
+readme = { file = "README.md", content-type = "text/markdown" }
+authors = [
+    { name = "ING Bank N.V.", email = "anilkumar.panda@ing.com" }
+]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+]
+dependencies = [
+    "scipy>=1.5.2",
+    "numpy>=1.19.5",
+    "pandas==1.5.3",
+    "scikit-learn>=0.23.2",
+    "pyyaml",
+    "category_encoders>=2.2.2",
+    "optbinning>=0.8.0",
+]
+
+[project.urls]
+Homepage = "https://ing-bank.github.io/skorecard/"
+Documentation = "https://ing-bank.github.io/skorecard/api/bucketers/OptimalBucketer/"
+Repository = "https://github.com/ing-bank/skorecard.git"
+Changelog = "https://github.com/ing-bank/skorecard/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+all = [
+    # Dashboard dependencies
+    "dash>=1.21.0",
+    "jupyter-dash>=0.4.0",
+    "dash_bootstrap_components>=0.13",
+    # Reporting dependencies
+    "plotly>=4.14.3",
+    # Dev dependencies
+    "black>=19.10b0",
+    "pre-commit>=2.5.0",
+    "pytest>=6.0.0",
+    "pytest-cov>=2.10.0",
+    "pyflakes>=3.0.1",
+    "isort>=5.12.0",
+    "codespell>=2.2.4",
+    "ruff>=0.0.272",
+    "mypy>=0.770",
+    # Mypy type stubs
+    "types-PyYAML>=6.0.12.10",
+    "types-six>=1.16.21.8",
+    "types-decorator>=5.1.8.3",
+    # Doc dependencies
+    "mkdocs>=1.1.2",
+    "mkdocs-material>=7.1",
+    "mkdocstrings>=0.13.2",
+    "mknotebooks>=0.7.0",
+    "mkdocs-git-revision-date-localized-plugin>=0.7.2",
+    "mkdocstrings-python>=1.1.2",
+]
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "notebooks", "docs"]
+
+[tool.nbqa.addopts]
+# E402: Ignores imports not at the top of file for IPYNB since this makes copy-pasting easier.
+ruff = ["--fix", "--ignore=E402"]
+mypy = ["--install-types", "--non-interactive", "--ignore-missing-imports"]
+isort = ["--profile=black"]
+black = ["--line-length=120"]
+
+[tool.ruff]
+line-length = 120
+# D100 requires all Python files (modules) to have a "public" docstring even if all functions within have a docstring.
+# D104 requires __init__ files to have a docstring
+# D202 No blank lines allowed after function docstring
+# E203
+# D212
+# D200
+# W293 blank line contains whitespace
+# D411 Missing blank line before section
+# D412 No blank lines allowed between a section header and its content
+# D417 Missing argument descriptions in the docstring # Only ignored because of false positve when using multiline args.
+# E731 do not assign a lambda expression, use a def
+ignore = ["D100", "D104", "D202", "D212", "D200", "E203", "E731", "W293", "D412", "D417", "D411", "RUF100"]
+extend-exclude = ["docs", "mkdocs.yml", ".github", "*md", "LICENSE", ".pre-commit-config.yaml", ".gitignore", "data", "*.css", "*.zip", "MANIFEST.in"]
+force-exclude = true
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.8"
+ignore_missing_imports = true
+namespace_packages = true
+pretty = true
+
+[tool.isort]
+line_length = "120"
+profile = "black"
+filter_files = true
+extend_skip = ["__init__.py", "docs"]
+
+[tool.codespell]
+skip = "**.egg-info*"
+
+[tool.black]
+line-length = 120

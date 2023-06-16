@@ -1,13 +1,15 @@
 from typing import List
-from skorecard.utils.validation import ensure_dataframe
+
 from sklearn.base import BaseEstimator, TransformerMixin
+
+from skorecard.utils.validation import ensure_dataframe
 
 
 class ColumnSelector(BaseEstimator, TransformerMixin):
     """
     Transformer that performs selection of variables from a pandas dataframe.
 
-    Useful in pipelines, where we require a step that selects feautures.
+    Useful in pipelines, where we require a step that selects features.
 
     Example:
 

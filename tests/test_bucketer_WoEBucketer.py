@@ -1,14 +1,12 @@
 import numpy as np
-import pytest
+import numpy.testing as npt
 import pandas as pd
-
-from skorecard.preprocessing import WoeEncoder
-from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer, AsIsCategoricalBucketer
-from skorecard.pipeline import BucketingProcess
-
+import pytest
 from sklearn.pipeline import make_pipeline
 
-import numpy.testing as npt
+from skorecard.bucketers import AsIsCategoricalBucketer, DecisionTreeBucketer, OptimalBucketer
+from skorecard.pipeline import BucketingProcess
+from skorecard.preprocessing import WoeEncoder
 
 # TODO: WoE should treat missing values as a separate bin and thus handled seamlessly.
 
@@ -67,7 +65,7 @@ def test_missing_bucket(X_y_2):
     assert len(new_X["col1"].unique()) == len(X["col1"].unique())
     assert len(new_X["col2"].unique()) == len(X["col2"].unique())
 
-    # because class 1 will have zero counts, the WOE transformer will divide by the value of epsilon, avoinding infinite
+    # because class 1 will have zero counts, the WOE transformer will divide by the value of epsilon, avoiding infinite
     # numbers
     assert not any(new_X["col1"] == np.inf)
     assert not any(new_X["col2"] == np.inf)

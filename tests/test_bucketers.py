@@ -1,22 +1,21 @@
-import pytest
 import numpy as np
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline
-from sklearn.utils.validation import check_is_fitted
+import pytest
 from sklearn.exceptions import NotFittedError
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.utils.validation import check_is_fitted
 
-from skorecard.bucketers.bucketers import UserInputBucketer
 from skorecard.bucketers import (
-    EqualWidthBucketer,
     AgglomerativeClusteringBucketer,
-    EqualFrequencyBucketer,
-    OptimalBucketer,
-    OrdinalCategoricalBucketer,
     AsIsCategoricalBucketer,
     AsIsNumericalBucketer,
     DecisionTreeBucketer,
+    EqualFrequencyBucketer,
+    EqualWidthBucketer,
+    OptimalBucketer,
+    OrdinalCategoricalBucketer,
 )
+from skorecard.bucketers.bucketers import UserInputBucketer
 from skorecard.pipeline import BucketingProcess
 
 BUCKETERS_WITH_SET_BINS = [
@@ -125,7 +124,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the riskiest bucket when missings are in a separate bucket
         riskiest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=False)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -142,7 +141,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the safest bucket when missings are in a separate bucket
         safest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=True)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -183,7 +182,7 @@ def test_missings_set(bucketer, df_with_missings) -> None:
                 BUCK_similar.bucket_table(feature)["bucket"] == closest_bucket
             ].reset_index()["label"][0]
         )
-    
+
     BUCK_passthrough = bucketer(n_bins=3, variables=["MARRIAGE", "EDUCATION"], missing_treatment="passthrough")
     BUCK_passthrough.fit(X, y)
 
@@ -224,7 +223,7 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the riskiest bucket when missings are in a separate bucket
         riskiest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=False)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -241,7 +240,7 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
     for feature in ["MARRIAGE", "EDUCATION"]:
         # look at the safest bucket when missings are in a separate bucket
         safest_bucket = (
-            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >=0]
+            BUCK_norisk.bucket_table(feature)[BUCK_norisk.bucket_table(feature)["bucket"] >= 0]
             .sort_values("Event Rate", ascending=True)
             .reset_index(drop=True)["bucket"][0]
         )
@@ -297,7 +296,6 @@ def test_missings_without_set(bucketer, df_with_missings) -> None:
         original_index_missings = X[X[feature].isnull()][feature].index
         trans_index_missings = X_trans[X_trans[feature].isnull()][feature].index
         assert all(original_index_missings[i] == trans_index_missings[i] for i in range(len(original_index_missings)))
-
 
 
 @pytest.mark.parametrize("bucketer", ALL_BUCKETERS)
@@ -385,4 +383,4 @@ def test_summary_no_bins(bucketer, df):
     BUCK.fit(X, y)
     summary_table = BUCK.summary()
     assert summary_table.shape[0] == 6
-    assert set(summary_table.columns) == set(["column", "num_prebuckets", "num_buckets", "IV_score", "dtype"])
+    assert set(summary_table.columns) == {"column", "num_prebuckets", "num_buckets", "IV_score", "dtype"}

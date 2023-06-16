@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-
 from sklearn.metrics import make_scorer
 
 
@@ -41,7 +40,7 @@ def woe_1d(X, y, epsilon=0.00001):
 
     # Make sure to give informative error when dividing by zero error occurs
     msg = """
-    One of the unique values in X has no occurances of the %s class.
+    One of the unique values in X has no occurrences of the %s class.
     Set epsilon to a very small value, or use a more coarse binning.
     """
     if any(neg == 0):

@@ -1,9 +1,8 @@
 import pytest
-
 from sklearn.exceptions import NotFittedError
 
-from skorecard.bucketers import UserInputBucketer
 from skorecard.bucket_mapping import BucketMapping
+from skorecard.bucketers import UserInputBucketer
 
 
 @pytest.fixture()

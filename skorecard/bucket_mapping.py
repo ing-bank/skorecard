@@ -2,12 +2,11 @@
 Classes to store features mapping for bucketing.
 """
 import dataclasses
-
 from dataclasses import dataclass, field
-from typing import List, Union, Dict, Optional
+from typing import Dict, List, Optional, Union
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
 @dataclass
@@ -70,11 +69,11 @@ class BucketMapping:
         # Check specials
         assert all(
             [isinstance(k, str) for k in self.specials.keys()]
-        ), f"The keys of the special dicionary must be \
+        ), f"The keys of the special dictionary must be \
         strings, got {self.specials.keys()} instead."
         assert all(
             [isinstance(k, list) for k in self.specials.values()]
-        ), f"The values of the special dicionary must be a list of elements, got {self.specials}instead."
+        ), f"The values of the special dictionary must be a list of elements, got {self.specials}instead."
         # TODO: assert that special values are not present in multiple special buckets.
 
         # Make sure map is in correct format
@@ -94,7 +93,7 @@ class BucketMapping:
                 if not np.isnan(self.missing_bucket):
                     assert (
                         self.missing_bucket <= max_bucket
-                    ), "map '%s' corresponds buckets 0-%s but missing_bucket is set to %s" % (
+                    ), "map '{}' corresponds buckets 0-{} but missing_bucket is set to {}".format(
                         self.map,
                         max_bucket,
                         self.missing_bucket,
@@ -103,7 +102,7 @@ class BucketMapping:
             else:
                 self._missing_bucket = -1
 
-            # We leave -2 for 'other', whcih only applies to categoricals
+            # We leave -2 for 'other', which only applies to categoricals
             # There for consistency
             self._start_special_bucket = -3
 
@@ -118,7 +117,6 @@ class BucketMapping:
 
         # Determine the bucket numbers for reserved categories: 'other' and 'missing'.
         if self.type == "categorical":
-
             assert isinstance(self.map, dict), "Map must be dict"
 
             # Assure the conversion from numpy.int to int
@@ -139,7 +137,9 @@ class BucketMapping:
 
             # Set 'other' bucket
             if self.other_bucket is not None:
-                assert self.other_bucket in self.map.values(), "other_bucket '%s' does not exist in map values: %s" % (
+                assert (
+                    self.other_bucket in self.map.values()
+                ), "other_bucket '{}' does not exist in map values: {}".format(
                     self.other_bucket,
                     self.map,
                 )
@@ -153,7 +153,7 @@ class BucketMapping:
                 if self.missing_bucket not in [-2, -1, np.nan]:
                     assert (
                         self.missing_bucket in self.map.values()
-                    ), "missing_bucket '%s' does not exist in map values: %s" % (self.missing_bucket, self.map)
+                    ), f"missing_bucket '{self.missing_bucket}' does not exist in map values: {self.map}"
 
                 self._missing_bucket = self.missing_bucket
             else:
@@ -206,7 +206,7 @@ class BucketMapping:
         if isinstance(x, list):
             x = pd.Series(x)
         assert isinstance(x, pd.core.series.Series)
-        
+
         # Workaround for missings
         def to_int(x):
             if not np.isnan(x):
@@ -236,7 +236,6 @@ class BucketMapping:
         return np.array(buckets)
 
     def _apply_cat_mapping(self, x):
-
         mapping = MissingDict(self.map)
         mapping.set_missing_value(self._other_bucket)  # This was 'other' but you cannot mix integers and strings
 
@@ -400,7 +399,6 @@ def merge_bucket_mapping(a, b):
     assert a.type == b.type, msg
 
     if a.type == "categorical":
-
         if b.other_bucket:
             assert (
                 b.other_bucket in a.labels.keys()
@@ -441,7 +439,6 @@ def merge_bucket_mapping(a, b):
         )
 
     if a.type == "numerical":
-
         # This should hold for numerical maps
         assert len(a.map) >= len(b.map)
 

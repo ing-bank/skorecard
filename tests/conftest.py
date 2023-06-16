@@ -1,19 +1,18 @@
 import random
+
 import numpy as np
 import pytest
 
-from skorecard import datasets
-
-import skorecard.linear_model
+import skorecard.bucket_mapping
 import skorecard.bucketers
+import skorecard.datasets
+import skorecard.linear_model
+import skorecard.metrics
 import skorecard.pipeline
 import skorecard.preprocessing
-import skorecard.metrics
-import skorecard.bucket_mapping
-import skorecard.utils
 import skorecard.rescale
-import skorecard.datasets
-
+import skorecard.utils
+from skorecard import datasets
 
 BUCKETERS = [
     skorecard.bucketers.OptimalBucketer,

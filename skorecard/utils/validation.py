@@ -1,7 +1,8 @@
+import warnings
+from typing import Dict
+
 import pandas as pd
 from sklearn.utils import check_array
-from typing import Dict
-import warnings
 
 
 def is_fitted(estimator) -> bool:

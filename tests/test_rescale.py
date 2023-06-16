@@ -1,12 +1,12 @@
-from skorecard.rescale import calibrate_to_master_scale
-from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
-from sklearn.pipeline import make_pipeline
-from skorecard import Skorecard
-from skorecard.rescale import ScoreCardPoints
-from sklearn.exceptions import NotFittedError
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
+from sklearn.exceptions import NotFittedError
+from sklearn.pipeline import make_pipeline
+
+from skorecard import Skorecard
+from skorecard.bucketers import DecisionTreeBucketer, OrdinalCategoricalBucketer
+from skorecard.rescale import ScoreCardPoints, calibrate_to_master_scale
 
 
 @pytest.fixture()
@@ -18,7 +18,7 @@ def probas():
 def test_master_scale_calibration(probas):
     """Test that the master scale calibrations follows the expected logic."""
     scores = calibrate_to_master_scale(probas, pdo=20, ref_odds=1, ref_score=100)
-    # add odds 1:1, te score is 100. This are probas of 50%
+    # add odds 1:1, the score is 100. This are probas of 50%
 
     # When proba is 0.2, the odds are 4:1. This means that the score should have increased by twice the pdo
     assert scores[1] == 140
@@ -27,7 +27,7 @@ def test_master_scale_calibration(probas):
     assert scores[7] == 60
 
     scores = calibrate_to_master_scale(probas, pdo=30, ref_odds=1, ref_score=100)
-    # add odds 1:1, te score is 100. This are probas of 50%
+    # add odds 1:1, the score is 100. This are probas of 50%
 
     # When proba is 0.2, the odds are 4:1. This means that the score should have increased by twice the pdo
     assert scores[1] == 160

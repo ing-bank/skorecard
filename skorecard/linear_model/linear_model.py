@@ -1,10 +1,12 @@
-from sklearn import linear_model as lm
-import scipy
 import numpy as np
 import pandas as pd
-from skorecard.utils import convert_sparse_matrix
+import scipy
+from sklearn import linear_model as lm
 from sklearn.utils.validation import check_is_fitted
+
 from skorecard.reporting import weight_plot
+from skorecard.utils import convert_sparse_matrix
+
 
 class LogisticRegression(lm.LogisticRegression):
     """Extended Logistic Regression.
@@ -76,7 +78,7 @@ class LogisticRegression(lm.LogisticRegression):
         Args:
             calculate_stats (bool): If true, calculate statistics like standard error during fit, accessible with .get_stats()
         """  # noqa
-        super(LogisticRegression, self).__init__(
+        super().__init__(
             penalty=penalty,
             dual=dual,
             tol=tol,
@@ -145,7 +147,6 @@ class LogisticRegression(lm.LogisticRegression):
         # Index 0 corresponds to the intercept, from index 1 onwards it relates to the coefficients
         # If fit intercept is False, then all the values are related to the coefficients
         if lr.fit_intercept:
-
             self.std_err_intercept_ = std_err[:, 0]
             self.std_err_coef_ = std_err[:, 1:][0]
 
@@ -194,7 +195,6 @@ class LogisticRegression(lm.LogisticRegression):
         return pd.DataFrame(data, index=self.names_)
 
     def plot_weights(self):
-
         """
         Plots the relative importance of coefficients of the model.
 

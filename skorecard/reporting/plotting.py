@@ -1,9 +1,8 @@
 import pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.utils.validation import check_is_fitted
 
 from skorecard.utils.exceptions import NotInstalledError
-
-from sklearn.utils.validation import check_is_fitted
-from sklearn.pipeline import Pipeline
 
 try:
     import plotly.express as px
@@ -15,7 +14,7 @@ except ModuleNotFoundError:
 try:
     from IPython.display import Image
 except ModuleNotFoundError:
-    Image = NotInstalledError("psutil")
+    Image = NotInstalledError("psutil")  # type: ignore
 
 
 def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
@@ -258,7 +257,6 @@ class PlotBucketMethod:
 
 
 def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height=None):
-
     """
     Generates a weight plot(plotly chart) from `stats`
     Example:
@@ -292,31 +290,28 @@ def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height
 
     fig.add_trace(
         go.Scatter(
-            x=stats['Coef.'],
-            y=stats['Coef.'].index,
-            line=dict(color='#42C4F7', width=2),
-            mode='markers',
-
+            x=stats["Coef."],
+            y=stats["Coef."].index,
+            line=dict(color="#42C4F7", width=2),
+            mode="markers",
             error_x=dict(
-                type='data',
+                type="data",
                 symmetric=False,
-                array=stats['conf_interval_0.975'] - stats['Coef.'],
-                arrayminus=stats['Coef.'] - stats['conf_interval_0.025'],
-                color='#68BBE3')
+                array=stats["conf_interval_0.975"] - stats["Coef."],
+                arrayminus=stats["Coef."] - stats["conf_interval_0.025"],
+                color="#68BBE3",
+            ),
         )
     )
 
-    fig.add_shape(type="line",
-                  x0=0, y0=0, x1=0, y1=len(stats),
-                  line=dict(color="#3f3f3f", width=3, dash='dash')
-                  )
+    fig.add_shape(type="line", x0=0, y0=0, x1=0, y1=len(stats), line=dict(color="#3f3f3f", width=3, dash="dash"))
 
     fig.update_layout(
-        title='Regression Meta Analysis - Weight Plot',
-        xaxis_title='Weight Estimates',
-        yaxis_title='Variable',
+        title="Regression Meta Analysis - Weight Plot",
+        xaxis_title="Weight Estimates",
+        yaxis_title="Variable",
         xaxis_showgrid=False,
-        yaxis_showgrid=False
+        yaxis_showgrid=False,
     )
     fig.update_layout(template="simple_white")
 

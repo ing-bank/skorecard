@@ -1,8 +1,8 @@
+import numpy as np
+import pytest
+
 from skorecard import datasets
 from skorecard.bucketers import DecisionTreeBucketer, EqualFrequencyBucketer, EqualWidthBucketer, OptimalBucketer
-import numpy as np
-
-import pytest
 
 
 @pytest.fixture()
@@ -139,7 +139,7 @@ def test_specials_equal_frequency_bucketer(df):
     assert ebt.features_bucket_mapping_.get("BILL_AMT1").labels[0].startswith("(-inf")
     assert ebt.features_bucket_mapping_.get("BILL_AMT1").labels[2].endswith("inf]")
 
-    # Test that tha labels are properly assigned. Because there are 2 specials in LIMIT_BAL, there should be 2 extra
+    # Test that the labels are properly assigned. Because there are 2 specials in LIMIT_BAL, there should be 2 extra
     # bins
     assert len(ebt.features_bucket_mapping_.get("LIMIT_BAL").labels) == 6
     # check that the labels match the specials dictionary
@@ -178,7 +178,7 @@ def test_specials_optimal_bucketer(df):
 
     assert X_bins[X["LIMIT_BAL"] == 50000]["LIMIT_BAL"].unique() == np.array(-3)
 
-    # Test that tha labels are properly assigned. Because there are 2 specials in LIMIT_BAL, there should be 2 extra
+    # Test that the labels are properly assigned. Because there are 2 specials in LIMIT_BAL, there should be 2 extra
     # bins
     assert len(opt.features_bucket_mapping_.get("LIMIT_BAL").labels) == 6
     # check that the labels match the specials dictionary

@@ -1,16 +1,17 @@
 import ast
 import json
+
 import pandas as pd
 
-from skorecard.reporting import build_bucket_table
 from skorecard.apps.app_utils import determine_boundaries, is_increasing, is_sequential
+from skorecard.reporting import build_bucket_table
 from skorecard.utils.exceptions import NotInstalledError
 
 # Dash + dependencies
 try:
-    from dash.dependencies import Input, Output, State
-    from dash import no_update
     import dash_table
+    from dash import no_update
+    from dash.dependencies import Input, Output, State
 except ModuleNotFoundError:
     Input = NotInstalledError("dash", "dashboard")
     Output = NotInstalledError("dash", "dashboard")

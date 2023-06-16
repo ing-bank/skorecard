@@ -1,13 +1,13 @@
+from functools import reduce
+
 import numpy as np
 import pandas as pd
-from sklearn.utils.validation import check_is_fitted
-from skorecard.preprocessing import WoeEncoder
 from category_encoders.woe import WOEEncoder
-
-
-from functools import reduce
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
+
 from skorecard import Skorecard
+from skorecard.preprocessing import WoeEncoder
 
 
 def calibrate_to_master_scale(y_pred, *, pdo, ref_score, ref_odds, epsilon=1e-6):
@@ -102,7 +102,6 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         self._calculate_scorecard_points()
 
     def _get_pipeline_elements(self):
-
         bucketers = self.skorecard_model.pipeline_.named_steps["bucketer"]
         woe_enc = self.skorecard_model.pipeline_.named_steps["encoder"]
         self.features = self.skorecard_model.variables
@@ -125,7 +124,6 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         self.woes = {k: woe_dict[k] for k in woe_dict.keys() if k in self.features}
 
     def _calculate_scorecard_points(self):
-
         # Put together the features in a list of table, containing all the buckets.
         list_dfs = list()
         for ix, col in enumerate(self.features):

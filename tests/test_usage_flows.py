@@ -1,5 +1,6 @@
-from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from sklearn.pipeline import make_pipeline
+
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 
 
 def test_full_pipeline(df):
