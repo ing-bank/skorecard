@@ -9,7 +9,6 @@ from skorecard.utils.exceptions import NotInstalledError
 
 # Dash + dependencies
 try:
-    import dash_table
     from dash import no_update
     from dash.dependencies import Input, Output, State
 except ModuleNotFoundError:

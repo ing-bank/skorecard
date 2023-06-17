@@ -3,9 +3,12 @@ from skorecard.utils.exceptions import NotInstalledError
 
 # Dash + dependencies
 try:
-    import dash_core_components as dcc
-    import dash_html_components as html
-    import dash_table
+    try:
+        from dash import dash_table, dcc, html
+    except ImportError:
+        import dash_core_components as dcc
+        import dash_html_components as html
+        import dash_table
 except ModuleNotFoundError:
     dcc = NotInstalledError("dash_core_components", "dashboard")
     html = NotInstalledError("dash_html_components", "dashboard")

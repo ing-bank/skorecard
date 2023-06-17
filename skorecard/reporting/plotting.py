@@ -5,16 +5,15 @@ from sklearn.utils.validation import check_is_fitted
 from skorecard.utils.exceptions import NotInstalledError
 
 try:
-    import plotly.express as px
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 except ModuleNotFoundError:
-    px = NotInstalledError("plotly", "reporting")
+    NotInstalledError("plotly", "reporting")
 
 try:
-    from IPython.display import Image
+    from IPython.core.display import Image
 except ModuleNotFoundError:
-    Image = NotInstalledError("psutil")  # type: ignore
+    NotInstalledError("psutil")
 
 
 def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
@@ -52,7 +51,12 @@ def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
 
         # Add trace with event rate
         fig.add_trace(
-            go.Scatter(x=plotdf["label"], y=plotdf[column_to_plot], name=column_to_plot, line=dict(color="#454c57")),
+            go.Scatter(
+                x=plotdf["label"],
+                y=plotdf[column_to_plot],
+                name=column_to_plot,
+                line=dict(color="#454c57"),
+            ),
             secondary_y=True,
         )
         fig.update_yaxes(title_text=f"Bucket {column_to_plot}", secondary_y=True, tickformat=",.0%")
@@ -85,7 +89,15 @@ def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
     return fig
 
 
-def plot_prebucket_table(prebucket_table, column="", line="", format=None, scale=None, width=None, height=None):
+def plot_prebucket_table(
+    prebucket_table,
+    column="",
+    line="",
+    format=None,
+    scale=None,
+    width=None,
+    height=None,
+):
     """
     Given the prebucketed data, plot the pre-buckets.
 
@@ -186,7 +198,15 @@ class PlotPreBucketMethod:
     To be used with skorecard.pipeline.BucketingProcess and skorecard.bucketers.BaseBucketer
     """
 
-    def plot_prebucket(self, column, line="event_rate", format=None, scale=None, width=None, height=None):
+    def plot_prebucket(
+        self,
+        column,
+        line="event_rate",
+        format=None,
+        scale=None,
+        width=None,
+        height=None,
+    ):
         """
         Generates the prebucket table and produces a corresponding plotly plot.
 
@@ -224,7 +244,15 @@ class PlotBucketMethod:
     To be used with skorecard.pipeline.BucketingProcess and skorecard.bucketers.BaseBucketer
     """
 
-    def plot_bucket(self, column, line="event_rate", format=None, scale=None, width=None, height=None):
+    def plot_bucket(
+        self,
+        column,
+        line="event_rate",
+        format=None,
+        scale=None,
+        width=None,
+        height=None,
+    ):
         """
         Plot the buckets.
 
