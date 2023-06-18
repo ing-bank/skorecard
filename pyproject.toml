@@ -26,7 +26,7 @@ classifiers = [
 dependencies = [
     "scipy>=1.5.2",
     "numpy>=1.19.5",
-    "pandas==1.5.3",
+    "pandas>=1.5.3",
     "scikit-learn>=0.23.2",
     "pyyaml",
     "category_encoders>=2.2.2",

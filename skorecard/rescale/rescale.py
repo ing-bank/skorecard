@@ -81,7 +81,8 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
     """
 
     def __init__(self, skorecard_model, *, pdo=20, ref_score=100, ref_odds=1):
-        """
+        """Initialize the transformer.
+
         Args:
             skorecard_model: the fitted Skorecard class
             pdo: number of points necessary to double the odds
@@ -124,7 +125,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         self.woes = {k: woe_dict[k] for k in woe_dict.keys() if k in self.features}
 
     def _calculate_scorecard_points(self):
-        # Put together the features in a list of table, containing all the buckets.
+        # Put together the features in a list of tables, containing all the buckets.
         list_dfs = list()
         for ix, col in enumerate(self.features):
             df_ = (
@@ -140,8 +141,13 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
         # Reduce the list of tables, to build the final scorecard feature points
         scorecard = reduce(lambda x, y: pd.concat([x, y]), list_dfs)
-        scorecard = scorecard.append(
-            {"feature": "Intercept", "coef": self.model.intercept_[0], "bin_index": 0, "map": 0, "woe": 0},
+        scorecard = pd.concat(
+            [
+                scorecard,
+                pd.DataFrame(
+                    [{"feature": "Intercept", "coef": self.model.intercept_[0], "bin_index": 0, "map": 0, "woe": 0}]
+                ),
+            ],
             ignore_index=True,
         )
         #     return buckets, woes
@@ -181,6 +187,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
 
 def _scale_scorecard(df, *, pdo, ref_score, ref_odds, features):
     """Equations to scale the feature scorecards.
+
     Args:
         df: Pandas DataFrame
         pdo: number of points necessary to double the odds
