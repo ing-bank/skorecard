@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "skorecard"
-version = "1.6.8"
+version = "1.6.7"
 requires-python= ">=3.8"
 description = "Tools for building scorecard models in python, with a sklearn-compatible API"
 readme = { file = "README.md", content-type = "text/markdown" }
