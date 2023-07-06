@@ -68,8 +68,14 @@ def test_psi_values(X1_X2):
 def test_IV_values(X_y):
     """Assert IV values match expectations."""
     X, y = X_y
-    X = pd.DataFrame(X, columns=["col1", "col2"])
+    random_index = [2 * x for x in range(0, len(y))]
+    X = pd.DataFrame(X, columns=["col1", "col2"], index=random_index)
     expected_iv = {"col1": 5.307, "col2": 4.635}
     iv_vals = skorecard.reporting.report.iv(X, y)
+    np.testing.assert_array_almost_equal(pd.Series(expected_iv).values, pd.Series(iv_vals).values, decimal=2)
 
+    # Make sure these are still accurate if y is a pd.Series with the same
+    # non-continuous indices as X.
+    y = pd.Series(y, index=random_index)
+    iv_vals = skorecard.reporting.report.iv(X, y)
     np.testing.assert_array_almost_equal(pd.Series(expected_iv).values, pd.Series(iv_vals).values, decimal=2)

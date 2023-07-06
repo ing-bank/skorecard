@@ -18,14 +18,18 @@ def woe_1d(X, y, epsilon=0.00001):
         - counts_0: count of entries per bin where y==0
         - counts_1: count of entries per bin where y==1
     """
-    X = X.copy().reset_index(drop=True)
-    if not isinstance(y, pd.Series):
-        if y.shape[0] == X.shape[0]:
-            y = pd.Series(y).reset_index(drop=True)
-        else:
-            raise ValueError(f"y has {y.shape[0]}, but expected {X.shape[0]}")
+    # Make sure y has the right number of rows.
+    if y.shape[0] != X.shape[0]:
+        raise ValueError(f"y has {y.shape[0]}, but expected {X.shape[0]}")
 
-    # Ensure classes in y start at zero
+    # Make sure y is a pd.Series so we can reset its index.
+    if not isinstance(y, pd.Series):
+        y = pd.Series(y)
+
+    X = X.reset_index(drop=True)
+    y = y.reset_index(drop=True)
+
+    # Ensure classes in y start at zero.
     y = y - min(y)
 
     df = pd.concat([X, y], axis=1, ignore_index=True)

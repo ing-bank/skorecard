@@ -144,12 +144,13 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         scorecard = pd.concat(
             [
                 scorecard,
-                pd.DataFrame(
+                pd.DataFrame.from_records(
                     [{"feature": "Intercept", "coef": self.model.intercept_[0], "bin_index": 0, "map": 0, "woe": 0}]
                 ),
             ],
             ignore_index=True,
         )
+
         #     return buckets, woes
         scorecard["contribution"] = scorecard["woe"] * scorecard["coef"]
 
