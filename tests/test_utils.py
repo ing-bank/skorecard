@@ -1,5 +1,5 @@
-from sklearn.tree import DecisionTreeClassifier
 import pytest
+from sklearn.tree import DecisionTreeClassifier
 
 from skorecard.utils.validation import check_args
 

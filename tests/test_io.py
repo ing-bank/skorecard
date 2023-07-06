@@ -1,23 +1,22 @@
-import pytest
 import os
-import yaml
-
-from skorecard.bucketers import (
-    DecisionTreeBucketer,
-    UserInputBucketer,
-    EqualWidthBucketer,
-    AgglomerativeClusteringBucketer,
-    EqualFrequencyBucketer,
-    OptimalBucketer,
-    OrdinalCategoricalBucketer,
-    AsIsNumericalBucketer,
-    AsIsCategoricalBucketer,
-)
-from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
-
-from sklearn.pipeline import make_pipeline
 from contextlib import contextmanager
 
+import pytest
+import yaml
+from sklearn.pipeline import make_pipeline
+
+from skorecard.bucketers import (
+    AgglomerativeClusteringBucketer,
+    AsIsCategoricalBucketer,
+    AsIsNumericalBucketer,
+    DecisionTreeBucketer,
+    EqualFrequencyBucketer,
+    EqualWidthBucketer,
+    OptimalBucketer,
+    OrdinalCategoricalBucketer,
+    UserInputBucketer,
+)
+from skorecard.pipeline import BucketingProcess, to_skorecard_pipeline
 
 BUCKETERS_WITH_SET_BINS = [EqualWidthBucketer, AgglomerativeClusteringBucketer, EqualFrequencyBucketer]
 
@@ -70,14 +69,14 @@ def test_ordinal_bucketer_to_file(df, tmpdir):
 
     # Test save to yaml in bucketer
     ocb.save_yml(open(os.path.join(tmpdir, "buckets.yml"), "w"))
-    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
+    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml")))
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
     assert X_trans.equals(X_trans_yaml)
 
     # Test save to yaml with str path
     with working_directory(tmpdir):
         ocb.save_yml("buckets.yml")
-        buckets_yaml = yaml.safe_load(open("buckets.yml", "r"))
+        buckets_yaml = yaml.safe_load(open("buckets.yml"))
         X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
         assert X_trans.equals(X_trans_yaml)
 
@@ -100,7 +99,7 @@ def test_decision_tree_bucketer_to_file(df, tmpdir):
 
     # Test save to yaml in bucketer
     tbt.save_yml(open(os.path.join(tmpdir, "buckets.yml"), "w"))
-    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
+    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml")))
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
     assert X_trans.equals(X_trans_yaml)
 
@@ -118,7 +117,7 @@ def test_bucketers_with_n_bins_to_file(bucketer, df, tmpdir) -> None:
 
     # Test save to yaml in bucketer
     BUCK.save_yml(open(os.path.join(tmpdir, "buckets.yml"), "w"))
-    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
+    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml")))
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
     assert X_trans.equals(X_trans_yaml)
 
@@ -143,7 +142,7 @@ def test_bucketers_with_sklearn_pipeline(df, tmpdir):
 
     # Test save to yaml
     bucketing.save_yml(open(os.path.join(tmpdir, "buckets.yml"), "w"))
-    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
+    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml")))
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
     assert X_trans.equals(X_trans_yaml)
 
@@ -171,7 +170,7 @@ def test_bucketing_process_to_file(df, tmpdir):
 
     # Test save to yaml in bucketer
     bucketing_process.save_yml(open(os.path.join(tmpdir, "buckets.yml"), "w"))
-    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
+    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml")))
     assert buckets_yaml == bucketing_process.features_bucket_mapping_.as_dict()
     # Test transforms work the same
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
@@ -191,7 +190,7 @@ def test_as_is_bucketers_to_file(bucketer, df, tmpdir) -> None:
 
     # Test save to yaml in bucketer
     BUCK.save_yml(open(os.path.join(tmpdir, "buckets.yml"), "w"))
-    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml"), "r"))
+    buckets_yaml = yaml.safe_load(open(os.path.join(tmpdir, "buckets.yml")))
     X_trans_yaml = UserInputBucketer(buckets_yaml).transform(X)
     assert X_trans.equals(X_trans_yaml)
 
@@ -200,6 +199,6 @@ def test_as_is_bucketers_to_file(bucketer, df, tmpdir) -> None:
     pipe.fit(X, y)
     assert X_trans.equals(pipe.transform(X))
     pipe.save_yml(open(os.path.join(tmpdir, "buckets3.yml"), "w"))
-    buckets_yaml3 = yaml.safe_load(open(os.path.join(tmpdir, "buckets3.yml"), "r"))
+    buckets_yaml3 = yaml.safe_load(open(os.path.join(tmpdir, "buckets3.yml")))
     X_trans_yaml = UserInputBucketer(buckets_yaml3).transform(X)
     assert X_trans.equals(X_trans_yaml)

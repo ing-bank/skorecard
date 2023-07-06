@@ -1,23 +1,16 @@
 import collections
-import pytest
 import itertools
 
+import pytest
+from category_encoders.woe import WOEEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import cross_val_score
-from sklearn.linear_model import LogisticRegression
 from sklearn.utils import estimator_checks
 
-from skorecard.bucketers import (
-    DecisionTreeBucketer,
-    OptimalBucketer,
-)
-from skorecard.pipeline import (
-    BucketingProcess,
-)
-
-from category_encoders.woe import WOEEncoder
-
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
+from skorecard.pipeline import BucketingProcess
 from tests.conftest import CLASSIFIERS, TRANSFORMERS
 
 # checks lists shamelessly copied from

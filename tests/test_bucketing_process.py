@@ -1,14 +1,13 @@
+import pytest
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.bucketers.bucketers import AsIsCategoricalBucketer, UserInputBucketer
-from skorecard.bucketers import OptimalBucketer, DecisionTreeBucketer
-from skorecard.preprocessing import WoeEncoder
 from skorecard.pipeline import BucketingProcess
 from skorecard.pipeline.bucketing_process import _find_remapped_specials
-from skorecard.utils import NotPreBucketedError, NotBucketObjectError, NotBucketedError
-
-from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import LogisticRegression
-
-import pytest
+from skorecard.preprocessing import WoeEncoder
+from skorecard.utils import NotBucketedError, NotBucketObjectError, NotPreBucketedError
 
 
 def test_bucketing_process_order(df):
@@ -109,7 +108,7 @@ def test_bucketing_optimization(df):
 
 
 def test_bucketing_with_specials(df):
-    """Test that specials propogate."""
+    """Test that specials propagate."""
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
 
@@ -148,7 +147,7 @@ def test_bucketing_with_specials(df):
 
 
 def test_bucketing_process_in_pipeline(df):
-    """Test that it works fine withing a sklearn pipeline."""
+    """Test that it works fine within a sklearn pipeline."""
     num_cols = ["LIMIT_BAL", "BILL_AMT1"]
     cat_cols = ["EDUCATION", "MARRIAGE"]
 
@@ -291,7 +290,7 @@ def test_bucketing_process_summary(df):
 
     bucketing_process.fit(X, y)
     table = bucketing_process.summary()
-    assert set(table.columns) == set(["column", "num_prebuckets", "num_buckets", "IV_score", "dtype"])
+    assert set(table.columns) == {"column", "num_prebuckets", "num_buckets", "IV_score", "dtype"}
     assert table[table["column"] == "pet_ownership"]["num_prebuckets"].values[0] == "not_prebucketed"
     assert table[table["column"] == "pet_ownership"]["num_buckets"].values[0] == "not_bucketed"
     assert len(table["dtype"].unique()) == 3
@@ -318,10 +317,10 @@ def test_bucketing_process_remainder(df):
         remainder="passthrough",
         specials={"EDUCATION": {"=0": [0]}},
         prebucketing_pipeline=make_pipeline(
-            DecisionTreeBucketer(max_n_bins=100, min_bin_size=0.05),  # note we didnt specify variables here!
+            DecisionTreeBucketer(max_n_bins=100, min_bin_size=0.05),  # note we didn't specify variables here!
         ),
         bucketing_pipeline=make_pipeline(
-            OptimalBucketer(max_n_bins=10, min_bin_size=0.05),  # note we didnt specify variables here!
+            OptimalBucketer(max_n_bins=10, min_bin_size=0.05),  # note we didn't specify variables here!
         ),
     )
     new_X = bucketing_process.fit_transform(X, y)

@@ -1,11 +1,11 @@
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict
 import warnings
+from typing import Dict, Optional
 
-from sklearn.utils.validation import check_is_fitted
+import numpy as np
+import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import Pipeline
+from sklearn.utils.validation import check_is_fitted
 
 from skorecard.bucket_mapping import BucketMapping
 from skorecard.metrics.metrics import _IV_score
@@ -76,7 +76,6 @@ def build_bucket_table(
         col_bucket_mapping = bucket_mapping
 
     if not bucket_mapping and bucketer:
-
         bucket_dict = bucketer.features_bucket_mapping_
 
         col_bucket_mapping = bucket_dict.get(column)
@@ -289,7 +288,7 @@ def psi(X1: pd.DataFrame, X2: pd.DataFrame, epsilon=0.0001, digits=None) -> Dict
     `X1` and `X2` should be bucketed (outputs of fitted bucketers).
 
     $$
-    PSI = \sum((\%{ Good } - \%{ Bad }) \times \ln \frac{\%{ Good }}{\%{ Bad }})
+    PSI = \\sum((\\%{ Good } - \\%{ Bad }) \times \\ln \frac{\\%{ Good }}{\\%{ Bad }})
     $$
 
     Args:
@@ -337,7 +336,7 @@ def psi(X1: pd.DataFrame, X2: pd.DataFrame, epsilon=0.0001, digits=None) -> Dict
 
 
 def iv(X: pd.DataFrame, y: pd.Series, epsilon: float = 0.0001, digits: Optional[int] = None) -> Dict:
-    """
+    r"""
     Calculate the Information Value (IV) of the features in `X`.
 
     `X` must be the output of fitted bucketers.

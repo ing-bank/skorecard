@@ -1,9 +1,8 @@
 import logging
-
-import pandas as pd
-import numpy as np
 from typing import Dict, List
 
+import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
@@ -26,8 +25,8 @@ except ModuleNotFoundError:
     dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
 
 
-from skorecard.apps.app_layout import add_basic_layout
 from skorecard.apps.app_callbacks import add_bucketing_callbacks
+from skorecard.apps.app_layout import add_basic_layout
 
 
 class KeepPandas(BaseEstimator, TransformerMixin):
@@ -105,7 +104,7 @@ def find_bucketing_step(pipeline: Pipeline, identifier: str = "bucketingprocess"
     """
     Finds a specific step in a sklearn Pipeline that has a 'name' attribute equalling 'identifier'.
 
-    This is usefull to extract certain steps from a pipeline, f.e. a BucketingProcess.
+    This is useful to extract certain steps from a pipeline, f.e. a BucketingProcess.
 
     Args:
         pipeline (sklearn.pipeline.Pipeline): sklearn pipeline
@@ -127,7 +126,7 @@ def find_bucketing_step(pipeline: Pipeline, identifier: str = "bucketingprocess"
         If you do not need prebucketing simply leave it empty.
 
         Example:
-        
+
         ```python
         from sklearn.pipeline import make_pipeline
         from skorecard.pipeline import make_bucketing_pipeline, make_prebucketing_pipeline
@@ -147,9 +146,9 @@ def find_bucketing_step(pipeline: Pipeline, identifier: str = "bucketingprocess"
         msg = """
         You need to identity only the bucketing step,
         using skorecard.pipeline.make_bucketing_pipeline and skorecard.pipeline.make_prebucketing_pipeline only once.
-        
+
         Example:
-        
+
         ```python
         from skorecard.pipeline import make_bucketing_pipeline
         bucket_pipeline = make_bucketing_pipeline(

@@ -1,9 +1,10 @@
-from sklearn.pipeline import make_pipeline
-from skorecard.bucketers.bucketers import DecisionTreeBucketer, EqualWidthBucketer
 import numpy as np
 import pandas as pd
 import pytest
-from skorecard.bucket_mapping import BucketMapping, merge_bucket_mapping, MissingDict
+from sklearn.pipeline import make_pipeline
+
+from skorecard.bucket_mapping import BucketMapping, MissingDict, merge_bucket_mapping
+from skorecard.bucketers.bucketers import DecisionTreeBucketer, EqualWidthBucketer
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 
 
@@ -229,7 +230,7 @@ def test_error_is_raised_if_wrong_specials():
 
 def test_features_bucket_mapping():
     """
-    Test contruction feature bucketing mapping.
+    Test construction feature bucketing mapping.
     """
     a = BucketMapping("testfeat1", "numerical", map=[1, 3, 5], right=True)
     b = BucketMapping("testfeat2", "numerical", map=[1, 3, 5], right=False)
@@ -595,7 +596,7 @@ def test_merge_features_bucket_mapping():
 
     assert FeaturesBucketMapping([c]) == merge_features_bucket_mapping(af, bf)
 
-    # now wiht new keys in either
+    # now with new keys in either
     a = BucketMapping("testfeat", "numerical", map=[1, 3, 5], right=True)
     b = BucketMapping("testfeat", "numerical", map=[1, 3], right=False)
     c = BucketMapping("new_feat", "numerical", map=[5, 6], right=False)

@@ -1,11 +1,14 @@
+from skorecard.apps.app_utils import colorize_cell, perc_data_bars
 from skorecard.utils.exceptions import NotInstalledError
-from skorecard.apps.app_utils import perc_data_bars, colorize_cell
 
 # Dash + dependencies
 try:
-    import dash_core_components as dcc
-    import dash_html_components as html
-    import dash_table
+    try:
+        from dash import dash_table, dcc, html
+    except ImportError:
+        import dash_core_components as dcc
+        import dash_html_components as html
+        import dash_table
 except ModuleNotFoundError:
     dcc = NotInstalledError("dash_core_components", "dashboard")
     html = NotInstalledError("dash_html_components", "dashboard")

@@ -1,5 +1,5 @@
-import pytest
 import pandas as pd
+import pytest
 
 from skorecard.bucketers import AsIsNumericalBucketer
 from skorecard.utils.exceptions import NotPreBucketedError

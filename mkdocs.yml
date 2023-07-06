@@ -40,6 +40,8 @@ theme:
         - navigation.tabs
         - navigation.top
 
+watch:
+- skorecard
 
 plugins:
     - search
@@ -50,18 +52,17 @@ plugins:
         default_handler: python
         handlers:
             python:
-                selection:
-                    inherited_members: true
-                rendering:
-                    show_source: false
-                    show_root_heading: false
-        watch:
-            - skorecard
+                options:
+                    selection:
+                        inherited_members: true
+                    rendering:
+                        show_source: false
+                        show_root_heading: false
     - git-revision-date-localized:
         type: timeago
 
 nav:
-    - Home: 
+    - Home:
         - Index: index.md
         - Contributing: contributing.md
     - Tutorials:
@@ -109,12 +110,13 @@ nav:
             - api/reporting/iv.md
             - api/reporting/psi.md
         - rescale:
-            - api/rescale/rescale.md 
+            - api/rescale/rescale.md
         - datasets:
             - api/datasets/load_uci_credit_card.md
     - Discussion:
         - Benchmarks: discussion/benchmarks.ipynb
         - Benchmarks with Explainable Boosting Classifier: discussion/benchmark_with_EBM.ipynb
+        - Benchmarks vs alternatives: discussion/benchmark_stats_feature.ipynb
 
 markdown_extensions:
     - codehilite:

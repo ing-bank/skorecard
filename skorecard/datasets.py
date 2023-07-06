@@ -1,5 +1,6 @@
-import pkgutil
 import io
+import pkgutil
+
 import pandas as pd
 from sklearn.datasets import fetch_openml
 
@@ -60,10 +61,12 @@ def load_credit_card(return_X_y=False, as_frame=False):
     try:
         data = fetch_openml(
             name="default-of-credit-card-clients",
+            version=1,
             data_home=None,
             cache=True,
             as_frame=as_frame,
             return_X_y=return_X_y,
+            parser="liac-arff",
         )
     except Exception as e:
         # update the error message with a more helpful message.

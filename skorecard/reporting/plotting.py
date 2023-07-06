@@ -1,21 +1,19 @@
 import pandas as pd
+from sklearn.pipeline import Pipeline
+from sklearn.utils.validation import check_is_fitted
 
 from skorecard.utils.exceptions import NotInstalledError
 
-from sklearn.utils.validation import check_is_fitted
-from sklearn.pipeline import Pipeline
-
 try:
-    import plotly.express as px
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
 except ModuleNotFoundError:
-    px = NotInstalledError("plotly", "reporting")
+    NotInstalledError("plotly", "reporting")
 
 try:
-    from IPython.display import Image
+    from IPython.core.display import Image
 except ModuleNotFoundError:
-    Image = NotInstalledError("psutil")
+    NotInstalledError("psutil")
 
 
 def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
@@ -53,7 +51,12 @@ def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
 
         # Add trace with event rate
         fig.add_trace(
-            go.Scatter(x=plotdf["label"], y=plotdf[column_to_plot], name=column_to_plot, line=dict(color="#454c57")),
+            go.Scatter(
+                x=plotdf["label"],
+                y=plotdf[column_to_plot],
+                name=column_to_plot,
+                line=dict(color="#454c57"),
+            ),
             secondary_y=True,
         )
         fig.update_yaxes(title_text=f"Bucket {column_to_plot}", secondary_y=True, tickformat=",.0%")
@@ -86,7 +89,15 @@ def make_plot_figure(bucket_table: pd.DataFrame, line="event_rate"):
     return fig
 
 
-def plot_prebucket_table(prebucket_table, column="", line="", format=None, scale=None, width=None, height=None):
+def plot_prebucket_table(
+    prebucket_table,
+    column="",
+    line="",
+    format=None,
+    scale=None,
+    width=None,
+    height=None,
+):
     """
     Given the prebucketed data, plot the pre-buckets.
 
@@ -187,7 +198,15 @@ class PlotPreBucketMethod:
     To be used with skorecard.pipeline.BucketingProcess and skorecard.bucketers.BaseBucketer
     """
 
-    def plot_prebucket(self, column, line="event_rate", format=None, scale=None, width=None, height=None):
+    def plot_prebucket(
+        self,
+        column,
+        line="event_rate",
+        format=None,
+        scale=None,
+        width=None,
+        height=None,
+    ):
         """
         Generates the prebucket table and produces a corresponding plotly plot.
 
@@ -225,7 +244,15 @@ class PlotBucketMethod:
     To be used with skorecard.pipeline.BucketingProcess and skorecard.bucketers.BaseBucketer
     """
 
-    def plot_bucket(self, column, line="event_rate", format=None, scale=None, width=None, height=None):
+    def plot_bucket(
+        self,
+        column,
+        line="event_rate",
+        format=None,
+        scale=None,
+        width=None,
+        height=None,
+    ):
         """
         Plot the buckets.
 
@@ -258,7 +285,6 @@ class PlotBucketMethod:
 
 
 def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height=None):
-
     """
     Generates a weight plot(plotly chart) from `stats`
     Example:
@@ -292,31 +318,28 @@ def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height
 
     fig.add_trace(
         go.Scatter(
-            x=stats['Coef.'],
-            y=stats['Coef.'].index,
-            line=dict(color='#42C4F7', width=2),
-            mode='markers',
-
+            x=stats["Coef."],
+            y=stats["Coef."].index,
+            line=dict(color="#42C4F7", width=2),
+            mode="markers",
             error_x=dict(
-                type='data',
+                type="data",
                 symmetric=False,
-                array=stats['conf_interval_0.975'] - stats['Coef.'],
-                arrayminus=stats['Coef.'] - stats['conf_interval_0.025'],
-                color='#68BBE3')
+                array=stats["conf_interval_0.975"] - stats["Coef."],
+                arrayminus=stats["Coef."] - stats["conf_interval_0.025"],
+                color="#68BBE3",
+            ),
         )
     )
 
-    fig.add_shape(type="line",
-                  x0=0, y0=0, x1=0, y1=len(stats),
-                  line=dict(color="#3f3f3f", width=3, dash='dash')
-                  )
+    fig.add_shape(type="line", x0=0, y0=0, x1=0, y1=len(stats), line=dict(color="#3f3f3f", width=3, dash="dash"))
 
     fig.update_layout(
-        title='Regression Meta Analysis - Weight Plot',
-        xaxis_title='Weight Estimates',
-        yaxis_title='Variable',
+        title="Regression Meta Analysis - Weight Plot",
+        xaxis_title="Weight Estimates",
+        yaxis_title="Variable",
         xaxis_showgrid=False,
-        yaxis_showgrid=False
+        yaxis_showgrid=False,
     )
     fig.update_layout(template="simple_white")
 

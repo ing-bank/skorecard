@@ -1,12 +1,11 @@
 import numpy as np
-
-from skorecard import datasets
-from skorecard.linear_model import LogisticRegression
-from skorecard.bucketers import EqualFrequencyBucketer
+import pytest
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-import pytest
+from skorecard import datasets
+from skorecard.bucketers import EqualFrequencyBucketer
+from skorecard.linear_model import LogisticRegression
 
 
 @pytest.fixture()

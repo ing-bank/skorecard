@@ -1,14 +1,13 @@
-import numpy as np
+import warnings
 from collections import defaultdict
+
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_is_fitted
 
 from skorecard.bucketers.base_bucketer import BaseBucketer
 from skorecard.metrics.metrics import woe_1d
 from skorecard.utils.validation import ensure_dataframe
-
-from sklearn.utils.validation import check_is_fitted
-from sklearn.base import BaseEstimator, TransformerMixin
-
-import warnings
 
 
 class WoeEncoder(BaseEstimator, TransformerMixin):

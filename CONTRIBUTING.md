@@ -22,6 +22,14 @@ We use [pre-commit](https://pre-commit.com/) hooks to ensure code styling. Insta
 pre-commit install
 ```
 
+Now if you install it (which you are encouraged to do), you are encouraged to do the following command before committing your work:
+
+```shell
+pre-commit run --all-files
+```
+
+This will allow you to quickly see if the work you made contains some adaptions that you still might need to make before a pull request is accepted.
+
 ## Documentation
 
 We use [mkdocs](https://www.mkdocs.org) with [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) theme. The docs are structured using the [divio documentation system](https://documentation.divio.com/). To view the docs locally:
@@ -47,7 +55,7 @@ When we create a new github release a [github action](https://github.com/ing-ban
 ## Logo
 
 - We adapted the ['scores' noun](https://thenounproject.com/search/?q=score&i=1929515)
-- We used [this color scheme](https://coolors.co/d7263d-f46036-2e294e-1b998b-c5d86d) from coolors.co 
+- We used [this color scheme](https://coolors.co/d7263d-f46036-2e294e-1b998b-c5d86d) from coolors.co
 - We edited the logo using https://boxy-svg.com/app
 
 ## Terminology

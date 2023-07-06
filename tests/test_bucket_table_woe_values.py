@@ -1,8 +1,8 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
-from skorecard.datasets import load_uci_credit_card
 from skorecard import Skorecard
+from skorecard.datasets import load_uci_credit_card
 
 
 def test_bucket_table_woe_values():
@@ -20,5 +20,5 @@ def test_bucket_table_woe_values():
         b_tab_woes = {x for x in b_tab_woes if pd.notna(x)}
         data_woes = set(np.round(X_woe[c].value_counts().index, 3))
         assert b_tab_woes == data_woes
-        iv_lt_zero = [ x < 0 for x in bucket_table["IV"] ]
+        iv_lt_zero = [x < 0 for x in bucket_table["IV"]]
         assert True not in iv_lt_zero

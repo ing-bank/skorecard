@@ -1,12 +1,11 @@
 import warnings
-import yaml
-import numpy as np
-import pandas as pd
 from typing import List
 
+import numpy as np
+import pandas as pd
+import yaml
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.tree import _tree
+from sklearn.tree import DecisionTreeClassifier, _tree
 from sklearn.utils.multiclass import unique_labels
 
 from skorecard.bucketers.base_bucketer import BaseBucketer
@@ -149,7 +148,7 @@ class OptimalBucketer(BaseBucketer):
             splits, right (tuple): The splits (dict or array), and whether right=True or False.
         """
         # Normally Optbinning uses a DecisionTreeBucketer to do automatic prebinning
-        # We require the user to pre-bucket explictly before using this.
+        # We require the user to pre-bucket explicitly before using this.
         if self.variables_type == "numerical":
             uniq_values = np.sort(np.unique(X.values))
             if len(uniq_values) > 100:
@@ -227,8 +226,8 @@ class EqualWidthBucketer(BaseBucketer):
         variables=[],
         specials={},
         missing_treatment="separate",
-        remainder="passthrough", 
-        get_statistics=True
+        remainder="passthrough",
+        get_statistics=True,
     ):
         """Init the class.
 
@@ -438,7 +437,7 @@ class EqualFrequencyBucketer(BaseBucketer):
         specials={},
         missing_treatment="separate",
         remainder="passthrough",
-        get_statistics=True
+        get_statistics=True,
     ):
         """Init the class.
 
@@ -474,7 +473,6 @@ class EqualFrequencyBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
 
     @property
     def variables_type(self):
@@ -718,7 +716,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
         encoding_method="frequency",
         missing_treatment="separate",
         remainder="passthrough",
-        get_statistics=True
+        get_statistics=True,
     ):
         """
         Init the class.
@@ -850,12 +848,7 @@ class AsIsCategoricalBucketer(BaseBucketer):
     """  # noqa
 
     def __init__(
-        self,
-        variables=[],
-        specials={},
-        missing_treatment="separate",
-        remainder="passthrough",
-        get_statistics=True
+        self, variables=[], specials={}, missing_treatment="separate", remainder="passthrough", get_statistics=True
     ):
         """Init the class.
 
@@ -889,7 +882,6 @@ class AsIsCategoricalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
 
     @property
     def variables_type(self):
@@ -947,8 +939,8 @@ class AsIsNumericalBucketer(BaseBucketer):
         variables=[],
         specials={},
         missing_treatment="separate",
-        remainder="passthrough", 
-        get_statistics=True
+        remainder="passthrough",
+        get_statistics=True,
     ):
         """
         Init the class.
@@ -987,7 +979,6 @@ class AsIsNumericalBucketer(BaseBucketer):
         self.missing_treatment = missing_treatment
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
 
     @property
     def variables_type(self):
@@ -1069,11 +1060,7 @@ class UserInputBucketer(BaseBucketer):
     """  # noqa
 
     def __init__(
-        self,
-        features_bucket_mapping=None,
-        variables: List = [],
-        remainder="passthrough", 
-        get_statistics=True
+        self, features_bucket_mapping=None, variables: List = [], remainder="passthrough", get_statistics=True
     ) -> None:
         """
         Initialise the user-defined boundaries with a dictionary.
@@ -1097,13 +1084,13 @@ class UserInputBucketer(BaseBucketer):
         self.features_bucket_mapping = features_bucket_mapping
         self.remainder = remainder
         self.get_statistics = get_statistics
-        
+
         self.variables = variables
 
         if features_bucket_mapping is None:
             self.features_bucket_mapping_ = FeaturesBucketMapping()
         elif isinstance(features_bucket_mapping, str):
-            buckets_yaml = yaml.safe_load(open(features_bucket_mapping, "r"))
+            buckets_yaml = yaml.safe_load(open(features_bucket_mapping))
             self.features_bucket_mapping_ = FeaturesBucketMapping(buckets_yaml)
         elif isinstance(features_bucket_mapping, dict):
             self.features_bucket_mapping_ = FeaturesBucketMapping(features_bucket_mapping)

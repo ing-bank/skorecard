@@ -1,27 +1,21 @@
-import pytest
 import numpy as np
 import pandas as pd
-
-from sklearn.pipeline import make_pipeline
-from sklearn.exceptions import NotFittedError
-from sklearn.preprocessing import StandardScaler
+import pytest
 from sklearn.compose import ColumnTransformer
+from sklearn.exceptions import NotFittedError
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
-from skorecard.bucketers import (
-    EqualWidthBucketer,
-    EqualFrequencyBucketer,
-    OrdinalCategoricalBucketer,
-    DecisionTreeBucketer,
-    OptimalBucketer,
-)
-from skorecard.pipeline import (
-    get_features_bucket_mapping,
-    KeepPandas,
-    BucketingProcess,
-    find_bucketing_step,
-)
-from skorecard.pipeline.pipeline import to_skorecard_pipeline, SkorecardPipeline
 from skorecard.bucket_mapping import BucketMapping
+from skorecard.bucketers import (
+    DecisionTreeBucketer,
+    EqualFrequencyBucketer,
+    EqualWidthBucketer,
+    OptimalBucketer,
+    OrdinalCategoricalBucketer,
+)
+from skorecard.pipeline import BucketingProcess, KeepPandas, find_bucketing_step, get_features_bucket_mapping
+from skorecard.pipeline.pipeline import SkorecardPipeline, to_skorecard_pipeline
 from skorecard.utils import BucketingPipelineError
 
 

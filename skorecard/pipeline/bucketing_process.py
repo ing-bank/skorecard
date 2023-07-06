@@ -1,27 +1,24 @@
 import pathlib
-import pandas as pd
-import numpy as np
 import warnings
-
 from copy import deepcopy
+from typing import Dict, List, Optional, TypeVar
 
+import numpy as np
+import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted
 from sklearn.pipeline import make_pipeline
+from sklearn.utils.validation import check_is_fitted
 
-from skorecard.utils import NotPreBucketedError, NotBucketedError
+from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
+from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 from skorecard.pipeline import to_skorecard_pipeline
 from skorecard.pipeline.pipeline import _get_all_steps
-from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.reporting import build_bucket_table
-from skorecard.reporting.report import BucketTableMethod, SummaryMethod
 from skorecard.reporting.plotting import PlotBucketMethod, PlotPreBucketMethod
-from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
-from skorecard.utils.validation import is_fitted, ensure_dataframe
+from skorecard.reporting.report import BucketTableMethod, SummaryMethod
+from skorecard.utils import NotBucketedError, NotPreBucketedError
 from skorecard.utils.exceptions import NotInstalledError
-
-from typing import Dict, TypeVar, List
-
+from skorecard.utils.validation import ensure_dataframe, is_fitted
 
 # JupyterDash
 try:
@@ -35,9 +32,8 @@ except ModuleNotFoundError:
     dbc = NotInstalledError("dash_bootstrap_components", "dashboard")
 
 
-from skorecard.apps.app_layout import add_bucketing_process_layout
 from skorecard.apps.app_callbacks import add_bucketing_process_callbacks
-
+from skorecard.apps.app_layout import add_bucketing_process_layout
 
 PathLike = TypeVar("PathLike", str, pathlib.Path)
 
@@ -107,7 +103,7 @@ class BucketingProcess(
         bucketing_pipeline=make_pipeline(OptimalBucketer(max_n_bins=6, min_bin_size=0.05)),
         variables: List = [],
         specials: Dict = {},
-        random_state: int = None,
+        random_state: Optional[int] = None,
         remainder="passthrough",
     ):
         """
@@ -191,8 +187,9 @@ class BucketingProcess(
             # Overwrite random_state to bucketers
             if hasattr(step, "random_state") and self.random_state is not None:
                 if step.random_state is not None:
-                    warnings.warn(f"Overwriting random_state of {step} with random_state of bucketingprocess",
-                                  UserWarning)
+                    warnings.warn(
+                        f"Overwriting random_state of {step} with random_state of bucketingprocess", UserWarning
+                    )
                 step.random_state = self.random_state
 
         # Overwrite variables to all bucketers
@@ -206,8 +203,9 @@ class BucketingProcess(
         for step in _get_all_steps(self.pipeline_):
             if hasattr(step, "random_state") and self.random_state is not None:
                 if step.random_state is not None:
-                    warnings.warn(f"Overwriting random_state of {step} with random_state of bucketingprocess",
-                                  UserWarning)
+                    warnings.warn(
+                        f"Overwriting random_state of {step} with random_state of bucketingprocess", UserWarning
+                    )
                 step.random_state = self.random_state
 
         self._prebucketing_specials = self.specials

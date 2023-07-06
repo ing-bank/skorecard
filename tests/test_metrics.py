@@ -3,8 +3,8 @@ import pandas as pd
 import pytest
 
 import skorecard.reporting.report
-from skorecard.metrics import metrics
 from skorecard.bucketers import DecisionTreeBucketer
+from skorecard.metrics import metrics
 
 
 @pytest.fixture()
@@ -68,7 +68,7 @@ def test_psi_values(X1_X2):
 def test_IV_values(X_y):
     """Assert IV values match expectations."""
     X, y = X_y
-    random_index = [ 2 * x for x in range(0, len(y)) ]
+    random_index = [2 * x for x in range(0, len(y))]
     X = pd.DataFrame(X, columns=["col1", "col2"], index=random_index)
     expected_iv = {"col1": 5.307, "col2": 4.635}
     iv_vals = skorecard.reporting.report.iv(X, y)
