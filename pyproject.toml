@@ -40,14 +40,15 @@ Repository = "https://github.com/ing-bank/skorecard.git"
 Changelog = "https://github.com/ing-bank/skorecard/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
-all = [
-    # Dashboard dependencies
+dashboard = [
     "dash>=1.21.0",
     "jupyter-dash>=0.4.0",
     "dash_bootstrap_components>=0.13",
-    # Reporting dependencies
+]
+reporting = [
     "plotly>=4.14.3",
-    # Dev dependencies
+]
+dev = [
     "black>=19.10b0",
     "pre-commit>=2.5.0",
     "pytest>=6.0.0",
@@ -61,7 +62,8 @@ all = [
     "types-PyYAML>=6.0.12.10",
     "types-six>=1.16.21.8",
     "types-decorator>=5.1.8.3",
-    # Doc dependencies
+]
+docs = [
     "mkdocs>=1.1.2",
     "mkdocs-material>=7.1",
     "mkdocstrings>=0.13.2",
@@ -69,6 +71,7 @@ all = [
     "mkdocs-git-revision-date-localized-plugin>=0.7.2",
     "mkdocstrings-python>=1.1.2",
 ]
+all = ["skorecard[dependencies,dashboard,reporting,dev,docs]"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "notebooks", "docs"]
