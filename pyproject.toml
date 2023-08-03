@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "skorecard"
-version = "1.6.7"
+dynamic = ["version"]
 requires-python= ">=3.8"
 description = "Tools for building scorecard models in python, with a sklearn-compatible API"
 readme = { file = "README.md", content-type = "text/markdown" }
@@ -71,10 +71,13 @@ docs = [
     "mkdocs-git-revision-date-localized-plugin>=0.7.2",
     "mkdocstrings-python>=1.1.2",
 ]
-all = ["skorecard[dependencies,dashboard,reporting,dev,docs]"]
+all = ["skorecard[dashboard,reporting,dev,docs]"]
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "notebooks", "docs"]
+
+[tool.setuptools.dynamic]
+version = {attr = "skorecard.__version__"}
 
 [tool.nbqa.addopts]
 # E402: Ignores imports not at the top of file for IPYNB since this makes copy-pasting easier.
