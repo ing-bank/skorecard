@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "skorecard"
 dynamic = ["version"]
-requires-python= ">=3.8"
+requires-python= ">=3.9"
 description = "Tools for building scorecard models in python, with a sklearn-compatible API"
 readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
@@ -17,15 +17,15 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
 ]
 dependencies = [
     "scipy>=1.5.2",
-    "numpy>=1.19.5",
+    "numpy>=1.19.5,<2.0.0",
     "pandas>=1.5.3",
     "scikit-learn>=0.23.2",
     "pyyaml",
@@ -50,14 +50,16 @@ reporting = [
 ]
 dev = [
     "black>=19.10b0",
-    "pre-commit>=2.5.0",
     "pytest>=6.0.0",
     "pytest-cov>=2.10.0",
     "pyflakes>=3.0.1",
+
+    "mypy>=0.770",
+
+    "pre-commit>=2.7.1",
     "isort>=5.12.0",
     "codespell>=2.2.4",
-    "ruff>=0.0.272",
-    "mypy>=0.770",
+    "ruff>=0.2.2"
     # Mypy type stubs
     "types-PyYAML>=6.0.12.10",
     "types-six>=1.16.21.8",
@@ -107,7 +109,7 @@ force-exclude = true
 convention = "google"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 ignore_missing_imports = true
 namespace_packages = true
 pretty = true
