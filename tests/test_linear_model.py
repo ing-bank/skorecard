@@ -15,6 +15,7 @@ def X_y():
     return X, y
 
 
+# TODO Pytest parametrization
 def test_output_dimensions():
     """Test the dimensions of the new attributes."""
     shape_features = (10, 3)
@@ -31,7 +32,6 @@ def test_output_dimensions():
     assert not np.isnan(lr.std_err_intercept_)
 
     lr = LogisticRegression(fit_intercept=False).fit(X, y, calculate_stats=True)
-
     assert lr.p_val_coef_.shape[1] == shape_features[1]
     assert lr.z_coef_.shape[1] == shape_features[1]
     assert len(lr.std_err_coef_) == shape_features[1]

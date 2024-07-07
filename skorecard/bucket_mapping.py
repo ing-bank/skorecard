@@ -1,6 +1,7 @@
 """
 Classes to store features mapping for bucketing.
 """
+
 import dataclasses
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
@@ -67,9 +68,7 @@ class BucketMapping:
         assert isinstance(self.specials, dict) or isinstance(self.specials, list)
 
         # Check specials
-        assert all(
-            [isinstance(k, str) for k in self.specials.keys()]
-        ), f"The keys of the special dictionary must be \
+        assert all([isinstance(k, str) for k in self.specials.keys()]), f"The keys of the special dictionary must be \
         strings, got {self.specials.keys()} instead."
         assert all(
             [isinstance(k, list) for k in self.specials.values()]

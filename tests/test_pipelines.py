@@ -42,7 +42,7 @@ def test_keep_pandas(df, caplog):
         bucket_pipeline.transform(X)
 
     bucket_pipeline.fit(X, y)
-    assert type(bucket_pipeline.transform(X)) == pd.DataFrame
+    assert isinstance(bucket_pipeline.transform(X), pd.DataFrame)
 
     bucket_pipeline = ColumnTransformer(
         [
@@ -62,7 +62,7 @@ def test_keep_pandas(df, caplog):
     KeepPandas(bucket_pipeline)
     assert "sklearn.compose.ColumnTransformer can change" in caplog.text
 
-    assert type(KeepPandas(bucket_pipeline).fit_transform(X, y)) == pd.DataFrame
+    assert isinstance(KeepPandas(bucket_pipeline).fit_transform(X, y), pd.DataFrame)
 
 
 def test_bucketing_pipeline(df):
@@ -234,6 +234,7 @@ def test_skorecard_pipeline(df):
     sk_pipe = to_skorecard_pipeline(bucketer)
 
 
+# TODO Cleanup
 # def test_bucket_transformer_bin_count_list(df):
 #     """Test the exception is raised in scikit-learn pipeline."""
 #     with pytest.raises(AttributeError):

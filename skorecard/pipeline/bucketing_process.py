@@ -232,7 +232,7 @@ class BucketingProcess(
 
         # Then assign the new specials to all bucketers in the bucketing pipeline
         for step in self.pipeline_.steps:
-            if type(step) != tuple:
+            if not isinstance(step, tuple):
                 step.specials = self._bucketing_specials
             else:
                 step[1].specials = self._bucketing_specials

@@ -88,7 +88,7 @@ def test_optimal_binning_numerical(df):
     obt.fit(X, y)
     assert all(obt.features_bucket_mapping_.get("LIMIT_BAL").transform([0, 30_000]) == np.array([0, 1]))
 
-    # optb.binning_table.build()
+    # optb.binning_table.build() # TODO Cleanup
     # optb.splits
     # obt.features_bucket_mapping_.get('LIMIT_BAL')
 
@@ -147,7 +147,7 @@ def test_optimal_binning_categorical_specials(df):
     """
     Test categoricals with specials.
     """
-    # WIP - currently not implemented yet
+    # WIP - currently not implemented yet # TODO Cleanup
     X = df[["LIMIT_BAL", "BILL_AMT1", "EDUCATION", "pet_ownership"]]
     y = df["default"].values
 
@@ -164,8 +164,8 @@ def test_optimal_binning_categorical_specials(df):
     specials = {"pet_ownership": {"indoor pets outside water": ["dog lover", "cat lover"]}}
     obt = OptimalBucketer(variables=["pet_ownership"], max_n_bins=2, variables_type="categorical", specials=specials)
     X_trans = obt.fit_transform(X, y)
-    # import pdb; pdb.set_trace();
-    assert len(X_trans.pet_ownership.unique()) == 2 + 1  # 2 bins plus 1 speclias
+    # import pdb; pdb.set_trace(); # TODO Cleanup
+    assert len(X_trans.pet_ownership.unique()) == 2 + 1  # 2 bins plus 1 specials
 
 
 def test_optimal_bucketing_cats(df):
@@ -176,7 +176,7 @@ def test_optimal_bucketing_cats(df):
     y = df["default"].values
     # specials = {'pet_ownership': {"indoor pets outside water": ['dog lover','cat lover']}}
 
-    # obt.features_bucket_mapping_.get('pet_ownership')
+    # obt.features_bucket_mapping_.get('pet_ownership') # TODO Cleanup
     obt = OptimalBucketer(variables=["pet_ownership"], variables_type="categorical")
     X_trans = obt.fit_transform(X, y)
     # assert len(X_trans.pet_ownership.unique()) == 5

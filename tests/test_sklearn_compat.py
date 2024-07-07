@@ -221,5 +221,6 @@ def test_cv_pipeline(df):
     with pytest.warns(None) as _:
         cross_val_score(pipe, X, y, cv=5, scoring="roc_auc")
 
+    # TODO Cleanup
     # also make sure no warnings were raised
     # assert len(record) == 0

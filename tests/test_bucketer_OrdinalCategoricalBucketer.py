@@ -13,6 +13,7 @@ def test_threshold_min(df) -> None:
         OrdinalCategoricalBucketer(tol=1.001, variables=["EDUCATION"]).fit(X=None, y=None)
 
 
+# TODO Pytest parametrization
 def test_correct_output(df):
     """Test that correct use of CatBucketTransformer returns expected results."""
     X = df

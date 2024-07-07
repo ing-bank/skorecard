@@ -91,9 +91,7 @@ def perc_data_bars(column):
                     #0074D9 {max_bound_percentage}%,
                     rgb(248, 248, 248) {max_bound_percentage}%,
                     rgb(248, 248, 248) 100%)
-                """.format(
-                        max_bound_percentage=max_bound_percentage
-                    )
+                """.format(max_bound_percentage=max_bound_percentage)
                 ),
                 "paddingBottom": 2,
                 "paddingTop": 2,
@@ -117,9 +115,7 @@ def perc_data_bars(column):
                     #0074D9 {max_bound_percentage}%,
                     white {max_bound_percentage}%,
                     white 100%)
-                """.format(
-                        max_bound_percentage=max_bound_percentage
-                    )
+                """.format(max_bound_percentage=max_bound_percentage)
                 ),
                 "paddingBottom": 2,
                 "paddingTop": 2,

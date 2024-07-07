@@ -4,6 +4,7 @@ from skorecard.apps.app_utils import determine_boundaries
 from skorecard.bucket_mapping import BucketMapping
 
 
+# TODO Add pytest parametrization
 def test_determine_boundaries():
     """Tests function."""
     df = pd.DataFrame()
