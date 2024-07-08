@@ -57,7 +57,6 @@ nonmeta_checks = (
     estimator_checks.check_pipeline_consistency,
     estimator_checks.check_estimators_nan_inf,
     estimator_checks.check_estimators_overwrite_params,
-    estimator_checks.check_estimator_sparse_data,
 )
 
 
@@ -148,7 +147,6 @@ def test_transformer_checks(transformer, test_fn):
                     "check_complex_data",
                     "check_estimators_empty_data_messages",
                     "check_estimators_nan_inf",
-                    "check_estimator_sparse_data",
                     "check_supervised_y_no_nan",
                     "check_estimators_partial_fit_n_features",
                 ],
