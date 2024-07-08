@@ -44,7 +44,7 @@ def test_results(X_y):
     """Test the actual p-values."""
     expected_approx_p_val_coef_ = np.array([[1.0, 1.0, 0.0, 0.8425]])
 
-    lr = LogisticRegression(fit_intercept=True, penalty="none").fit(*X_y, calculate_stats=True)
+    lr = LogisticRegression(fit_intercept=True, penalty=None).fit(*X_y, calculate_stats=True)
 
     np.testing.assert_array_almost_equal(lr.p_val_coef_, expected_approx_p_val_coef_, decimal=3)
 

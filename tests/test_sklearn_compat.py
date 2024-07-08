@@ -57,6 +57,8 @@ nonmeta_checks = (
     estimator_checks.check_pipeline_consistency,
     estimator_checks.check_estimators_nan_inf,
     estimator_checks.check_estimators_overwrite_params,
+    estimator_checks.check_estimator_sparse_matrix,
+    estimator_checks.check_estimator_sparse_array,
 )
 
 
@@ -104,6 +106,8 @@ def flatten(nested_iterable):
                     "check_fit2d_1sample",
                     "check_methods_subset_invariance",
                     "check_estimators_nan_inf",
+                    "check_estimator_sparse_matrix",
+                    "check_estimator_sparse_array",
                     "check_estimators_empty_data_messages",
                     "check_transformer_data_not_an_array",
                     "check_dtype_object",
