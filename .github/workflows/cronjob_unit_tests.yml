@@ -1,0 +1,57 @@
+name: Cron Test Dependencies
+
+# Controls when the action will run.
+# Every sunday at 4:05
+# See https://crontab.guru/#5 4 * * 0
+on:
+  schedule:
+    - cron: "5 4 * * 0"
+
+jobs:
+  run:
+    name: Run unit tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        build: [macos, ubuntu, windows]
+        include:
+          - build: macos
+            os: macos-latest
+          - build: ubuntu
+            os: ubuntu-latest
+          - build: windows
+            os: windows-latest
+        python-version: [3.9, "3.10", "3.11", "3.12"]
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Get latest CMake and Ninja
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: latest
+        ninjaVersion: latest
+
+    - name: Install LIBOMP on Macos runners
+      if: runner.os == 'macOS'
+      run: |
+        brew install libomp
+
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Python dependencies
+      run: |
+        pip3 install --upgrade setuptools pip
+        pip3 install ".[all]"
+
+    - name: Run linters
+      run: |
+        pre-commit install
+        pre-commit run --all-files
+
+    - name: Run (unit) tests
+      run: |
+        pytest
+        pyflakes skorecard
