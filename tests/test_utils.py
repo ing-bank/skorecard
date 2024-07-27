@@ -1,20 +1,16 @@
 import pytest
 from sklearn.tree import DecisionTreeClassifier
+import warnings
 
 from skorecard.utils.validation import check_args
 
 
-def test_checks_args():
+@pytest.mark.parametrize("args, nr_of_warnings", [({"hi": 1}, 1), ({"min_samples_leaf": 1}, 0)])
+def test_checks_args(args, nr_of_warnings):
     """
     Tests checking arguments.
     """
-    args = {"hi": 1}
-    with pytest.warns(UserWarning):
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
         check_args(args, DecisionTreeClassifier)
-
-    # check no warning is raised with valid arg
-    args = {"min_samples_leaf": 1}
-    with pytest.warns(None) as record:
-        check_args(args, DecisionTreeClassifier)
-
-    assert len(record) == 0
+        return len(caught_warnings) == nr_of_warnings

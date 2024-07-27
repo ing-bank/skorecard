@@ -12,6 +12,7 @@ from sklearn.utils import estimator_checks
 from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.pipeline import BucketingProcess
 from tests.conftest import CLASSIFIERS, TRANSFORMERS
+import warnings
 
 # checks lists shamelessly copied from
 # https://github.com/koaning/human-learn/blob/master/tests/conftest.py
@@ -220,9 +221,7 @@ def test_cv_pipeline(df):
         bucketing_process, WOEEncoder(cols=X.columns), LogisticRegression(solver="liblinear", random_state=0)
     )
 
-    with pytest.warns(None) as _:
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
         cross_val_score(pipe, X, y, cv=5, scoring="roc_auc")
-
-    # TODO Cleanup
-    # also make sure no warnings were raised
-    # assert len(record) == 0
+        return len(caught_warnings) == 0

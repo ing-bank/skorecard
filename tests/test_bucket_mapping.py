@@ -8,7 +8,6 @@ from skorecard.bucketers.bucketers import DecisionTreeBucketer, EqualWidthBucket
 from skorecard.features_bucket_mapping import FeaturesBucketMapping, merge_features_bucket_mapping
 
 
-# TODO Pytest parametrization
 def test_bucket_mapping_numerical():
     """Tests numerical transforms."""
     bm = BucketMapping("testfeat", "numerical", map=[1, 3, 5], right=True)
