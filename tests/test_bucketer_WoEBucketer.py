@@ -140,7 +140,7 @@ def test_woe_in_pipeline(df):
     )
 
     out = pipeline.fit_transform(X, y)
-    assert all(out.dtypes == float)
+    assert out.select_dtypes(include=[float]).shape[1] == out.shape[1]
     npt.assert_almost_equal(out["LIMIT_BAL"][0], 0.566607, decimal=4)
     npt.assert_almost_equal(out["LIMIT_BAL"][1], -0.165262, decimal=4)
     npt.assert_almost_equal(out["LIMIT_BAL"][3], -0.031407, decimal=4)

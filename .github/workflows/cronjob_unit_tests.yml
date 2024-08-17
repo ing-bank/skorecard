@@ -1,19 +1,16 @@
-name: Development
+name: Cron Test Dependencies
+
+# Controls when the action will run.
+# Every sunday at 4:05
+# See https://crontab.guru/#5 4 * * 0
 on:
-  # Trigger the workflow on push or pull request,
-  # but only for the master branch
-  push:
-    branches:
-      - main
-    pull_request:
-      branches:
-        - main
+  schedule:
+    - cron: "5 4 * * 0"
+
 jobs:
   run:
-    name: Run unit tests with codecov upload
+    name: Run unit tests
     runs-on: ${{ matrix.os }}
-    env:
-      USING_COVERAGE: '3.10'
     strategy:
       matrix:
         build: [macos, ubuntu, windows]
@@ -24,7 +21,7 @@ jobs:
             os: ubuntu-latest
           - build: windows
             os: windows-latest
-            python-version: [3.9, "3.10", "3.11", "3.12"]
+        python-version: [3.9, "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@master
 
@@ -54,7 +51,7 @@ jobs:
         pre-commit install
         pre-commit run --all-files
 
-    - name: Run (unit) tests and generate coverage report
+    - name: Run (unit) tests
       run: |
-        pytest --cov=src --cov-report=xml -vvv
+        pytest
         pyflakes skorecard

@@ -239,6 +239,7 @@ def test_features_bucket_mapping():
     assert fbm.get("testfeat2") == b
     assert len(fbm) == 2
 
+    # TODO: Remove or include
     # features_dict = {
     #     'feature1': {'feature_name': 'feature1',
     #         'type': 'numerical',

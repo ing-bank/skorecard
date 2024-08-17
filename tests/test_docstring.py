@@ -49,7 +49,7 @@ def handle_docstring(doc, indent):
             exec(code_part)
 
 
-# @pytest.mark.parametrize("m", MODULES_TO_TEST)
+# @pytest.mark.parametrize("m", MODULES_TO_TEST) # TODO Cleanup
 # def test_module_docstrings(m):
 #     """
 #     Take the docstring of a given module.

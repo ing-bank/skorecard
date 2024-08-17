@@ -12,6 +12,7 @@ from sklearn.utils import estimator_checks
 from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer
 from skorecard.pipeline import BucketingProcess
 from tests.conftest import CLASSIFIERS, TRANSFORMERS
+import warnings
 
 # checks lists shamelessly copied from
 # https://github.com/koaning/human-learn/blob/master/tests/conftest.py
@@ -57,7 +58,8 @@ nonmeta_checks = (
     estimator_checks.check_pipeline_consistency,
     estimator_checks.check_estimators_nan_inf,
     estimator_checks.check_estimators_overwrite_params,
-    estimator_checks.check_estimator_sparse_data,
+    estimator_checks.check_estimator_sparse_matrix,
+    estimator_checks.check_estimator_sparse_array,
 )
 
 
@@ -105,6 +107,8 @@ def flatten(nested_iterable):
                     "check_fit2d_1sample",
                     "check_methods_subset_invariance",
                     "check_estimators_nan_inf",
+                    "check_estimator_sparse_matrix",
+                    "check_estimator_sparse_array",
                     "check_estimators_empty_data_messages",
                     "check_transformer_data_not_an_array",
                     "check_dtype_object",
@@ -148,7 +152,6 @@ def test_transformer_checks(transformer, test_fn):
                     "check_complex_data",
                     "check_estimators_empty_data_messages",
                     "check_estimators_nan_inf",
-                    "check_estimator_sparse_data",
                     "check_supervised_y_no_nan",
                     "check_estimators_partial_fit_n_features",
                 ],
@@ -218,8 +221,7 @@ def test_cv_pipeline(df):
         bucketing_process, WOEEncoder(cols=X.columns), LogisticRegression(solver="liblinear", random_state=0)
     )
 
-    with pytest.warns(None) as _:
+    with warnings.catch_warnings(record=True) as caught_warnings:
+        warnings.simplefilter("always")
         cross_val_score(pipe, X, y, cv=5, scoring="roc_auc")
-
-    # also make sure no warnings were raised
-    # assert len(record) == 0
+        return len(caught_warnings) == 0

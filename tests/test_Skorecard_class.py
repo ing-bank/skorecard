@@ -109,7 +109,7 @@ def test_passing_kwargs(df):
     skorecard_model = Skorecard(
         bucketing=bucketer,
         variables=features,
-        lr_kwargs={"penalty": "none", "C": 1, "multi_class": "ovr", "n_jobs": 1, "max_iter": int(1e3)},
+        lr_kwargs={"penalty": None, "C": 1, "multi_class": "ovr", "n_jobs": 1, "max_iter": int(1e3)},
     )
     skorecard_model.fit(X, y)
 

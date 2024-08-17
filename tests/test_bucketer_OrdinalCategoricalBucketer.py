@@ -13,31 +13,16 @@ def test_threshold_min(df) -> None:
         OrdinalCategoricalBucketer(tol=1.001, variables=["EDUCATION"]).fit(X=None, y=None)
 
 
-def test_correct_output(df):
+@pytest.mark.parametrize("tol_input, expected_unique,", [(0.44, 2), (0.05, 4), (0, 7), (0.5, 1)])
+def test_correct_output(df, tol_input, expected_unique):
     """Test that correct use of CatBucketTransformer returns expected results."""
     X = df
     y = df["default"].values
 
-    cbt = OrdinalCategoricalBucketer(tol=0.44, variables=["EDUCATION"])
+    cbt = OrdinalCategoricalBucketer(tol=tol_input, variables=["EDUCATION"])
     cbt.fit(X, y)
     X_trans = cbt.transform(X)
-    assert len(X_trans["EDUCATION"].unique()) == 2
-
-    cbt = OrdinalCategoricalBucketer(tol=0.05, variables=["EDUCATION"])
-    cbt.fit(X, y)
-    X_trans = cbt.transform(X)
-    assert len(X_trans["EDUCATION"].unique()) == 4
-
-    cbt = OrdinalCategoricalBucketer(tol=0, variables=["EDUCATION"])
-    cbt.fit(X, y)
-    X_trans = cbt.transform(X)
-    assert len(X_trans["EDUCATION"].unique()) == len(X["EDUCATION"].unique())
-
-    # when the threshold is above the maximum value, make sure its only one bucket
-    cbt = OrdinalCategoricalBucketer(tol=0.5, variables=["EDUCATION"])
-    cbt.fit(X, y)
-    X_trans = cbt.transform(X)
-    assert len(X_trans["EDUCATION"].unique()) == 1
+    assert len(X_trans["EDUCATION"].unique()) == expected_unique
 
 
 def test_mapping_dict(df):

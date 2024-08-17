@@ -78,15 +78,15 @@ class BaseBucketer(BaseEstimator, TransformerMixin, PlotBucketMethod, BucketTabl
             "passthrough",
         ]
 
-        if type(missing_treatment) == str:
+        if isinstance(missing_treatment, str):
             if missing_treatment not in allowed_str_missing:
                 raise ValueError(f"missing_treatment must be in {allowed_str_missing} or a dict")
 
-        elif type(missing_treatment) == dict:
+        elif isinstance(missing_treatment, dict):
             for _, v in enumerate(missing_treatment):
                 if missing_treatment[v] < 0:
                     raise ValueError("As an integer, missing_treatment must be greater than 0")
-                elif type(missing_treatment[v]) != int:
+                elif not isinstance(missing_treatment[v], int):
                     raise ValueError("Values of the missing_treatment dict must be integers")
 
         else:

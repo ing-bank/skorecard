@@ -222,7 +222,7 @@ def _get_all_steps(pipeline: Pipeline) -> List:
     """
     steps = []
     for step in pipeline.steps:
-        if type(step) == tuple:
+        if isinstance(step, tuple):
             step = step[1]
         if hasattr(step, "steps"):
             steps += _get_all_steps(step)

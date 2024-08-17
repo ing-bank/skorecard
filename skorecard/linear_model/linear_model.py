@@ -139,7 +139,7 @@ class LogisticRegression(lm.LogisticRegression):
         else:
             X_design = X
 
-        p = np.product(predProbs, axis=1)
+        p = np.prod(predProbs, axis=1)
         self.cov_matrix_ = np.linalg.inv((X_design * p[..., np.newaxis]).T @ X_design)
         std_err = np.sqrt(np.diag(self.cov_matrix_)).reshape(1, -1)
 
