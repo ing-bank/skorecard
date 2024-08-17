@@ -1,0 +1,3698 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Build credit risk scorecards with sklearn-compatible components">
+      
+      
+        <meta name="author" content="RPAA">
+      
+      
+        <link rel="canonical" href="https://github.com/ing-bank/skorecard/tutorials/3_skorecard_model/">
+      
+      
+        <link rel="prev" href="../2_feature_selection/">
+      
+      
+        <link rel="next" href="../../howto/using_manually_defined_buckets/">
+      
+      
+      <link rel="icon" href="../../assets/images/cli.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
+    
+    
+      
+        <title>Scorecard model - skorecard</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../css/timeago.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/mknotebooks.css">
+    
+      <link rel="stylesheet" href="../../css/ansi-colours.css">
+    
+      <link rel="stylesheet" href="../../css/pandas-dataframe.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#building-a-scorecard-model" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="skorecard" class="md-header__button md-logo" aria-label="skorecard" data-md-component="logo">
+      
+  <img src="../../assets/img/skorecard_logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            skorecard
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Scorecard model
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ing-bank/skorecard" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../.." class="md-tabs__link">
+          
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../the_basics/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../howto/using_manually_defined_buckets/" class="md-tabs__link">
+          
+  
+  How to
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/bucketers/OptimalBucketer/" class="md-tabs__link">
+          
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../discussion/benchmarks/" class="md-tabs__link">
+          
+  
+  Discussion
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="skorecard" class="md-nav__button md-logo" aria-label="skorecard" data-md-component="logo">
+      
+  <img src="../../assets/img/skorecard_logo.svg" alt="logo">
+
+    </a>
+    skorecard
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ing-bank/skorecard" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Bucketing a feature
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Bucketing a feature
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../the_basics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The Basics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../missing_values/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Missing Values
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../specials/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Special Values
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../categoricals/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Categoricals
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interactive_bucketing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Interactive
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../methods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Methods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../using-bucketing-process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    BucketingProcess
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reporting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reporting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Skorecard from A-Z
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Skorecard from A-Z
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../1_bucketing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bucketing features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2_feature_selection/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Selecting features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Scorecard model
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Scorecard model
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#define-the-scorecard-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Define the scorecard model
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removing-features-based-on-their-statistical-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removing features based on their statistical properties
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retrieving-the-transformed-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Retrieving the transformed data
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    How to
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            How to
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/using_manually_defined_buckets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Manually defining buckets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/save_buckets_to_file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Read/write buckets to file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/psi_and_iv/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Assessing bucket quality
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/Optimizations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimizations in the bucketing process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../howto/mix_with_other_packages/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mixed usage with other packages
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    API
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    bucketers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            bucketers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/OptimalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OptimalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/AgglomerativeClusteringBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AgglomerativeClusteringBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/DecisionTreeBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DecisionTreeBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/EqualFrequencyBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EqualFrequencyBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/EqualWidthBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EqualWidthBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/OrdinalCategoricalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OrdinalCategoricalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/UserInputBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    UserInputBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/AsIsNumericalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AsIsNumericalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/bucketers/AsIsCategoricalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AsIsCategoricalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/pipeline/BucketingProcess/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    BucketingProcess
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/pipeline/KeepPandas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KeepPandas
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/pipeline/SkorecardPipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SkorecardPipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/pipeline/to_skorecard_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    To skorecard pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    preprocessing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            preprocessing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/preprocessing/ColumnSelector/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ColumnSelector
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/preprocessing/WoeEncoder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    WoeEncoder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    linear_model
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            linear_model
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/linear_model/LogisticRegression/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LogisticRegression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    reporting
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            reporting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reporting/iv/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Information Value
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/reporting/psi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Population Stability Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    rescale
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            rescale
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/rescale/rescale/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ScoreCardPoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    datasets
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/datasets/load_uci_credit_card/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Datasets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Discussion
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Discussion
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../discussion/benchmarks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../discussion/benchmark_with_EBM/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarks with Explainable Boosting Classifier
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../discussion/benchmark_stats_feature/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarks vs alternatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#define-the-scorecard-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Define the scorecard model
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#removing-features-based-on-their-statistical-properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removing features based on their statistical properties
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#retrieving-the-transformed-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      Retrieving the transformed data
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var requireJsScript = document.createElement('script');
+    requireJsScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js';
+
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var jupyterWidgetsScript = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    jupyterWidgetsScript.src = widgetRendererSrc;
+
+    document.body.appendChild(requireJsScript);
+    document.body.appendChild(jupyterWidgetsScript);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="building-a-scorecard-model">Building a scorecard model<a class="headerlink" href="#building-a-scorecard-model" title="Permanent link">&para;</a></h1>
+<p>This tutorial shows how to build a <code>skorecard</code> model.</p>
+<p>Start by loading the data and performiing the train test split:</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="kn">from</span> <span class="nn">skorecard.datasets</span> <span class="kn">import</span> <span class="n">load_credit_card</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">load_credit_card</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">],</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Load the buckets and the selected features that were created in the previous tutorials.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">yaml</span>
+
+<span class="n">buckets_dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;buckets.yml&quot;</span><span class="p">))</span>
+<span class="n">selected_features</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;x6&quot;</span><span class="p">,</span> <span class="s2">&quot;x8&quot;</span><span class="p">,</span> <span class="s2">&quot;x10&quot;</span><span class="p">,</span> <span class="s2">&quot;x18&quot;</span><span class="p">,</span> <span class="s2">&quot;x1&quot;</span><span class="p">,</span> <span class="s2">&quot;x19&quot;</span><span class="p">,</span> <span class="s2">&quot;x20&quot;</span><span class="p">,</span> <span class="s2">&quot;x21&quot;</span><span class="p">,</span> <span class="s2">&quot;x23&quot;</span><span class="p">,</span> <span class="s2">&quot;x22&quot;</span><span class="p">,</span> <span class="s2">&quot;x3&quot;</span><span class="p">,</span> <span class="s2">&quot;x17&quot;</span><span class="p">,</span> <span class="s2">&quot;x16&quot;</span><span class="p">]</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="define-the-scorecard-model">Define the scorecard model<a class="headerlink" href="#define-the-scorecard-model" title="Permanent link">&para;</a></h3>
+<p>A Skorecard class has two main components:
+- the bucketer
+- the list of selected features (if <code>None</code> is passed, it uses all the features defined in the bucketer)</p>
+<p>It behaves like a scikit-learn model</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">skorecard</span> <span class="kn">import</span> <span class="n">Skorecard</span>
+<span class="kn">from</span> <span class="nn">skorecard.bucketers</span> <span class="kn">import</span> <span class="n">UserInputBucketer</span>
+
+<span class="n">scorecard</span> <span class="o">=</span> <span class="n">Skorecard</span><span class="p">(</span><span class="n">bucketing</span><span class="o">=</span><span class="n">UserInputBucketer</span><span class="p">(</span><span class="n">buckets_dict</span><span class="p">),</span> <span class="n">variables</span><span class="o">=</span><span class="n">selected_features</span><span class="p">,</span> <span class="n">calculate_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">scorecard</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <code>get_stats</code> method returns the coefficients with their standard error and p-values</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">scorecard</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Coef.</th>
+<th>Std.Err</th>
+<th>z</th>
+<th>P&gt;|z|</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>const</th>
+<td>-1.242955</td>
+<td>0.018238</td>
+<td>-68.152266</td>
+<td>0.000000e+00</td>
+</tr>
+<tr>
+<th>x6</th>
+<td>0.765416</td>
+<td>0.020622</td>
+<td>37.116970</td>
+<td>1.495993e-301</td>
+</tr>
+<tr>
+<th>x8</th>
+<td>0.276995</td>
+<td>0.033657</td>
+<td>8.229831</td>
+<td>1.874781e-16</td>
+</tr>
+<tr>
+<th>x10</th>
+<td>0.323640</td>
+<td>0.036329</td>
+<td>8.908558</td>
+<td>5.170055e-19</td>
+</tr>
+<tr>
+<th>x18</th>
+<td>0.226277</td>
+<td>0.050398</td>
+<td>4.489820</td>
+<td>7.128339e-06</td>
+</tr>
+<tr>
+<th>x1</th>
+<td>0.394922</td>
+<td>0.048176</td>
+<td>8.197563</td>
+<td>2.453087e-16</td>
+</tr>
+<tr>
+<th>x19</th>
+<td>0.165650</td>
+<td>0.055950</td>
+<td>2.960659</td>
+<td>3.069817e-03</td>
+</tr>
+<tr>
+<th>x20</th>
+<td>0.254235</td>
+<td>0.062924</td>
+<td>4.040349</td>
+<td>5.337170e-05</td>
+</tr>
+<tr>
+<th>x21</th>
+<td>0.097257</td>
+<td>0.072504</td>
+<td>1.341396</td>
+<td>1.797919e-01</td>
+</tr>
+<tr>
+<th>x23</th>
+<td>0.176958</td>
+<td>0.074045</td>
+<td>2.389866</td>
+<td>1.685452e-02</td>
+</tr>
+<tr>
+<th>x22</th>
+<td>0.110976</td>
+<td>0.076718</td>
+<td>1.446541</td>
+<td>1.480256e-01</td>
+</tr>
+<tr>
+<th>x3</th>
+<td>0.443555</td>
+<td>0.096009</td>
+<td>4.619955</td>
+<td>3.838229e-06</td>
+</tr>
+<tr>
+<th>x17</th>
+<td>0.203349</td>
+<td>0.133504</td>
+<td>1.523175</td>
+<td>1.277148e-01</td>
+</tr>
+<tr>
+<th>x16</th>
+<td>-0.166103</td>
+<td>0.142547</td>
+<td>-1.165254</td>
+<td>2.439163e-01</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Retrieve the model performance like in any sklearn classifier</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span><span class="p">,</span> <span class="n">classification_report</span>
+
+<span class="n">proba_train</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">proba_test</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AUC train:</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span><span class="w"> </span><span class="n">proba_train</span><span class="p">),</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AUC test :</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="w"> </span><span class="n">proba_test</span><span class="p">),</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+<code>AUC train:0.7714
+AUC test :0.7642
+
+              precision    recall  f1-score   support
+
+           0       0.84      0.95      0.89      5873
+           1       0.66      0.34      0.45      1627
+
+    accuracy                           0.82      7500
+   macro avg       0.75      0.65      0.67      7500
+weighted avg       0.80      0.82      0.80      7500
+
+</code>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="removing-features-based-on-their-statistical-properties">Removing features based on their statistical properties<a class="headerlink" href="#removing-features-based-on-their-statistical-properties" title="Permanent link">&para;</a></h3>
+<p>Features can be further removed.<br/>
+In a scorecard model, the coefficients are expected to be between 0 and -1.<br/>
+Coefficients smaller than -1 indicate that the model relies heavily on features (likely to overfit), while positive coefficients show an inverted trend.</p>
+<p>Additionally, p-values of the coefficients should be smaller that 0.05. (or 0.01).</p>
+<p>Looking at the stats table above, this would suggest removing the following features from the list <code>['x21','x16','x17','x22']</code>.</p>
+<p>Note that feature removal should be done carefully, as every time the feature is removed, the coefficients might converge elsewhere, and would hence give a different model with a different interpretation.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="n">new_feats</span> <span class="o">=</span> <span class="p">[</span><span class="n">feat</span> <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">selected_features</span> <span class="k">if</span> <span class="n">feat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;x21&quot;</span><span class="p">,</span> <span class="s2">&quot;x16&quot;</span><span class="p">,</span> <span class="s2">&quot;x17&quot;</span><span class="p">,</span> <span class="s2">&quot;x22&quot;</span><span class="p">]]</span>
+
+<span class="n">scorecard</span> <span class="o">=</span> <span class="n">Skorecard</span><span class="p">(</span><span class="n">UserInputBucketer</span><span class="p">(</span><span class="n">buckets_dict</span><span class="p">),</span> <span class="n">variables</span><span class="o">=</span><span class="n">new_feats</span><span class="p">,</span> <span class="n">calculate_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">scorecard</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">model_stats</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">get_stats</span><span class="p">()</span>
+
+<span class="n">model_stats</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Const&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_feats</span>
+<span class="n">display</span><span class="p">(</span><span class="n">model_stats</span><span class="p">)</span>
+
+<span class="n">proba_train</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_train</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">proba_test</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AUC train:</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span><span class="w"> </span><span class="n">proba_train</span><span class="p">),</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AUC test :</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="w"> </span><span class="n">proba_test</span><span class="p">),</span><span class="mi">4</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_html rendered_html output_subarea">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Coef.</th>
+<th>Std.Err</th>
+<th>z</th>
+<th>P&gt;|z|</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>Const</th>
+<td>-1.242598</td>
+<td>0.018229</td>
+<td>-68.166667</td>
+<td>0.000000e+00</td>
+</tr>
+<tr>
+<th>x6</th>
+<td>0.763946</td>
+<td>0.020596</td>
+<td>37.092613</td>
+<td>3.695794e-301</td>
+</tr>
+<tr>
+<th>x8</th>
+<td>0.269057</td>
+<td>0.033234</td>
+<td>8.095809</td>
+<td>5.688515e-16</td>
+</tr>
+<tr>
+<th>x10</th>
+<td>0.339016</td>
+<td>0.035156</td>
+<td>9.643180</td>
+<td>5.253488e-22</td>
+</tr>
+<tr>
+<th>x18</th>
+<td>0.241832</td>
+<td>0.049687</td>
+<td>4.867076</td>
+<td>1.132612e-06</td>
+</tr>
+<tr>
+<th>x1</th>
+<td>0.409354</td>
+<td>0.046618</td>
+<td>8.781019</td>
+<td>1.619998e-18</td>
+</tr>
+<tr>
+<th>x19</th>
+<td>0.191910</td>
+<td>0.053865</td>
+<td>3.562812</td>
+<td>3.669030e-04</td>
+</tr>
+<tr>
+<th>x20</th>
+<td>0.282166</td>
+<td>0.060879</td>
+<td>4.634866</td>
+<td>3.571691e-06</td>
+</tr>
+<tr>
+<th>x23</th>
+<td>0.227794</td>
+<td>0.069624</td>
+<td>3.271788</td>
+<td>1.068698e-03</td>
+</tr>
+<tr>
+<th>x3</th>
+<td>0.441695</td>
+<td>0.095994</td>
+<td>4.601264</td>
+<td>4.199341e-06</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="output_area">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+<code>AUC train:0.7712
+AUC test :0.7648
+</code>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="retrieving-the-transformed-data">Retrieving the transformed data<a class="headerlink" href="#retrieving-the-transformed-data" title="Permanent link">&para;</a></h3>
+<p>Buckets and WoE transformations are available directly in a fitted <code>skorecard</code> model</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Top 5 rows and the transformed buckets&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">scorecard</span><span class="o">.</span><span class="n">bucket_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[</span><span class="n">new_feats</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Top 5 rows and the transformed WoEs&quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">scorecard</span><span class="o">.</span><span class="n">woe_transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[</span><span class="n">new_feats</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+<code>Top 5 rows and the transformed buckets
+</code>
+</pre>
+</div>
+</div>
+<div class="output_area">
+<div class="output_html rendered_html output_subarea">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>x6</th>
+<th>x8</th>
+<th>x10</th>
+<th>x18</th>
+<th>x1</th>
+<th>x19</th>
+<th>x20</th>
+<th>x23</th>
+<th>x3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2308</th>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+<tr>
+<th>22404</th>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr>
+<th>23397</th>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<th>25058</th>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<th>2664</th>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>-3</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="output_area">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+<code>
+Top 5 rows and the transformed WoEs
+</code>
+</pre>
+</div>
+</div>
+<div class="output_area">
+<div class="output_html rendered_html output_subarea">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>x6</th>
+<th>x8</th>
+<th>x10</th>
+<th>x18</th>
+<th>x1</th>
+<th>x19</th>
+<th>x20</th>
+<th>x23</th>
+<th>x3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>2308</th>
+<td>-0.668068</td>
+<td>-0.321161</td>
+<td>-0.230059</td>
+<td>-0.029168</td>
+<td>0.610738</td>
+<td>0.000397</td>
+<td>-0.015444</td>
+<td>0.105318</td>
+<td>0.102411</td>
+</tr>
+<tr>
+<th>22404</th>
+<td>-0.668068</td>
+<td>-0.321161</td>
+<td>-0.230059</td>
+<td>-0.029168</td>
+<td>-0.353564</td>
+<td>0.000397</td>
+<td>-0.015444</td>
+<td>-0.256887</td>
+<td>-0.192612</td>
+</tr>
+<tr>
+<th>23397</th>
+<td>-0.668068</td>
+<td>-0.321161</td>
+<td>-0.230059</td>
+<td>-0.029168</td>
+<td>0.610738</td>
+<td>0.000397</td>
+<td>-0.015444</td>
+<td>-0.256887</td>
+<td>0.168106</td>
+</tr>
+<tr>
+<th>25058</th>
+<td>-0.668068</td>
+<td>-0.321161</td>
+<td>-0.230059</td>
+<td>-0.029168</td>
+<td>0.070222</td>
+<td>0.000397</td>
+<td>-0.405293</td>
+<td>-0.256887</td>
+<td>0.168106</td>
+</tr>
+<tr>
+<th>2664</th>
+<td>-0.668068</td>
+<td>-0.321161</td>
+<td>-0.230059</td>
+<td>-0.029168</td>
+<td>0.224540</td>
+<td>0.000397</td>
+<td>-0.015444</td>
+<td>0.105318</td>
+<td>0.102411</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="getting-the-feature-importance-to-be-integrated-in-the-skorecard-class">Getting the feature importance (to be integrated in the skorecard class)<a class="headerlink" href="#getting-the-feature-importance-to-be-integrated-in-the-skorecard-class" title="Permanent link">&para;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to talk of feature importance, we should consider both the coefficients and the IV of the single feature.
+The importance cab be approximated as the product of the two numbers.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">skorecard.reporting</span> <span class="kn">import</span> <span class="n">iv</span>
+
+<span class="n">X_train_bins</span> <span class="o">=</span> <span class="n">scorecard</span><span class="o">.</span><span class="n">bucket_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">iv_dict</span> <span class="o">=</span> <span class="n">iv</span><span class="p">(</span><span class="n">X_train_bins</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="n">iv_values</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">iv_dict</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">iv_values</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;IV&quot;</span>
+
+<span class="n">feat_importance</span> <span class="o">=</span> <span class="n">model_stats</span><span class="p">[[</span><span class="s2">&quot;Coef.&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">iv_values</span><span class="p">)</span>
+<span class="n">feat_importance</span><span class="p">[</span><span class="s2">&quot;importance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">feat_importance</span><span class="p">[</span><span class="s2">&quot;Coef.&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">feat_importance</span><span class="p">[</span><span class="s2">&quot;IV&quot;</span><span class="p">]</span>
+<span class="n">feat_importance</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>Coef.</th>
+<th>IV</th>
+<th>importance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>x23</th>
+<td>0.227794</td>
+<td>0.002257</td>
+<td>-0.000514</td>
+</tr>
+<tr>
+<th>x8</th>
+<td>0.269057</td>
+<td>0.001924</td>
+<td>-0.000518</td>
+</tr>
+<tr>
+<th>x20</th>
+<td>0.282166</td>
+<td>0.001998</td>
+<td>-0.000564</td>
+</tr>
+<tr>
+<th>x18</th>
+<td>0.241832</td>
+<td>0.002503</td>
+<td>-0.000605</td>
+</tr>
+<tr>
+<th>x19</th>
+<td>0.191910</td>
+<td>0.003325</td>
+<td>-0.000638</td>
+</tr>
+<tr>
+<th>x10</th>
+<td>0.339016</td>
+<td>0.001917</td>
+<td>-0.000650</td>
+</tr>
+<tr>
+<th>x1</th>
+<td>0.409354</td>
+<td>0.002457</td>
+<td>-0.001006</td>
+</tr>
+<tr>
+<th>x3</th>
+<td>0.441695</td>
+<td>0.002968</td>
+<td>-0.001311</td>
+</tr>
+<tr>
+<th>x6</th>
+<td>0.763946</td>
+<td>0.002430</td>
+<td>-0.001857</td>
+</tr>
+<tr>
+<th>Const</th>
+<td>-1.242598</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="scaling-the-scores">Scaling the scores<a class="headerlink" href="#scaling-the-scores" title="Permanent link">&para;</a></h1>
+<p>The last step of building skorecard models is the rescaling of the predictions.<br/>
+This is a very common practice within the Credit Risk domain, where scorecard models are widely used.<br/></p>
+<p>Rescaling scorecards  has no impact on the model performance, but rather returns the predictions on an arbitrary scale (normally from 0-1000) which are more meaningful for risk managers and underwriters in a bank than probabilities.</p>
+<p>The rescaling is a linear transfromation performed on the log-odds of the predicted probability <span class="arithmatex">\(p\)</span>,</p>
+<div class="arithmatex">\[ log(\frac{1-p}{p}) \]</div>
+<p>Where the odds are defined as:</p>
+<div class="arithmatex">\[ \frac{1-p}{p} \]</div>
+<p>The reference for the linear transformation are commonly defined by the following values:</p>
+<ul>
+<li><code>ref_score</code>: reference score, that should match a given reference odds (ref_odds)<br/></li>
+<li><code>ref_odds</code>: reference odds that should match a giver reference score<br/></li>
+<li><code>pdo</code>: points to double the odds, number of points to add where the odds double.</li>
+</ul>
+<p>An example: with the following settings:</p>
+<ul>
+<li><code>ref_score = 400</code> <br/></li>
+<li><code>ref_odds = 20</code> <br/></li>
+<li><code>pdo = 25</code> <br/></li>
+</ul>
+<p>A score of <code>400</code> corresponds to the odds <code>20:1</code> of being a "good client" (<code>y=0</code>). This means that the predicted probability for <code>y=1</code> is in this case <code>~4.76%</code>, which you can get by rearranging the equation for the odds, above.<br/>
+When the score increases to <code>425</code>, the odds double to <code>40:1</code> (predicted probability to be <code>y=1</code> is <code>~2,43%</code>).<br/>
+When the score decreases to <code>375</code>, the odds are reduced by a factor 2, ie, <code>10:1</code> (predicted probability to be <code>y=1</code> is <code>~9,09%</code>).<br/></p>
+<p>In <code>skorecard</code>, one can use the <code>calibrate_to_master_scale</code> function.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">skorecard.rescale</span> <span class="kn">import</span> <span class="n">calibrate_to_master_scale</span>
+
+<span class="n">proba_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">proba_train</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>  <span class="c1"># sorting for visualization purposes</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">calibrate_to_master_scale</span><span class="p">(</span><span class="n">proba_train</span><span class="p">,</span> <span class="n">pdo</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">ref_score</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">ref_odds</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="visualize-the-score-dependencies">Visualize the score dependencies<a class="headerlink" href="#visualize-the-score-dependencies" title="Permanent link">&para;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">,</span> <span class="n">ax3</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;hspace&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">proba_train</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Predicted probability&quot;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Rescaled scores and probabilities&quot;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">proba_train</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Odds&quot;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+
+
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">scores</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">proba_train</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;log-odds&quot;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Rescaled scores&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_png output_subarea">
+<img alt="No description has been provided for this image" src="data:image/png;base64,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"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="assigning-points-to-every-feature">Assigning points to every feature<a class="headerlink" href="#assigning-points-to-every-feature" title="Permanent link">&para;</a></h1>
+<p>The last step of a scorecard development is to convert all the features into the rescaled model.<br/></p>
+<p>A scorecard model is a logisitic regression fitted on the WoE values of every single bucketed feature.<br/>
+In other words, the following equations holds:</p>
+<div class="arithmatex">\[ log(odds) = log(\frac{1-p}{p}) = \beta_{0} + \sum_{i} \beta_{i} \cdot WOE(X_{i}) \]</div>
+<p>As the rescaling performed earlier is linear in the predicted <code>log-odds</code>, this means that the every feature-bucket contribution can be rescaled to an integer value (by rescaling directly the $ \beta_{i} \cdot WOE(X_{i})$ factors with the same calculations. <br/></p>
+<p>This returns the final scorecard, that can be easily implemented.<br/></p>
+<p>The functionality in <code>skorecard</code> to rescale the features is as follows</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">skorecard.rescale</span> <span class="kn">import</span> <span class="n">ScoreCardPoints</span>
+
+<span class="c1"># ensure that pdo, ref_score and ref_odds are consistent</span>
+<span class="n">scp</span> <span class="o">=</span> <span class="n">ScoreCardPoints</span><span class="p">(</span><span class="n">skorecard_model</span><span class="o">=</span><span class="n">scorecard</span><span class="p">,</span> <span class="n">pdo</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">ref_score</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">ref_odds</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>one can extract the final scorecard as follows</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">scp</span><span class="o">.</span><span class="n">get_scorecard_points</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+<thead>
+<tr style="text-align: right;">
+<th></th>
+<th>bin_index</th>
+<th>map</th>
+<th>woe</th>
+<th>feature</th>
+<th>coef</th>
+<th>contribution</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>0</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x6</td>
+<td>0.763946</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>1</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x6</td>
+<td>0.763946</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>3</th>
+<td>1</td>
+<td>[-0.5, 0.5)</td>
+<td>-0.668068</td>
+<td>x6</td>
+<td>0.763946</td>
+<td>-0.510368</td>
+<td>56</td>
+</tr>
+<tr>
+<th>4</th>
+<td>2</td>
+<td>[0.5, 1.5)</td>
+<td>-0.419221</td>
+<td>x6</td>
+<td>0.763946</td>
+<td>-0.320262</td>
+<td>49</td>
+</tr>
+<tr>
+<th>5</th>
+<td>3</td>
+<td>[1.5, inf)</td>
+<td>0.586085</td>
+<td>x6</td>
+<td>0.763946</td>
+<td>0.447737</td>
+<td>21</td>
+</tr>
+<tr>
+<th>6</th>
+<td>4</td>
+<td>NaN</td>
+<td>2.095463</td>
+<td>x6</td>
+<td>0.763946</td>
+<td>1.600820</td>
+<td>-20</td>
+</tr>
+<tr>
+<th>7</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x8</td>
+<td>0.269057</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>8</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x8</td>
+<td>0.269057</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>10</th>
+<td>1</td>
+<td>[1.5, inf)</td>
+<td>-0.321161</td>
+<td>x8</td>
+<td>0.269057</td>
+<td>-0.086411</td>
+<td>41</td>
+</tr>
+<tr>
+<th>11</th>
+<td>2</td>
+<td>NaN</td>
+<td>1.392671</td>
+<td>x8</td>
+<td>0.269057</td>
+<td>0.374708</td>
+<td>24</td>
+</tr>
+<tr>
+<th>12</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x10</td>
+<td>0.339016</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>13</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x10</td>
+<td>0.339016</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>15</th>
+<td>1</td>
+<td>[1.0, inf)</td>
+<td>-0.230059</td>
+<td>x10</td>
+<td>0.339016</td>
+<td>-0.077994</td>
+<td>40</td>
+</tr>
+<tr>
+<th>16</th>
+<td>2</td>
+<td>NaN</td>
+<td>1.491617</td>
+<td>x10</td>
+<td>0.339016</td>
+<td>0.505681</td>
+<td>19</td>
+</tr>
+<tr>
+<th>17</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x18</td>
+<td>0.241832</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>18</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x18</td>
+<td>0.241832</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>20</th>
+<td>1</td>
+<td>[21.0, 4552.5)</td>
+<td>-0.029168</td>
+<td>x18</td>
+<td>0.241832</td>
+<td>-0.007054</td>
+<td>38</td>
+</tr>
+<tr>
+<th>21</th>
+<td>2</td>
+<td>[4552.5, 15001.5)</td>
+<td>0.692001</td>
+<td>x18</td>
+<td>0.241832</td>
+<td>0.167348</td>
+<td>31</td>
+</tr>
+<tr>
+<th>22</th>
+<td>3</td>
+<td>[15001.5, inf)</td>
+<td>-0.457263</td>
+<td>x18</td>
+<td>0.241832</td>
+<td>-0.110581</td>
+<td>41</td>
+</tr>
+<tr>
+<th>23</th>
+<td>4</td>
+<td>NaN</td>
+<td>-0.860845</td>
+<td>x18</td>
+<td>0.241832</td>
+<td>-0.208180</td>
+<td>45</td>
+</tr>
+<tr>
+<th>25</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>26</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>28</th>
+<td>1</td>
+<td>[75000.0, 145000.0)</td>
+<td>-0.353564</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>-0.144733</td>
+<td>43</td>
+</tr>
+<tr>
+<th>29</th>
+<td>2</td>
+<td>[145000.0, 375000.0)</td>
+<td>0.610738</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>0.250008</td>
+<td>28</td>
+</tr>
+<tr>
+<th>30</th>
+<td>3</td>
+<td>[375000.0, inf)</td>
+<td>0.070222</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>0.028746</td>
+<td>36</td>
+</tr>
+<tr>
+<th>31</th>
+<td>4</td>
+<td>NaN</td>
+<td>-0.766316</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>-0.313695</td>
+<td>49</td>
+</tr>
+<tr>
+<th>32</th>
+<td>5</td>
+<td>NaN</td>
+<td>0.224540</td>
+<td>x1</td>
+<td>0.409354</td>
+<td>0.091916</td>
+<td>34</td>
+</tr>
+<tr>
+<th>33</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x19</td>
+<td>0.191910</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>34</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x19</td>
+<td>0.191910</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>36</th>
+<td>1</td>
+<td>[131.5, 4970.5)</td>
+<td>0.000397</td>
+<td>x19</td>
+<td>0.191910</td>
+<td>0.000076</td>
+<td>37</td>
+</tr>
+<tr>
+<th>37</th>
+<td>2</td>
+<td>[4970.5, 15001.0)</td>
+<td>0.576300</td>
+<td>x19</td>
+<td>0.191910</td>
+<td>0.110598</td>
+<td>33</td>
+</tr>
+<tr>
+<th>38</th>
+<td>3</td>
+<td>[15001.0, inf)</td>
+<td>-0.403868</td>
+<td>x19</td>
+<td>0.191910</td>
+<td>-0.077506</td>
+<td>40</td>
+</tr>
+<tr>
+<th>39</th>
+<td>4</td>
+<td>NaN</td>
+<td>-1.162523</td>
+<td>x19</td>
+<td>0.191910</td>
+<td>-0.223100</td>
+<td>45</td>
+</tr>
+<tr>
+<th>40</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x20</td>
+<td>0.282166</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>41</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x20</td>
+<td>0.282166</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>43</th>
+<td>1</td>
+<td>[16.5, 4513.5)</td>
+<td>-0.015444</td>
+<td>x20</td>
+<td>0.282166</td>
+<td>-0.004358</td>
+<td>38</td>
+</tr>
+<tr>
+<th>44</th>
+<td>2</td>
+<td>[4513.5, 12490.5)</td>
+<td>0.509437</td>
+<td>x20</td>
+<td>0.282166</td>
+<td>0.143746</td>
+<td>32</td>
+</tr>
+<tr>
+<th>45</th>
+<td>3</td>
+<td>[12490.5, inf)</td>
+<td>-0.405293</td>
+<td>x20</td>
+<td>0.282166</td>
+<td>-0.114360</td>
+<td>42</td>
+</tr>
+<tr>
+<th>46</th>
+<td>4</td>
+<td>NaN</td>
+<td>-0.832020</td>
+<td>x20</td>
+<td>0.282166</td>
+<td>-0.234768</td>
+<td>46</td>
+</tr>
+<tr>
+<th>47</th>
+<td>-2</td>
+<td>NaN</td>
+<td>0.000000</td>
+<td>x23</td>
+<td>0.227794</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>48</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x23</td>
+<td>0.227794</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>50</th>
+<td>1</td>
+<td>[1.5, 2000.5)</td>
+<td>-0.256887</td>
+<td>x23</td>
+<td>0.227794</td>
+<td>-0.058517</td>
+<td>40</td>
+</tr>
+<tr>
+<th>51</th>
+<td>2</td>
+<td>[2000.5, 9849.5)</td>
+<td>0.105318</td>
+<td>x23</td>
+<td>0.227794</td>
+<td>0.023991</td>
+<td>37</td>
+</tr>
+<tr>
+<th>52</th>
+<td>3</td>
+<td>[9849.5, inf)</td>
+<td>0.350867</td>
+<td>x23</td>
+<td>0.227794</td>
+<td>0.079925</td>
+<td>35</td>
+</tr>
+<tr>
+<th>53</th>
+<td>4</td>
+<td>NaN</td>
+<td>-0.701982</td>
+<td>x23</td>
+<td>0.227794</td>
+<td>-0.159907</td>
+<td>43</td>
+</tr>
+<tr>
+<th>54</th>
+<td>-2</td>
+<td>Other</td>
+<td>0.000000</td>
+<td>x3</td>
+<td>0.441695</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>55</th>
+<td>-1</td>
+<td>Missing</td>
+<td>0.000000</td>
+<td>x3</td>
+<td>0.441695</td>
+<td>0.000000</td>
+<td>37</td>
+</tr>
+<tr>
+<th>57</th>
+<td>1</td>
+<td>1.0</td>
+<td>0.168106</td>
+<td>x3</td>
+<td>0.441695</td>
+<td>0.074252</td>
+<td>35</td>
+</tr>
+<tr>
+<th>58</th>
+<td>2</td>
+<td>2.0</td>
+<td>0.102411</td>
+<td>x3</td>
+<td>0.441695</td>
+<td>0.045235</td>
+<td>36</td>
+</tr>
+<tr>
+<th>59</th>
+<td>3</td>
+<td>NaN</td>
+<td>-0.192612</td>
+<td>x3</td>
+<td>0.441695</td>
+<td>-0.085076</td>
+<td>40</td>
+</tr>
+<tr>
+<th>60</th>
+<td>4</td>
+<td>NaN</td>
+<td>-1.207590</td>
+<td>x3</td>
+<td>0.441695</td>
+<td>-0.533387</td>
+<td>57</td>
+</tr>
+<tr>
+<th>61</th>
+<td>0</td>
+<td>0</td>
+<td>0.000000</td>
+<td>Intercept</td>
+<td>-1.242598</td>
+<td>-0.000000</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Or one can apply the transformation directly on the data, by calling the <code>transform</code> method, in order to map each feature to its actual points.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="validate-the-rescaling">Validate the rescaling<a class="headerlink" href="#validate-the-rescaling" title="Permanent link">&para;</a></h4>
+<p>As the last step, in order to ensure that the rescaling was successfull, one can verify that the sum of the points of each row in the dataset matches the rescaled scores.<br/>
+The rescaling steps has some integer rounding, therefore small discrepancies of 1-2 points might occur due to the rounding error</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">proba_train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+    <span class="n">proba_train</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">index</span>
+<span class="p">)</span>  <span class="c1"># convert to pandas and correct index in order to be able to perform the diff</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">calibrate_to_master_scale</span><span class="p">(</span><span class="n">proba_train</span><span class="p">,</span> <span class="n">pdo</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">ref_score</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">ref_odds</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Check the distribution of the differences</span>
+<span class="p">(</span><span class="n">scores</span> <span class="o">-</span> <span class="n">scp</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="output_text output_subarea output_execute_result">
+<pre>
+<code> 111.0    878
+ 105.0    708
+ 146.0    560
+ 125.0    516
+ 130.0    442
+         ... 
+ 284.0      1
+ 292.0      1
+-54.0       1
+ 261.0      1
+-80.0       1
+Length: 373, dtype: int64</code>
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1-2.1-2M12.5 7v5.2l4 2.4-1 1L11 13V7h1.5M11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2v1.8Z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2024-08-17T23:42:40+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2024-08-17</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tracking", "navigation.sections", "header.autohide", "navigation.tabs", "navigation.top"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="../../js/timeago.min.js"></script>
+      
+        <script src="../../js/timeago_mkdocs_material.js"></script>
+      
+        <script src="../../assets/javascripts/config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

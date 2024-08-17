@@ -1,0 +1,4032 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Build credit risk scorecards with sklearn-compatible components">
+      
+      
+        <meta name="author" content="RPAA">
+      
+      
+        <link rel="canonical" href="https://github.com/ing-bank/skorecard/api/pipeline/BucketingProcess/">
+      
+      
+        <link rel="prev" href="../../bucketers/AsIsCategoricalBucketer/">
+      
+      
+        <link rel="next" href="../KeepPandas/">
+      
+      
+      <link rel="icon" href="../../../assets/images/cli.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
+    
+    
+      
+        <title>BucketingProcess - skorecard</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+    
+    
+      <link rel="stylesheet" href="../../../css/timeago.css">
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/mknotebooks.css">
+    
+      <link rel="stylesheet" href="../../../css/ansi-colours.css">
+    
+      <link rel="stylesheet" href="../../../css/pandas-dataframe.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#skorecard.pipeline.BucketingProcess" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="skorecard" class="md-header__button md-logo" aria-label="skorecard" data-md-component="logo">
+      
+  <img src="../../../assets/img/skorecard_logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            skorecard
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              BucketingProcess
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="deep-orange" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/ing-bank/skorecard" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../.." class="md-tabs__link">
+          
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../tutorials/the_basics/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../howto/using_manually_defined_buckets/" class="md-tabs__link">
+          
+  
+  How to
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../bucketers/OptimalBucketer/" class="md-tabs__link">
+          
+  
+  API
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../discussion/benchmarks/" class="md-tabs__link">
+          
+  
+  Discussion
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="skorecard" class="md-nav__button md-logo" aria-label="skorecard" data-md-component="logo">
+      
+  <img src="../../../assets/img/skorecard_logo.svg" alt="logo">
+
+    </a>
+    skorecard
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/ing-bank/skorecard" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Contributing
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Bucketing a feature
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Bucketing a feature
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/the_basics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The Basics
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/missing_values/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Missing Values
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/specials/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Special Values
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/categoricals/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Categoricals
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/interactive_bucketing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Interactive
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/methods/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Methods
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/using-bucketing-process/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    BucketingProcess
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/reporting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Reporting
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Skorecard from A-Z
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            Skorecard from A-Z
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/1_bucketing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bucketing features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/2_feature_selection/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Selecting features
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tutorials/3_skorecard_model/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Scorecard model
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    How to
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            How to
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../howto/using_manually_defined_buckets/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Manually defining buckets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../howto/save_buckets_to_file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Read/write buckets to file
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../howto/psi_and_iv/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Assessing bucket quality
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../howto/Optimizations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimizations in the bucketing process
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../howto/mix_with_other_packages/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mixed usage with other packages
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    API
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            API
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    bucketers
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            bucketers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/OptimalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OptimalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/AgglomerativeClusteringBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AgglomerativeClusteringBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/DecisionTreeBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    DecisionTreeBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/EqualFrequencyBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EqualFrequencyBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/EqualWidthBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    EqualWidthBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/OrdinalCategoricalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OrdinalCategoricalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/UserInputBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    UserInputBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/AsIsNumericalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AsIsNumericalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bucketers/AsIsCategoricalBucketer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AsIsCategoricalBucketer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    pipeline
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            pipeline
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    BucketingProcess
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    BucketingProcess
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess" class="md-nav__link">
+    <span class="md-ellipsis">
+      BucketingProcess
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.features_bucket_mapping_" class="md-nav__link">
+    <span class="md-ellipsis">
+      features_bucket_mapping_
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      fit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.fit_interactive" class="md-nav__link">
+    <span class="md-ellipsis">
+      fit_interactive
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.prebucket_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      prebucket_table
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.save_yml" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_yml
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      transform
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../KeepPandas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KeepPandas
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SkorecardPipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SkorecardPipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../to_skorecard_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    To skorecard pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    preprocessing
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            preprocessing
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preprocessing/ColumnSelector/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ColumnSelector
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../preprocessing/WoeEncoder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    WoeEncoder
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    linear_model
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            linear_model
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../linear_model/LogisticRegression/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LogisticRegression
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    reporting
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            reporting
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reporting/iv/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Information Value
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reporting/psi/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Population Stability Index
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    rescale
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            rescale
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rescale/rescale/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    ScoreCardPoints
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    datasets
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            datasets
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/load_uci_credit_card/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Datasets
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Discussion
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Discussion
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../discussion/benchmarks/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarks
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../discussion/benchmark_with_EBM/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarks with Explainable Boosting Classifier
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../discussion/benchmark_stats_feature/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Benchmarks vs alternatives
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess" class="md-nav__link">
+    <span class="md-ellipsis">
+      BucketingProcess
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.features_bucket_mapping_" class="md-nav__link">
+    <span class="md-ellipsis">
+      features_bucket_mapping_
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      fit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.fit_interactive" class="md-nav__link">
+    <span class="md-ellipsis">
+      fit_interactive
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.prebucket_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      prebucket_table
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.save_yml" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_yml
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skorecard.pipeline.BucketingProcess.transform" class="md-nav__link">
+    <span class="md-ellipsis">
+      transform
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  <h1>BucketingProcess</h1>
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="skorecard.pipeline.BucketingProcess"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="sklearn.base.BaseEstimator">BaseEstimator</span></code>, <code><span title="sklearn.base.TransformerMixin">TransformerMixin</span></code>, <code><span title="skorecard.reporting.report.BucketTableMethod">BucketTableMethod</span></code>, <code><span title="skorecard.reporting.plotting.PlotBucketMethod">PlotBucketMethod</span></code>, <code><span title="skorecard.reporting.plotting.PlotPreBucketMethod">PlotPreBucketMethod</span></code>, <code><span title="skorecard.reporting.report.SummaryMethod">SummaryMethod</span></code></p>
+
+
+      <p>A two-step bucketing pipeline allowing for pre-bucketing before bucketing.</p>
+<p>Often you want to pre-bucket features (f.e. to 100 buckets) before bucketing to a smaller set.
+This brings some additional challenges around propagating specials and defining a bucketer that is able to go from raw data to final bucket.
+This class facilicates the process and also provides all regular methods and attributes:</p>
+<ul>
+<li><code>.summary()</code>: See which columns are bucketed</li>
+<li><code>.plot_bucket()</code>: Plot buckets of a column</li>
+<li><code>.bucket_table()</code>: Table with buckets of a column</li>
+<li><code>.save_to_yaml()</code>: Save information necessary for bucketing to a YAML file</li>
+<li><code>.features_bucket_mapping_</code>: Access bucketing information</li>
+</ul>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">skorecard</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">skorecard.bucketers</span> <span class="kn">import</span> <span class="n">DecisionTreeBucketer</span><span class="p">,</span> <span class="n">OptimalBucketer</span><span class="p">,</span> <span class="n">AsIsCategoricalBucketer</span>
+<span class="kn">from</span> <span class="nn">skorecard.pipeline</span> <span class="kn">import</span> <span class="n">BucketingProcess</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_uci_credit_card</span><span class="p">(</span><span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">])</span>
+
+<span class="n">num_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;LIMIT_BAL&quot;</span><span class="p">,</span> <span class="s2">&quot;BILL_AMT1&quot;</span><span class="p">]</span>
+<span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;EDUCATION&quot;</span><span class="p">,</span> <span class="s2">&quot;MARRIAGE&quot;</span><span class="p">]</span>
+
+<span class="n">bucketing_process</span> <span class="o">=</span> <span class="n">BucketingProcess</span><span class="p">(</span>
+    <span class="n">specials</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;LIMIT_BAL&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;=400000.0&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="mf">400000.0</span><span class="p">]}},</span>
+    <span class="n">prebucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span>
+        <span class="n">DecisionTreeBucketer</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">max_n_bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+        <span class="n">AsIsCategoricalBucketer</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">cat_cols</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">bucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span>
+        <span class="n">OptimalBucketer</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">max_n_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+        <span class="n">OptimalBucketer</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">cat_cols</span><span class="p">,</span> <span class="n">variables_type</span><span class="o">=</span><span class="s1">&#39;categorical&#39;</span><span class="p">,</span> <span class="n">max_n_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">bucketing_process</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># Details</span>
+<span class="n">bucketing_process</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span> <span class="c1"># all vars, and # buckets</span>
+<span class="n">bucketing_process</span><span class="o">.</span><span class="n">bucket_table</span><span class="p">(</span><span class="s2">&quot;LIMIT_BAL&quot;</span><span class="p">)</span>
+<span class="n">bucketing_process</span><span class="o">.</span><span class="n">plot_bucket</span><span class="p">(</span><span class="s2">&quot;LIMIT_BAL&quot;</span><span class="p">)</span>
+<span class="n">bucketing_process</span><span class="o">.</span><span class="n">prebucket_table</span><span class="p">(</span><span class="s2">&quot;LIMIT_BAL&quot;</span><span class="p">)</span>
+<span class="n">bucketing_process</span><span class="o">.</span><span class="n">plot_prebucket</span><span class="p">(</span><span class="s2">&quot;LIMIT_BAL&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+              <details class="quote">
+                <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 41</span>
+<span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">BucketingProcess</span><span class="p">(</span>
+    <span class="n">BaseEstimator</span><span class="p">,</span>
+    <span class="n">TransformerMixin</span><span class="p">,</span>
+    <span class="n">BucketTableMethod</span><span class="p">,</span>
+    <span class="n">PlotBucketMethod</span><span class="p">,</span>
+    <span class="n">PlotPreBucketMethod</span><span class="p">,</span>
+    <span class="n">SummaryMethod</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A two-step bucketing pipeline allowing for pre-bucketing before bucketing.</span>
+
+<span class="sd">    Often you want to pre-bucket features (f.e. to 100 buckets) before bucketing to a smaller set.</span>
+<span class="sd">    This brings some additional challenges around propagating specials and defining a bucketer that is able to go from raw data to final bucket.</span>
+<span class="sd">    This class facilicates the process and also provides all regular methods and attributes:</span>
+
+<span class="sd">    - `.summary()`: See which columns are bucketed</span>
+<span class="sd">    - `.plot_bucket()`: Plot buckets of a column</span>
+<span class="sd">    - `.bucket_table()`: Table with buckets of a column</span>
+<span class="sd">    - `.save_to_yaml()`: Save information necessary for bucketing to a YAML file</span>
+<span class="sd">    - `.features_bucket_mapping_`: Access bucketing information</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    ```python</span>
+<span class="sd">    from skorecard import datasets</span>
+<span class="sd">    from skorecard.bucketers import DecisionTreeBucketer, OptimalBucketer, AsIsCategoricalBucketer</span>
+<span class="sd">    from skorecard.pipeline import BucketingProcess</span>
+<span class="sd">    from sklearn.pipeline import make_pipeline</span>
+
+<span class="sd">    df = datasets.load_uci_credit_card(as_frame=True)</span>
+<span class="sd">    y = df[&quot;default&quot;]</span>
+<span class="sd">    X = df.drop(columns=[&quot;default&quot;])</span>
+
+<span class="sd">    num_cols = [&quot;LIMIT_BAL&quot;, &quot;BILL_AMT1&quot;]</span>
+<span class="sd">    cat_cols = [&quot;EDUCATION&quot;, &quot;MARRIAGE&quot;]</span>
+
+<span class="sd">    bucketing_process = BucketingProcess(</span>
+<span class="sd">        specials={&#39;LIMIT_BAL&#39;: {&#39;=400000.0&#39; : [400000.0]}},</span>
+<span class="sd">        prebucketing_pipeline=make_pipeline(</span>
+<span class="sd">            DecisionTreeBucketer(variables=num_cols, max_n_bins=100, min_bin_size=0.05),</span>
+<span class="sd">            AsIsCategoricalBucketer(variables=cat_cols),</span>
+<span class="sd">        ),</span>
+<span class="sd">        bucketing_pipeline=make_pipeline(</span>
+<span class="sd">            OptimalBucketer(variables=num_cols, max_n_bins=10, min_bin_size=0.05),</span>
+<span class="sd">            OptimalBucketer(variables=cat_cols, variables_type=&#39;categorical&#39;, max_n_bins=10, min_bin_size=0.05),</span>
+<span class="sd">        )</span>
+<span class="sd">    )</span>
+
+<span class="sd">    bucketing_process.fit(X, y)</span>
+
+<span class="sd">    # Details</span>
+<span class="sd">    bucketing_process.summary() # all vars, and # buckets</span>
+<span class="sd">    bucketing_process.bucket_table(&quot;LIMIT_BAL&quot;)</span>
+<span class="sd">    bucketing_process.plot_bucket(&quot;LIMIT_BAL&quot;)</span>
+<span class="sd">    bucketing_process.prebucket_table(&quot;LIMIT_BAL&quot;)</span>
+<span class="sd">    bucketing_process.plot_prebucket(&quot;LIMIT_BAL&quot;)</span>
+<span class="sd">    ```</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prebucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">DecisionTreeBucketer</span><span class="p">(</span><span class="n">max_n_bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)),</span>
+        <span class="n">bucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">OptimalBucketer</span><span class="p">(</span><span class="n">max_n_bins</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)),</span>
+        <span class="n">variables</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
+        <span class="n">specials</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">remainder</span><span class="o">=</span><span class="s2">&quot;passthrough&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define a BucketingProcess to first prebucket and then bucket multiple columns in one go.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            prebucketing_pipeline (Pipeline): The scikit-learn pipeline that does pre-bucketing.</span>
+<span class="sd">                Defaults to an all-numeric DecisionTreeBucketer pipeline.</span>
+<span class="sd">            bucketing_pipeline (Pipeline): The scikit-learn pipeline that does bucketing.</span>
+<span class="sd">                Defaults to an all-numeric OptimalBucketer pipeline.</span>
+<span class="sd">                Must transform same features as the prebucketing pipeline.</span>
+<span class="sd">            variables (list): The features to bucket. Uses all features if not defined.</span>
+<span class="sd">            specials: (nested) dictionary of special values that require their own binning.</span>
+<span class="sd">                Will merge when specials are also defined in any bucketers in a (pre)bucketing pipeline, and overwrite in case there are shared keys.</span>
+<span class="sd">                The dictionary has the following format:</span>
+<span class="sd">                 {&quot;&lt;column name&gt;&quot; : {&quot;name of special bucket&quot; : &lt;list with 1 or more values&gt;}}</span>
+<span class="sd">                For every feature that needs a special value, a dictionary must be passed as value.</span>
+<span class="sd">                This dictionary contains a name of a bucket (key) and an array of unique values that should be put</span>
+<span class="sd">                in that bucket.</span>
+<span class="sd">                When special values are defined, they are not considered in the fitting procedure.</span>
+<span class="sd">            remainder (str): How we want the non-specified columns to be transformed. It must be in [&quot;passthrough&quot;, &quot;drop&quot;].</span>
+<span class="sd">                passthrough (Default): all columns that were not specified in &quot;variables&quot; will be passed through.</span>
+<span class="sd">                drop: all remaining columns that were not specified in &quot;variables&quot; will be dropped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+        <span class="c1"># Save original input params</span>
+        <span class="c1"># We overwrite the input later, so we need to save</span>
+        <span class="c1"># original so we can clone instances</span>
+        <span class="c1"># https://scikit-learn.org/dev/developers/develop.html#cloning</span>
+        <span class="c1"># https://scikit-learn.org/dev/developers/develop.html#get-params-and-set-params</span>
+        <span class="c1"># Assigning the variable in the init to the attribute with the same name is a requirement of</span>
+        <span class="c1"># sklearn.base.BaseEstimator. See the notes in</span>
+        <span class="c1"># https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prebucketing_pipeline</span> <span class="o">=</span> <span class="n">prebucketing_pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bucketing_pipeline</span> <span class="o">=</span> <span class="n">bucketing_pipeline</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="o">=</span> <span class="n">remainder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="n">specials</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        To be able to identity the bucketingprocess in a pipeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;bucketingprocess&quot;</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the prebucketing and bucketing pipeline with `X`, `y`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            X (pd.DataFrame): Data to fit on.</span>
+<span class="sd">            y (np.array, optional): target. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">ensure_dataframe</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1"># input validation</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;passthrough&quot;</span><span class="p">,</span> <span class="s2">&quot;drop&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Convert to skorecard pipelines</span>
+        <span class="c1"># This does some checks on the pipelines</span>
+        <span class="c1"># and adds some convenience methods to the pipeline.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span> <span class="o">=</span> <span class="n">to_skorecard_pipeline</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prebucketing_pipeline</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span> <span class="o">=</span> <span class="n">to_skorecard_pipeline</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bucketing_pipeline</span><span class="p">))</span>
+
+        <span class="c1"># Add/Overwrite specials to all pre-bucketers</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">_get_all_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;specials&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">specials</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">specials</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># note, specials defined BucketingProcess level</span>
+                <span class="c1"># will overwrite any specials on bucketer level.</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overwriting specials of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with specials of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">step</span><span class="o">.</span><span class="n">specials</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">specials</span><span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specials</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overwriting variables of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with variables of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span>
+
+            <span class="c1"># Overwrite random_state to bucketers</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Overwriting random_state of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with random_state of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span>
+                    <span class="p">)</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+
+        <span class="c1"># Overwrite variables to all bucketers</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">_get_all_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overwriting variables of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with variables of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span>
+
+        <span class="c1"># Overwrite random_state to bucketers</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">_get_all_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Overwriting random_state of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with random_state of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span>
+                    <span class="p">)</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prebucketing_specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specials</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># will be determined later.</span>
+
+        <span class="c1"># Fit the prebucketing pipeline</span>
+        <span class="n">X_prebucketed_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_prebucketed_</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the prebucket tables.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_bucket_table</span><span class="p">(</span>
+                    <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span> <span class="n">bucket_mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Find the new bucket numbers of the specials after prebucketing,</span>
+        <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">var_specials</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prebucketing_specials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">bucket_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">labels</span>
+            <span class="n">new_specials</span> <span class="o">=</span> <span class="n">_find_remapped_specials</span><span class="p">(</span><span class="n">bucket_labels</span><span class="p">,</span> <span class="n">var_specials</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_specials</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_specials</span>
+
+        <span class="c1"># Then assign the new specials to all bucketers in the bucketing pipeline</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">step</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">step</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span>
+
+        <span class="c1"># Fit the bucketing pipeline</span>
+        <span class="c1"># And save the bucket mapping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_prebucketed_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="c1"># Make sure all columns that are bucketed have also been pre-bucketed.</span>
+        <span class="n">not_prebucketed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">not_prebucketed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_prebucketed</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;These numerical columns are bucketed but have not been pre-bucketed: &quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">not_prebucketed</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Consider adding a numerical bucketer to the prebucketing pipeline,&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;for example AsIsNumericalBucketer or DecisionTreeBucketer.&quot;</span>
+            <span class="k">raise</span> <span class="n">NotPreBucketedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># Make sure all columns that have been pre-bucketed also have been bucketed</span>
+        <span class="n">not_bucketed</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">not_bucketed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_bucketed</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;These numerical columns are prebucketed but have not been bucketed: &quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">not_bucketed</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Consider updating the bucketing pipeline.&quot;</span>
+            <span class="k">raise</span> <span class="n">NotBucketedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="c1"># calculate the bucket tables.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bucket_tables_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bucket_tables_</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_bucket_table</span><span class="p">(</span>
+                    <span class="n">X_prebucketed_</span><span class="p">,</span>
+                    <span class="n">y</span><span class="p">,</span>
+                    <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                    <span class="n">bucket_mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">),</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Calculate the summary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_summary</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">fit_interactive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;external&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">server_kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit a bucketer and then interactive edit the fit using a dash app.</span>
+
+<span class="sd">        Note we are using a [jupyterdash](https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e) app,</span>
+<span class="sd">        which supports 3 different modes:</span>
+
+<span class="sd">        - &#39;external&#39; (default): Start dash server and print URL</span>
+<span class="sd">        - &#39;inline&#39;: Start dash app inside an Iframe in the jupyter notebook</span>
+<span class="sd">        - &#39;jupyterlab&#39;: Start dash app as a new tab inside jupyterlab</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># We need to make sure we only fit if not already fitted</span>
+        <span class="c1"># This prevents a user losing manually defined boundaries</span>
+        <span class="c1"># when re-running .fit_interactive()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">JupyterDash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">external_stylesheets</span><span class="o">=</span><span class="p">[</span><span class="n">dbc</span><span class="o">.</span><span class="n">themes</span><span class="o">.</span><span class="n">BOOTSTRAP</span><span class="p">])</span>
+        <span class="n">add_bucketing_process_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">add_bucketing_process_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="o">**</span><span class="n">server_kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform `X` through the prebucketing and bucketing pipelines.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">X_prebucketed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="n">new_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_prebucketed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="o">==</span> <span class="s2">&quot;drop&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new_X</span>
+
+    <span class="k">def</span> <span class="nf">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fout</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the features bucket to a yaml file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fout: path for output file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">fbm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_bucket_mapping_</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fbm</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">FeaturesBucketMapping</span><span class="p">(</span><span class="n">fbm</span><span class="p">)</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fbm</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">features_bucket_mapping_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a `FeaturesBucketMapping` instance.</span>
+
+<span class="sd">        In normal bucketers, you can access `.features_bucket_mapping_`</span>
+<span class="sd">        to retrieve a `FeaturesBucketMapping` instance. This contains</span>
+<span class="sd">        all the info you need to transform values into their buckets.</span>
+
+<span class="sd">        In this class, we basically have a two step bucketing process:</span>
+<span class="sd">        first prebucketing, and then we bucket the prebuckets.</span>
+
+<span class="sd">        In order to still be able to use BucketingProcess as if it were a normal bucketer,</span>
+<span class="sd">        we&#39;ll need to merge both into one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">merge_features_bucket_mapping</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">prebucket_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates the statistics for the buckets of a particular column.</span>
+
+<span class="sd">        An example is seen below:</span>
+
+<span class="sd">        pre-bucket | label      | Count | Count (%) | Non-event | Event | Event Rate | WoE   | IV   | bucket</span>
+<span class="sd">        -----------|------------|-------|-----------|-----------|-------|------------|-------|------|------</span>
+<span class="sd">        0          | (-inf, 1.0)| 479   | 7.98      | 300       | 179   |  37.37     |  0.73 | 0.05 | 0</span>
+<span class="sd">        1          | [1.0, 2.0) | 370   | 6.17      | 233       | 137   |  37.03     |  0.71 | 0.04 | 0</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            column (str): The column we wish to analyse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            df (pd.DataFrame): A pandas dataframe of the format above</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+        <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;column &#39;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">&#39; was not part of the pre-bucketing process&quot;</span><span class="p">)</span>
+
+        <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bucket_id&quot;</span><span class="p">:</span> <span class="s2">&quot;pre-bucket&quot;</span><span class="p">})</span>
+
+        <span class="c1"># Find bucket for each pre-bucket</span>
+        <span class="n">bucket_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="n">table</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Find out missing bucket</span>
+        <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Find out the &#39;other&#39; bucket</span>
+        <span class="k">if</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;categorical&quot;</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">2</span> <span class="ow">in</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">something_random</span> <span class="o">=</span> <span class="s2">&quot;84a088e251d2fa058f37145222e536dc&quot;</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">something_random</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">table</span>
+
+    <span class="k">def</span> <span class="nf">_more_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Estimator tags are annotations of estimators that allow programmatic inspection of their capabilities.</span>
+
+<span class="sd">        See https://scikit-learn.org/stable/developers/develop.html#estimator-tags</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;binary_only&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.features_bucket_mapping_" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">features_bucket_mapping_</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#skorecard.pipeline.BucketingProcess.features_bucket_mapping_" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Returns a <code>FeaturesBucketMapping</code> instance.</p>
+<p>In normal bucketers, you can access <code>.features_bucket_mapping_</code>
+to retrieve a <code>FeaturesBucketMapping</code> instance. This contains
+all the info you need to transform values into their buckets.</p>
+<p>In this class, we basically have a two step bucketing process:
+first prebucketing, and then we bucket the prebuckets.</p>
+<p>In order to still be able to use BucketingProcess as if it were a normal bucketer,
+we'll need to merge both into one.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.name" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">name</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#skorecard.pipeline.BucketingProcess.name" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>To be able to identity the bucketingprocess in a pipeline.</p>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">prebucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">DecisionTreeBucketer</span><span class="p">(</span><span class="n">max_n_bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)),</span> <span class="n">bucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">OptimalBucketer</span><span class="p">(</span><span class="n">max_n_bins</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)),</span> <span class="n">variables</span><span class="o">=</span><span class="p">[],</span> <span class="n">specials</span><span class="o">=</span><span class="p">{},</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remainder</span><span class="o">=</span><span class="s1">&#39;passthrough&#39;</span><span class="p">)</span></code>
+
+<a href="#skorecard.pipeline.BucketingProcess.__init__" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Define a BucketingProcess to first prebucket and then bucket multiple columns in one go.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>prebucketing_pipeline</code></td>
+            <td>
+                  <code>Pipeline</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The scikit-learn pipeline that does pre-bucketing.
+Defaults to an all-numeric DecisionTreeBucketer pipeline.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="sklearn.pipeline.make_pipeline">make_pipeline</span>(<a class="autorefs autorefs-internal" title="skorecard.bucketers.DecisionTreeBucketer" href="../../bucketers/DecisionTreeBucketer/#skorecard.bucketers.DecisionTreeBucketer">DecisionTreeBucketer</a>(max_n_bins=50, min_bin_size=0.02))</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>bucketing_pipeline</code></td>
+            <td>
+                  <code>Pipeline</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The scikit-learn pipeline that does bucketing.
+Defaults to an all-numeric OptimalBucketer pipeline.
+Must transform same features as the prebucketing pipeline.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="sklearn.pipeline.make_pipeline">make_pipeline</span>(<a class="autorefs autorefs-internal" title="skorecard.bucketers.OptimalBucketer" href="../../bucketers/OptimalBucketer/#skorecard.bucketers.OptimalBucketer">OptimalBucketer</a>(max_n_bins=6, min_bin_size=0.05))</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code>list</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The features to bucket. Uses all features if not defined.</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>specials</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>(nested) dictionary of special values that require their own binning.
+Will merge when specials are also defined in any bucketers in a (pre)bucketing pipeline, and overwrite in case there are shared keys.
+The dictionary has the following format:
+ {"<column name>" : {"name of special bucket" : <list with 1 or more values>}}
+For every feature that needs a special value, a dictionary must be passed as value.
+This dictionary contains a name of a bucket (key) and an array of unique values that should be put
+in that bucket.
+When special values are defined, they are not considered in the fitting procedure.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>remainder</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How we want the non-specified columns to be transformed. It must be in ["passthrough", "drop"].
+passthrough (Default): all columns that were not specified in "variables" will be passed through.
+drop: all remaining columns that were not specified in "variables" will be dropped.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;passthrough&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">prebucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">DecisionTreeBucketer</span><span class="p">(</span><span class="n">max_n_bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)),</span>
+    <span class="n">bucketing_pipeline</span><span class="o">=</span><span class="n">make_pipeline</span><span class="p">(</span><span class="n">OptimalBucketer</span><span class="p">(</span><span class="n">max_n_bins</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">min_bin_size</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)),</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
+    <span class="n">specials</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">remainder</span><span class="o">=</span><span class="s2">&quot;passthrough&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Define a BucketingProcess to first prebucket and then bucket multiple columns in one go.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prebucketing_pipeline (Pipeline): The scikit-learn pipeline that does pre-bucketing.</span>
+<span class="sd">            Defaults to an all-numeric DecisionTreeBucketer pipeline.</span>
+<span class="sd">        bucketing_pipeline (Pipeline): The scikit-learn pipeline that does bucketing.</span>
+<span class="sd">            Defaults to an all-numeric OptimalBucketer pipeline.</span>
+<span class="sd">            Must transform same features as the prebucketing pipeline.</span>
+<span class="sd">        variables (list): The features to bucket. Uses all features if not defined.</span>
+<span class="sd">        specials: (nested) dictionary of special values that require their own binning.</span>
+<span class="sd">            Will merge when specials are also defined in any bucketers in a (pre)bucketing pipeline, and overwrite in case there are shared keys.</span>
+<span class="sd">            The dictionary has the following format:</span>
+<span class="sd">             {&quot;&lt;column name&gt;&quot; : {&quot;name of special bucket&quot; : &lt;list with 1 or more values&gt;}}</span>
+<span class="sd">            For every feature that needs a special value, a dictionary must be passed as value.</span>
+<span class="sd">            This dictionary contains a name of a bucket (key) and an array of unique values that should be put</span>
+<span class="sd">            in that bucket.</span>
+<span class="sd">            When special values are defined, they are not considered in the fitting procedure.</span>
+<span class="sd">        remainder (str): How we want the non-specified columns to be transformed. It must be in [&quot;passthrough&quot;, &quot;drop&quot;].</span>
+<span class="sd">            passthrough (Default): all columns that were not specified in &quot;variables&quot; will be passed through.</span>
+<span class="sd">            drop: all remaining columns that were not specified in &quot;variables&quot; will be dropped.</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="c1"># Save original input params</span>
+    <span class="c1"># We overwrite the input later, so we need to save</span>
+    <span class="c1"># original so we can clone instances</span>
+    <span class="c1"># https://scikit-learn.org/dev/developers/develop.html#cloning</span>
+    <span class="c1"># https://scikit-learn.org/dev/developers/develop.html#get-params-and-set-params</span>
+    <span class="c1"># Assigning the variable in the init to the attribute with the same name is a requirement of</span>
+    <span class="c1"># sklearn.base.BaseEstimator. See the notes in</span>
+    <span class="c1"># https://scikit-learn.org/stable/modules/generated/sklearn.base.BaseEstimator.html#sklearn.base.BaseEstimator</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">prebucketing_pipeline</span> <span class="o">=</span> <span class="n">prebucketing_pipeline</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bucketing_pipeline</span> <span class="o">=</span> <span class="n">bucketing_pipeline</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="o">=</span> <span class="n">remainder</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="n">variables</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="n">specials</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.fit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+<a href="#skorecard.pipeline.BucketingProcess.fit" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Fit the prebucketing and bucketing pipeline with <code>X</code>, <code>y</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>X</code></td>
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Data to fit on.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>y</code></td>
+            <td>
+                  <code><span title="numpy.array">array</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>target. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit the prebucketing and bucketing pipeline with `X`, `y`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (pd.DataFrame): Data to fit on.</span>
+<span class="sd">        y (np.array, optional): target. Defaults to None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">ensure_dataframe</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="c1"># input validation</span>
+    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;passthrough&quot;</span><span class="p">,</span> <span class="s2">&quot;drop&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Convert to skorecard pipelines</span>
+    <span class="c1"># This does some checks on the pipelines</span>
+    <span class="c1"># and adds some convenience methods to the pipeline.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span> <span class="o">=</span> <span class="n">to_skorecard_pipeline</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prebucketing_pipeline</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span> <span class="o">=</span> <span class="n">to_skorecard_pipeline</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bucketing_pipeline</span><span class="p">))</span>
+
+    <span class="c1"># Add/Overwrite specials to all pre-bucketers</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">_get_all_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;specials&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">specials</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">specials</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># note, specials defined BucketingProcess level</span>
+            <span class="c1"># will overwrite any specials on bucketer level.</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overwriting specials of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with specials of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">step</span><span class="o">.</span><span class="n">specials</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">specials</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specials</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overwriting variables of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with variables of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span>
+
+        <span class="c1"># Overwrite random_state to bucketers</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Overwriting random_state of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with random_state of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span>
+                <span class="p">)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+
+    <span class="c1"># Overwrite variables to all bucketers</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">_get_all_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Overwriting variables of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with variables of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span>
+
+    <span class="c1"># Overwrite random_state to bucketers</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">_get_all_steps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;random_state&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Overwriting random_state of </span><span class="si">{</span><span class="n">step</span><span class="si">}</span><span class="s2"> with random_state of bucketingprocess&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span>
+                <span class="p">)</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_prebucketing_specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">specials</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># will be determined later.</span>
+
+    <span class="c1"># Fit the prebucketing pipeline</span>
+    <span class="n">X_prebucketed_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_prebucketed_</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the prebucket tables.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_bucket_table</span><span class="p">(</span>
+                <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span> <span class="n">bucket_mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Find the new bucket numbers of the specials after prebucketing,</span>
+    <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">var_specials</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prebucketing_specials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">bucket_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var</span><span class="p">)</span><span class="o">.</span><span class="n">labels</span>
+        <span class="n">new_specials</span> <span class="o">=</span> <span class="n">_find_remapped_specials</span><span class="p">(</span><span class="n">bucket_labels</span><span class="p">,</span> <span class="n">var_specials</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_specials</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_specials</span>
+
+    <span class="c1"># Then assign the new specials to all bucketers in the bucketing pipeline</span>
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">step</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">step</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">specials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bucketing_specials</span>
+
+    <span class="c1"># Fit the bucketing pipeline</span>
+    <span class="c1"># And save the bucket mapping</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_prebucketed_</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># Make sure all columns that are bucketed have also been pre-bucketed.</span>
+    <span class="n">not_prebucketed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">not_prebucketed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_prebucketed</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;These numerical columns are bucketed but have not been pre-bucketed: &quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">not_prebucketed</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Consider adding a numerical bucketer to the prebucketing pipeline,&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;for example AsIsNumericalBucketer or DecisionTreeBucketer.&quot;</span>
+        <span class="k">raise</span> <span class="n">NotPreBucketedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># Make sure all columns that have been pre-bucketed also have been bucketed</span>
+    <span class="n">not_bucketed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col</span><span class="p">)</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;numerical&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">not_bucketed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">not_bucketed</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;These numerical columns are prebucketed but have not been bucketed: &quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">not_bucketed</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;Consider updating the bucketing pipeline.&quot;</span>
+        <span class="k">raise</span> <span class="n">NotBucketedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="c1"># calculate the bucket tables.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bucket_tables_</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">maps</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bucket_tables_</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_bucket_table</span><span class="p">(</span>
+                <span class="n">X_prebucketed_</span><span class="p">,</span>
+                <span class="n">y</span><span class="p">,</span>
+                <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+                <span class="n">bucket_mapping</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">),</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Calculate the summary</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_generate_summary</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">self</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.fit_interactive" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">fit_interactive</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;external&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">server_kwargs</span><span class="p">)</span></code>
+
+<a href="#skorecard.pipeline.BucketingProcess.fit_interactive" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Fit a bucketer and then interactive edit the fit using a dash app.</p>
+<p>Note we are using a <a href="https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e">jupyterdash</a> app,
+which supports 3 different modes:</p>
+<ul>
+<li>'external' (default): Start dash server and print URL</li>
+<li>'inline': Start dash app inside an Iframe in the jupyter notebook</li>
+<li>'jupyterlab': Start dash app as a new tab inside jupyterlab</li>
+</ul>
+
+            <details class="quote">
+              <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_interactive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;external&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">server_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a bucketer and then interactive edit the fit using a dash app.</span>
+
+<span class="sd">    Note we are using a [jupyterdash](https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e) app,</span>
+<span class="sd">    which supports 3 different modes:</span>
+
+<span class="sd">    - &#39;external&#39; (default): Start dash server and print URL</span>
+<span class="sd">    - &#39;inline&#39;: Start dash app inside an Iframe in the jupyter notebook</span>
+<span class="sd">    - &#39;jupyterlab&#39;: Start dash app as a new tab inside jupyterlab</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># We need to make sure we only fit if not already fitted</span>
+    <span class="c1"># This prevents a user losing manually defined boundaries</span>
+    <span class="c1"># when re-running .fit_interactive()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">app</span> <span class="o">=</span> <span class="n">JupyterDash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">external_stylesheets</span><span class="o">=</span><span class="p">[</span><span class="n">dbc</span><span class="o">.</span><span class="n">themes</span><span class="o">.</span><span class="n">BOOTSTRAP</span><span class="p">])</span>
+    <span class="n">add_bucketing_process_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">add_bucketing_process_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">run_server</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="o">**</span><span class="n">server_kwargs</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.prebucket_table" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">prebucket_table</span><span class="p">(</span><span class="n">column</span><span class="p">)</span></code>
+
+<a href="#skorecard.pipeline.BucketingProcess.prebucket_table" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Generates the statistics for the buckets of a particular column.</p>
+<p>An example is seen below:</p>
+<table>
+<thead>
+<tr>
+<th>pre-bucket</th>
+<th>label</th>
+<th>Count</th>
+<th>Count (%)</th>
+<th>Non-event</th>
+<th>Event</th>
+<th>Event Rate</th>
+<th>WoE</th>
+<th>IV</th>
+<th>bucket</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>(-inf, 1.0)</td>
+<td>479</td>
+<td>7.98</td>
+<td>300</td>
+<td>179</td>
+<td>37.37</td>
+<td>0.73</td>
+<td>0.05</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>[1.0, 2.0)</td>
+<td>370</td>
+<td>6.17</td>
+<td>233</td>
+<td>137</td>
+<td>37.03</td>
+<td>0.71</td>
+<td>0.04</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>column</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The column we wish to analyse</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>df</code></td>            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A pandas dataframe of the format above</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">prebucket_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the statistics for the buckets of a particular column.</span>
+
+<span class="sd">    An example is seen below:</span>
+
+<span class="sd">    pre-bucket | label      | Count | Count (%) | Non-event | Event | Event Rate | WoE   | IV   | bucket</span>
+<span class="sd">    -----------|------------|-------|-----------|-----------|-------|------------|-------|------|------</span>
+<span class="sd">    0          | (-inf, 1.0)| 479   | 7.98      | 300       | 179   |  37.37     |  0.73 | 0.05 | 0</span>
+<span class="sd">    1          | [1.0, 2.0) | 370   | 6.17      | 233       | 137   |  37.03     |  0.71 | 0.04 | 0</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        column (str): The column we wish to analyse</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        df (pd.DataFrame): A pandas dataframe of the format above</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;column &#39;</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">&#39; was not part of the pre-bucketing process&quot;</span><span class="p">)</span>
+
+    <span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prebucket_tables_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bucket_id&quot;</span><span class="p">:</span> <span class="s2">&quot;pre-bucket&quot;</span><span class="p">})</span>
+
+    <span class="c1"># Find bucket for each pre-bucket</span>
+    <span class="n">bucket_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">features_bucket_mapping_</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+    <span class="n">table</span><span class="p">[</span><span class="s2">&quot;bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Find out missing bucket</span>
+    <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">in</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Find out the &#39;other&#39; bucket</span>
+    <span class="k">if</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;categorical&quot;</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">2</span> <span class="ow">in</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+        <span class="n">something_random</span> <span class="o">=</span> <span class="s2">&quot;84a088e251d2fa058f37145222e536dc&quot;</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;pre-bucket&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;bucket&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bucket_mapping</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">something_random</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">table</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.save_yml" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save_yml</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span></code>
+
+<a href="#skorecard.pipeline.BucketingProcess.save_yml" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Save the features bucket to a yaml file.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>fout</code></td>
+            <td>
+                  <code><span title="skorecard.pipeline.bucketing_process.PathLike">PathLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>path for output file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_yml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fout</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save the features bucket to a yaml file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fout: path for output file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">fbm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_bucket_mapping_</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fbm</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">FeaturesBucketMapping</span><span class="p">(</span><span class="n">fbm</span><span class="p">)</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fbm</span><span class="o">.</span><span class="n">save_yml</span><span class="p">(</span><span class="n">fout</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="skorecard.pipeline.BucketingProcess.transform" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></code>
+
+<a href="#skorecard.pipeline.BucketingProcess.transform" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Transform <code>X</code> through the prebucketing and bucketing pipelines.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>skorecard/pipeline/bucketing_process.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform `X` through the prebucketing and bucketing pipelines.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_is_fitted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="n">X_prebucketed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_pipeline_</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+    <span class="n">new_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pipeline_</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_prebucketed</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">remainder</span> <span class="o">==</span> <span class="s2">&quot;drop&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">new_X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">new_X</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1-2.1-2M12.5 7v5.2l4 2.4-1 1L11 13V7h1.5M11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2v1.8Z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago"><span class="timeago" datetime="2024-08-17T23:42:40+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date">2024-08-17</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tracking", "navigation.sections", "header.autohide", "navigation.tabs", "navigation.top"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      
+        <script src="../../../js/timeago.min.js"></script>
+      
+        <script src="../../../js/timeago_mkdocs_material.js"></script>
+      
+        <script src="../../../assets/javascripts/config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
