@@ -12,8 +12,6 @@ jobs:
   run:
     name: Run unit tests with codecov upload
     runs-on: ${{ matrix.os }}
-    env:
-      USING_COVERAGE: "3.10"
     strategy:
       matrix:
         build: [macos, ubuntu, windows]
