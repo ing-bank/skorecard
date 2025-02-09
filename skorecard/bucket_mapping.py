@@ -68,11 +68,13 @@ class BucketMapping:
         assert isinstance(self.specials, dict) or isinstance(self.specials, list)
 
         # Check specials
-        assert all([isinstance(k, str) for k in self.specials.keys()]), f"The keys of the special dictionary must be \
+        assert all([isinstance(k, str) for k in self.specials.keys()]), (
+            f"The keys of the special dictionary must be \
         strings, got {self.specials.keys()} instead."
-        assert all(
-            [isinstance(k, list) for k in self.specials.values()]
-        ), f"The values of the special dictionary must be a list of elements, got {self.specials}instead."
+        )
+        assert all([isinstance(k, list) for k in self.specials.values()]), (
+            f"The values of the special dictionary must be a list of elements, got {self.specials}instead."
+        )
         # TODO: assert that special values are not present in multiple special buckets.
 
         # Make sure map is in correct format
@@ -90,12 +92,12 @@ class BucketMapping:
 
             if self.missing_bucket is not None:
                 if not np.isnan(self.missing_bucket):
-                    assert (
-                        self.missing_bucket <= max_bucket
-                    ), "map '{}' corresponds buckets 0-{} but missing_bucket is set to {}".format(
-                        self.map,
-                        max_bucket,
-                        self.missing_bucket,
+                    assert self.missing_bucket <= max_bucket, (
+                        "map '{}' corresponds buckets 0-{} but missing_bucket is set to {}".format(
+                            self.map,
+                            max_bucket,
+                            self.missing_bucket,
+                        )
                     )
                 self._missing_bucket = self.missing_bucket
             else:
@@ -136,11 +138,11 @@ class BucketMapping:
 
             # Set 'other' bucket
             if self.other_bucket is not None:
-                assert (
-                    self.other_bucket in self.map.values()
-                ), "other_bucket '{}' does not exist in map values: {}".format(
-                    self.other_bucket,
-                    self.map,
+                assert self.other_bucket in self.map.values(), (
+                    "other_bucket '{}' does not exist in map values: {}".format(
+                        self.other_bucket,
+                        self.map,
+                    )
                 )
                 self._other_bucket = self.other_bucket
             else:
@@ -150,9 +152,9 @@ class BucketMapping:
             if self.missing_bucket is not None:
                 # Allow -2, -1 Some missing_treatments (e.g. most_risky) add it here
                 if self.missing_bucket not in [-2, -1, np.nan]:
-                    assert (
-                        self.missing_bucket in self.map.values()
-                    ), f"missing_bucket '{self.missing_bucket}' does not exist in map values: {self.map}"
+                    assert self.missing_bucket in self.map.values(), (
+                        f"missing_bucket '{self.missing_bucket}' does not exist in map values: {self.map}"
+                    )
 
                 self._missing_bucket = self.missing_bucket
             else:
@@ -323,7 +325,7 @@ def build_labels(
 
     for i, boundary in enumerate(boundaries):
         if i != len(boundaries) - 1:
-            labels[i] = f"{b_left}{boundary}, {boundaries[i+1]}{b_right}"
+            labels[i] = f"{b_left}{boundary}, {boundaries[i + 1]}{b_right}"
 
     # reserve a label for missing values
     if missing_bucket in labels.keys():
@@ -399,13 +401,13 @@ def merge_bucket_mapping(a, b):
 
     if a.type == "categorical":
         if b.other_bucket:
-            assert (
-                b.other_bucket in a.labels.keys()
-            ), f"b.other_bucket set to {b.other_bucket} but not present in any of a's buckets ({a.labels})"
+            assert b.other_bucket in a.labels.keys(), (
+                f"b.other_bucket set to {b.other_bucket} but not present in any of a's buckets ({a.labels})"
+            )
         if b.missing_bucket:
-            assert (
-                b.missing_bucket in a.labels.keys()
-            ), f"b.other_bucket set to {b.missing_bucket} but not present in any of a's buckets ({a.labels})"
+            assert b.missing_bucket in a.labels.keys(), (
+                f"b.other_bucket set to {b.missing_bucket} but not present in any of a's buckets ({a.labels})"
+            )
 
         new_boundaries = {}
         for category, bucket in a.map.items():

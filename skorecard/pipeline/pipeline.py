@@ -207,9 +207,9 @@ def get_features_bucket_mapping(pipe: Pipeline) -> FeaturesBucketMapping:
         if hasattr(step, "features_bucket_mapping_"):
             features_bucket_mapping.update(step.features_bucket_mapping_.as_dict())
 
-    assert (
-        len(features_bucket_mapping) > 0
-    ), "pipeline does not have any fitted skorecard bucketer. Update the pipeline or fit(X,y) first"
+    assert len(features_bucket_mapping) > 0, (
+        "pipeline does not have any fitted skorecard bucketer. Update the pipeline or fit(X,y) first"
+    )
     return FeaturesBucketMapping(features_bucket_mapping)
 
 

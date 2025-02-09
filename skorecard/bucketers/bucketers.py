@@ -642,7 +642,7 @@ class DecisionTreeBucketer(BaseBucketer):
             if (self.max_n_bins - n_special_bins) <= 1:
                 raise ValueError(
                     f"max_n_bins must be at least = the number of special bins + 2: set a value "
-                    f"max_n_bins>= {n_special_bins+2} (currently max_n_bins={self.max_n_bins})"
+                    f"max_n_bins>= {n_special_bins + 2} (currently max_n_bins={self.max_n_bins})"
                 )
 
         # If the data contains only specials,

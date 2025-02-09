@@ -109,7 +109,7 @@ class ScoreCardPoints(BaseEstimator, TransformerMixin):
         self.model = self.skorecard_model.pipeline_.named_steps["model"]
 
         assert hasattr(self.model, "predict_proba"), (
-            f"Expected a model at the end of the pipeline, " f"got {self.model.__class__}"
+            f"Expected a model at the end of the pipeline, got {self.model.__class__}"
         )
         if not (isinstance(woe_enc, WoeEncoder) or isinstance(woe_enc, WOEEncoder)):
             raise ValueError("Pipeline must have WoE encoder")
