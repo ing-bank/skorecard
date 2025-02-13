@@ -811,7 +811,7 @@ class OrdinalCategoricalBucketer(BaseBucketer):
             normalized_counts = X_y[feature].value_counts(normalize=True)
 
         # Limit number of categories if set.
-        normalized_counts = normalized_counts[: self.max_n_categories]
+        normalized_counts = normalized_counts[-self.max_n_categories:]
         # Remove less frequent categories
         normalized_counts = normalized_counts[normalized_counts >= self.tol]
 
