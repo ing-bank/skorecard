@@ -9,6 +9,7 @@ Development install:
 ```shell
 pip install -e '.[all]'
 ```
+Siyu Yan
 
 Unit testing:
 
