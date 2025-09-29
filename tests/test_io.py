@@ -38,7 +38,7 @@ def working_directory(path):
     with working_directory('/my/new/path'):
         # Do something in new directory
     # Back to old directory
-    ````
+    ```
 
     Credits: https://gist.github.com/nottrobin/3d675653244f8814838a
     """
