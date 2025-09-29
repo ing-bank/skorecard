@@ -200,7 +200,8 @@ class LogisticRegression(lm.LogisticRegression):
 
         Example:
 
-        ```from skorecard.datasets import load_uci_credit_card
+        ```python
+        from skorecard.datasets import load_uci_credit_card
         from skorecard.bucketers import EqualFrequencyBucketer
         from skorecard.linear_model import LogisticRegression
         from skorecard.reporting.plotting import weight_plot
