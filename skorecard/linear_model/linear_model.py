@@ -215,7 +215,8 @@ class LogisticRegression(lm.LogisticRegression):
         pipeline.fit(X, y)
         assert pipeline.named_steps['clf'].p_val_coef_[0][0] > 0
         stats = pipeline.named_steps['clf'].get_stats()
-        pipeline.named_steps['clf'].plot_weights()```
+        pipeline.named_steps['clf'].plot_weights()
+        ```
         """
         stats = self.get_stats()
         return weight_plot(stats)

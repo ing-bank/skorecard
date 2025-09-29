@@ -289,7 +289,8 @@ def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height
     Generates a weight plot(plotly chart) from `stats`
     Example:
 
-    ```from skorecard.datasets import load_uci_credit_card
+    ```python
+    from skorecard.datasets import load_uci_credit_card
     from skorecard.bucketers import EqualFrequencyBucketer
     from skorecard.linear_model import LogisticRegression
     from skorecard.reporting import weight_plot
@@ -302,7 +303,8 @@ def weight_plot(stats: pd.DataFrame, format=None, scale=None, width=None, height
     pipeline.fit(X, y)
     stats = pipeline.named_steps['clf'].get_stats()
 
-    weight_plot(stats)```
+    weight_plot(stats)
+    ```
 
     Args:
         stats: The statistics to display
